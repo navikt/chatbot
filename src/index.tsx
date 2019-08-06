@@ -1,7 +1,9 @@
-import React, {Component} from 'react';
-import styled  from 'styled-components';
+import React, { Component } from "react";
+import styled, { ThemeProvider } from "styled-components";
+import theme from "./theme/theme";
+import ChatContainer from "./components/ChatContainer";
 
-const Outer = styled.div`
+const BorderBox = styled.div`
   box-sizing: border-box;
 
   *,
@@ -11,16 +13,14 @@ const Outer = styled.div`
   }
 `;
 
-const Header = styled.h2`
-  color: red;
-`;
-
 export default class Chat extends Component {
   render() {
-    return(
-        <Outer>
-          <Header>Hei</Header>
-        </Outer>
-    )
+    return (
+      <ThemeProvider theme={theme}>
+        <BorderBox>
+          <ChatContainer />
+        </BorderBox>
+      </ThemeProvider>
+    );
   }
 }
