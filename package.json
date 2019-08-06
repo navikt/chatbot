@@ -1,0 +1,43 @@
+{
+  "name": "nav-chatbot",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/navikt/chatbot.git"
+  },
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "files": [
+    "css",
+    "es",
+    "lib",
+    "umd"
+  ],
+  "scripts": {
+    "build": "nwb build-react-component --no-demo",
+    "clean": "nwb clean-module && nwb clean-demo",
+    "prepublishOnly": "npm run build",
+    "start": "nwb -c ./nwb.demo.config.js serve-react-demo",
+    "test": "nwb test-react",
+    "test:coverage": "nwb test-react --coverage",
+    "test:watch": "nwb test-react --server"
+  },
+  "dependencies": {
+    "styled-components": "^4.3.2"
+  },
+  "peerDependencies": {
+    "react": "16.x"
+  },
+  "devDependencies": {
+    "@types/react": "^16.8.24",
+    "@types/react-dom": "^16.8.5",
+    "@types/styled-components": "^4.1.18",
+    "nwb": "^0.23.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "ts-loader": "^6.0.4",
+    "typescript": "^3.5.3"
+  }
+}
