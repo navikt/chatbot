@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import styled, { ThemeProvider } from "styled-components";
-import theme from "./theme/theme";
 import ChatContainer from "./components/ChatContainer";
+
+import tema from "./tema/tema";
 
 const BorderBox = styled.div`
   box-sizing: border-box;
@@ -16,7 +17,7 @@ const BorderBox = styled.div`
 export default class Chat extends Component {
   render() {
     return (
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={tema}>
         <BorderBox>
           <ChatContainer />
         </BorderBox>

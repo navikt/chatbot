@@ -1,6 +1,6 @@
-const theme = {
+const tema = {
     width: '400px',
     height: '568px'
 };
 
-export default theme;
+export default tema;
