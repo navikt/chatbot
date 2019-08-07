@@ -1,6 +1,11 @@
 const tema = {
     bredde: '400px',
     hoyde: '568px',
+    storrelser: {
+        tekst: {
+            toppBar: '20px'
+        }
+    },
     farger: {
         snakkebobler: {
             bruker: '#E0F5FB',
@@ -12,7 +17,8 @@ const tema = {
             paragraf: '#3E3831',
             klokketekst: '#707070'
         },
-        interaksjon: '#0067C5'
+        interaksjon: '#0067C5',
+        tekstfelt: '#707070'
     }
 };
 
