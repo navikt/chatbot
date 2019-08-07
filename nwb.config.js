@@ -2,22 +2,28 @@ module.exports = {
   type: "react-component",
   npm: {
     umd: {
-      global: 'NAVChatBot',
+      global: "NAVChatBot",
       externals: {
-        react: 'React'
+        react: "React"
       }
     }
   },
   polyfill: true,
   webpack: {
     extra: {
-      entry: './src/index',
+      entry: "./src/index",
       resolve: {
-        extensions: ['.ts', '.tsx', '.js', '.jsx'],
+        extensions: [".ts", ".tsx", ".js", ".jsx"]
       },
       module: {
-        rules: [{test: /\.tsx$/, loader: 'ts-loader'}],
-      },
+        rules: [{ test: /\.tsx$/, loader: "ts-loader" }]
+      }
     },
-  },
+    rules: {
+      svg: {
+        loader: "svg-inline-loader",
+        options: { classPrefix: true }
+      }
+    }
+  }
 };
