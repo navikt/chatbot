@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import tema from '../tema/tema';
+import axios from 'axios';
 
 const Interaksjon = styled.div`
     display: flex;
@@ -23,56 +24,79 @@ const Tekstfelt = styled.textarea`
 `;
 const Test = styled.div``;
 
-export default class Interaksjonsvindu extends Component {
+type InteraksjonsvinduProps = {
+    sessionId: string;
+    sessionIdPure: string;
+    requestId: string;
+    historie: any[];
+};
+
+export default class Interaksjonsvindu extends Component<
+    {},
+    InteraksjonsvinduProps
+> {
+    baseUrl = 'https://devapi.puzzel.com/chat/v1';
+
+    constructor(props: InteraksjonsvinduProps) {
+        super(props);
+        this.state = {
+            requestId: '',
+            sessionId: '',
+            sessionIdPure: '',
+            historie: []
+        };
+    }
+
+    async componentDidMount() {
+        if (!localStorage.getItem('config')) {
+            let session = await axios.post(`${this.baseUrl}/sessions`, {
+                customerKey: '12345',
+                queueKey: 'Q_CHAT_BOT',
+                nickName: 'test',
+                chatId: 'test.name@customer.com',
+                languageCode: 'NO',
+                denyArchiving: false
+            });
+
+            let data: InteraksjonsvinduProps = {
+                sessionId: '1234-' + session.data.iqSessionId,
+                sessionIdPure: session.data.iqSessionId,
+                requestId: session.data.requestId,
+                historie: []
+            };
+            localStorage.setItem('config', JSON.stringify(data));
+        }
+
+        setInterval(async () => {
+            const config: InteraksjonsvinduProps = JSON.parse(
+                localStorage.getItem('config') as string
+            );
+            let historie = await axios.get(
+                `${this.baseUrl}/sessions/${config.sessionId}/messages/0`
+            );
+            this.setState({ historie: historie.data });
+        }, 5000);
+    }
+
     render() {
+        const { historie } = this.state;
+        let historieListe = historie.map(historieItem => {
+            if (historieItem.type === 'Message') {
+                return (
+                    <div
+                        key={historieItem.id}
+                        dangerouslySetInnerHTML={{
+                            __html: unescape(historieItem.content)
+                        }}
+                    />
+                );
+            } else {
+                return;
+            }
+        });
         return (
             <Interaksjon>
-                <Chatlog>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                    <h2>Test</h2>
-                </Chatlog>
+                <Chatlog>{historieListe}</Chatlog>
                 <Tekstomrade>
                     <Tekstfelt placeholder={'Skriv spørsmålet ditt'} />
                     <Test>
