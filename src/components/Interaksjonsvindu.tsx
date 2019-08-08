@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import tema from '../tema/tema';
 import axios from 'axios';
+import Snakkeboble from './Snakkeboble';
 
 const Interaksjon = styled.div`
     display: flex;
@@ -11,6 +12,7 @@ const Interaksjon = styled.div`
 const Chatlog = styled.div`
     height: 100%;
     overflow-y: scroll;
+    padding: 15px;
 `;
 const Tekstomrade = styled.div`
     margin-top: auto;
@@ -67,15 +69,13 @@ export default class Interaksjonsvindu extends Component<
             localStorage.setItem('config', JSON.stringify(data));
         }
 
-        setInterval(async () => {
-            const config: InteraksjonsvinduProps = JSON.parse(
-                localStorage.getItem('config') as string
-            );
-            let historie = await axios.get(
-                `${this.baseUrl}/sessions/${config.sessionId}/messages/0`
-            );
-            this.setState({ historie: historie.data });
-        }, 5000);
+        const config: InteraksjonsvinduProps = JSON.parse(localStorage.getItem(
+            'config'
+        ) as string);
+        let historie = await axios.get(
+            `${this.baseUrl}/sessions/${config.sessionId}/messages/0`
+        );
+        this.setState({ historie: historie.data });
     }
 
     render() {
@@ -83,12 +83,7 @@ export default class Interaksjonsvindu extends Component<
         let historieListe = historie.map(historieItem => {
             if (historieItem.type === 'Message') {
                 return (
-                    <div
-                        key={historieItem.id}
-                        dangerouslySetInnerHTML={{
-                            __html: unescape(historieItem.content)
-                        }}
-                    />
+                    <Snakkeboble key={historieItem.id} Message={historieItem} />
                 );
             } else {
                 return;

@@ -8,7 +8,7 @@ import avslutt from '../assets/avslutt.svg';
 
 const Bar = styled.div`
     border-bottom: 2px solid #000;
-    font-family: Arial, sans-serif;
+    font-family: ${tema.tekstFamilie};
     font-size: ${tema.storrelser.tekst.toppBar};
     margin: 0;
     display: flex;

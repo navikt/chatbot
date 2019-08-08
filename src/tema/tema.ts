@@ -3,7 +3,9 @@ const tema = {
     hoyde: '568px',
     storrelser: {
         tekst: {
-            toppBar: '20px'
+            generell: '16px',
+            toppBar: '20px',
+            metaInfo: '10px'
         }
     },
     farger: {
@@ -19,7 +21,8 @@ const tema = {
         },
         interaksjon: '#0067C5',
         tekstfelt: '#707070'
-    }
+    },
+    tekstFamilie: 'Arial, sans-serif'
 };
 
 export default tema;
