@@ -12,6 +12,13 @@ const Bar = styled.div`
     font-size: ${tema.storrelser.tekst.toppBar};
     margin: 0;
     display: flex;
+    background: ${(props: ToppBarProps) =>
+        props.navn === 'Net Nordic'
+            ? tema.farger.toppBar.bot
+            : tema.farger.toppBar.ekstern};
+    color: ${(props: ToppBarProps) =>
+        props.navn === 'Net Nordic' ? undefined : '#fff'};
+    transition: all 300ms ease-in-out;
 `;
 
 const Navn = styled.div`
@@ -33,11 +40,19 @@ const Knapp = styled.div`
     svg {
         width: 20px;
         height: 20px;
+
+        line,
+        path {
+            stroke: ${(props: ToppBarProps) =>
+                props.navn === 'Net Nordic' ? undefined : '#fff'};
+            transition: all 300ms ease-in-out;
+        }
     }
 `;
 
 type ToppBarProps = {
-    lukk: () => void;
+    lukk?: () => void;
+    navn: string | undefined;
 };
 
 export default class ToppBar extends Component<ToppBarProps, {}> {
@@ -46,16 +61,24 @@ export default class ToppBar extends Component<ToppBarProps, {}> {
     }
 
     render() {
+        const { lukk, navn } = this.props;
         return (
-            <Bar>
-                <Navn>Chatbot Frida</Navn>
+            <Bar navn={this.props.navn}>
+                <Navn>{navn}</Navn>
                 <Knapper>
                     <Knapp
-                        onClick={this.props.lukk}
+                        navn={this.props.navn}
+                        onClick={lukk}
                         dangerouslySetInnerHTML={{ __html: minimer }}
                     />
-                    <Knapp dangerouslySetInnerHTML={{ __html: omstart }} />
-                    <Knapp dangerouslySetInnerHTML={{ __html: avslutt }} />
+                    <Knapp
+                        navn={this.props.navn}
+                        dangerouslySetInnerHTML={{ __html: omstart }}
+                    />
+                    <Knapp
+                        navn={this.props.navn}
+                        dangerouslySetInnerHTML={{ __html: avslutt }}
+                    />
                 </Knapper>
             </Bar>
         );

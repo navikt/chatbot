@@ -7,16 +7,16 @@ import ToppBar from './ToppBar';
 import Interaksjonsvindu from './Interaksjonsvindu';
 
 const Container = styled.div`
-    width: ${(props: ChatContainerProps) =>
+    width: ${(props: ChatContainerState) =>
         props.erApen ? tema.bredde : '68px'};
-    height: ${(props: ChatContainerProps) =>
+    height: ${(props: ChatContainerState) =>
         props.erApen ? tema.hoyde : '68px'};
-    border-radius: ${(props: ChatContainerProps) =>
+    border-radius: ${(props: ChatContainerState) =>
         props.erApen ? '0' : '50%'};
     position: fixed;
     bottom: 50px;
     right: 50px;
-    background: ${(props: ChatContainerProps) =>
+    background: ${(props: ChatContainerState) =>
         props.erApen
             ? '#fff'
             : `transparent url('data:image/svg+xml;base64,${window.btoa(
@@ -28,16 +28,16 @@ const Container = styled.div`
     flex-direction: column;
 
     ${liten} {
-        width: ${(props: ChatContainerProps) =>
+        width: ${(props: ChatContainerState) =>
             props.erApen ? 'auto' : '68px'};
-        height: ${(props: ChatContainerProps) =>
+        height: ${(props: ChatContainerState) =>
             props.erApen ? 'auto' : '68px'};
-        border-radius: ${(props: ChatContainerProps) =>
+        border-radius: ${(props: ChatContainerState) =>
             props.erApen ? '0' : '50%'};
-        top: ${(props: ChatContainerProps) => (props.erApen ? '0' : undefined)};
-        right: ${(props: ChatContainerProps) => (props.erApen ? '0' : '20px')};
-        bottom: ${(props: ChatContainerProps) => (props.erApen ? '0' : '20px')};
-        left: ${(props: ChatContainerProps) =>
+        top: ${(props: ChatContainerState) => (props.erApen ? '0' : undefined)};
+        right: ${(props: ChatContainerState) => (props.erApen ? '0' : '20px')};
+        bottom: ${(props: ChatContainerState) => (props.erApen ? '0' : '20px')};
+        left: ${(props: ChatContainerState) =>
             props.erApen ? '0' : undefined};
     }
 `;
@@ -47,19 +47,38 @@ const FridaKnapp = styled.div`
     height: 100%;
 `;
 
-type ChatContainerProps = {
+type ChatContainerState = {
     erApen: boolean;
+    navn?: string | undefined;
 };
 
-export default class ChatContainer extends Component<{}, ChatContainerProps> {
-    constructor(props: ChatContainerProps) {
+export default class ChatContainer extends Component<{}, ChatContainerState> {
+    constructor(props: ChatContainerState) {
         super(props);
         this.state = {
-            erApen: true
+            erApen: true,
+            navn: 'Chatbot Frida'
         };
 
         this.apne = this.apne.bind(this);
         this.lukk = this.lukk.bind(this);
+        this.oppdaterNavn = this.oppdaterNavn.bind(this);
+    }
+
+    render() {
+        return (
+            <Container erApen={this.state.erApen}>
+                {!this.state.erApen && <FridaKnapp onClick={this.apne} />}
+                {this.state.erApen && (
+                    <ToppBar navn={this.state.navn} lukk={() => this.lukk()} />
+                )}
+                {this.state.erApen && (
+                    <Interaksjonsvindu
+                        oppdaterNavn={navn => this.oppdaterNavn(navn)}
+                    />
+                )}
+            </Container>
+        );
     }
 
     apne(): void {
@@ -70,13 +89,10 @@ export default class ChatContainer extends Component<{}, ChatContainerProps> {
         this.setState({ erApen: false });
     }
 
-    render() {
-        return (
-            <Container erApen={this.state.erApen}>
-                {!this.state.erApen && <FridaKnapp onClick={this.apne} />}
-                {this.state.erApen && <ToppBar lukk={() => this.lukk()} />}
-                {this.state.erApen && <Interaksjonsvindu />}
-            </Container>
-        );
+    oppdaterNavn(navn: string): void {
+        console.log(this.state.navn);
+        if (this.state.navn !== navn) {
+            this.setState({ navn });
+        }
     }
 }

@@ -19,6 +19,10 @@ const tema = {
             paragraf: '#3E3831',
             klokketekst: '#707070'
         },
+        toppBar: {
+            ekstern: '#59514B',
+            bot: '#fff'
+        },
         interaksjon: '#0067C5',
         tekstfelt: '#707070'
     },
