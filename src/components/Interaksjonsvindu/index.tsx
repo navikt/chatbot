@@ -1,56 +1,24 @@
 import React, { ChangeEvent, Component, FormEvent } from 'react';
-import styled from 'styled-components';
-import tema from '../tema/tema';
 import axios from 'axios';
-import Kommunikasjon, { Beskjed } from './Kommunikasjon';
-import Knapp from './Knapp';
-import Eventviser from './Eventviser';
-import { Message, SessionCreateResponse } from '../api/Sessions';
+import Kommunikasjon, { Beskjed } from '../Kommunikasjon';
+import Eventviser from '../Eventviser/';
+import { Message, SessionCreateResponse } from '../../api/Sessions';
+import {
+    Chatlog,
+    Interaksjon,
+    SendKnapp,
+    Tekstfelt,
+    Tekstomrade
+} from './styles';
+import moment from 'moment';
 
-interface Bruker {
+export interface Bruker {
     userId: number;
     avatarUrl: string;
     userType: string;
     nickName: string;
     role: number;
-    harBlittVist: boolean;
 }
-
-const Interaksjon = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-`;
-const Chatlog = styled.div`
-    height: 100%;
-    overflow-y: scroll;
-    padding: 15px;
-`;
-const Tekstomrade = styled.form`
-    margin-top: auto;
-    display: flex;
-    border-top: 1px solid ${tema.farger.tekstfelt};
-    height: 20%;
-    padding: 10px;
-    align-items: center;
-`;
-const Tekstfelt = styled.textarea`
-    width: 100%;
-    height: 100%;
-    resize: none;
-    margin-right: 5px;
-    border: none;
-    font-size: ${tema.storrelser.tekst.generell};
-    font-family: ${tema.tekstFamilie};
-    scroll-behavior: smooth;
-
-    ::placeholder {
-        color: ${tema.farger.tekstfelt};
-    }
-`;
-const SendKnapp = styled(Knapp)`
-    margin-left: auto;
-`;
 
 type InteraksjonsvinduProps = {
     oppdaterNavn: (navn: string) => void;
@@ -64,6 +32,13 @@ type InteraksjonsvinduState = {
     melding: string;
     brukere: Bruker[];
 };
+
+interface Config {
+    sessionId: string;
+    sessionIdPure: string;
+    requestId: number;
+    alive: number;
+}
 
 export default class Interaksjonsvindu extends Component<
     InteraksjonsvinduProps,
@@ -103,15 +78,24 @@ export default class Interaksjonsvindu extends Component<
                 }
             );
 
-            let data: InteraksjonsvinduState = {
+            let data: Config = {
                 sessionId: '1234-' + session.data.iqSessionId,
                 sessionIdPure: session.data.iqSessionId,
                 requestId: session.data.requestId,
-                historie: [],
-                melding: '',
-                brukere: []
+                alive: moment(new Date())
+                    .add(2, 'hours')
+                    .valueOf()
             };
             localStorage.setItem('config', JSON.stringify(data));
+        }
+
+        const config: Config = JSON.parse(localStorage.getItem(
+            'config'
+        ) as string);
+
+        if (moment().valueOf() >= moment(config.alive).valueOf()) {
+            console.log('Get new config');
+            // TODO: Get new config
         }
 
         this.oppdaterHistorie();
@@ -119,6 +103,9 @@ export default class Interaksjonsvindu extends Component<
         setInterval(async () => {
             this.oppdaterHistorie();
         }, 1000);
+
+        sessionStorage.removeItem('brukereSett');
+        sessionStorage.removeItem('sisteHistorie');
     }
 
     render() {
@@ -172,26 +159,38 @@ export default class Interaksjonsvindu extends Component<
     }
 
     oppdaterHistorie() {
-        const config: InteraksjonsvinduState = JSON.parse(localStorage.getItem(
+        const config: Config = JSON.parse(localStorage.getItem(
             'config'
         ) as string);
-
         axios
             .get(`${this.baseUrl}/sessions/${config.sessionId}/messages/0`)
             .then(res => {
                 const historie = res.data as Message[];
+                const sisteHistorie = sessionStorage.getItem(
+                    'sisteHistorie'
+                ) as string;
+                if (
+                    sisteHistorie ===
+                    JSON.stringify(historie[historie.length - 1].id)
+                ) {
+                    return;
+                }
                 for (let _historie of historie) {
                     switch (_historie.type) {
                         case 'Event':
                             if (_historie.content === 'USER_CONNECTED') {
                                 this.props.oppdaterNavn(_historie.nickName);
                             }
+                            if (_historie.content === 'TYPE_MSG') {
+                                console.log('Agent is typing');
+                            }
                         case 'UserInfo':
+                            // TODO: Sjekk duplikater
                             if (
                                 this.state.brukere.filter(
                                     (bruker: Bruker) =>
                                         bruker.userId === _historie.userId
-                                ).length < 1 &&
+                                ).length === 0 &&
                                 _historie.content.userType
                             ) {
                                 this.setState({
@@ -203,9 +202,7 @@ export default class Interaksjonsvindu extends Component<
                                                 _historie.content.avatarUrl,
                                             nickName: _historie.nickName,
                                             role: _historie.role,
-                                            userType:
-                                                _historie.content.userType,
-                                            harBlittVist: false
+                                            userType: _historie.content.userType
                                         }
                                     ]
                                 });
@@ -214,6 +211,10 @@ export default class Interaksjonsvindu extends Component<
                 }
                 this.setState({ historie });
                 this.scrollToBottom();
+                sessionStorage.setItem(
+                    'sisteHistorie',
+                    JSON.stringify(res.data[res.data.length - 1].id)
+                );
             });
     }
 
@@ -222,11 +223,7 @@ export default class Interaksjonsvindu extends Component<
             case 'Message':
                 return (
                     <div key={`el-${historie.id}`}>
-                        <Kommunikasjon
-                            visBilde={true}
-                            key={historie.id}
-                            Beskjed={historie}
-                        />
+                        <Kommunikasjon key={historie.id} Beskjed={historie} />
                         <div
                             key={`scroll-el-${historie.id}`}
                             ref={e => (this.scrollEl = e)}
@@ -236,7 +233,7 @@ export default class Interaksjonsvindu extends Component<
             case 'Event':
                 return (
                     <div key={`el-${historie.id}`}>
-                        <Eventviser visBilde={false} Beskjed={historie} />
+                        <Eventviser Beskjed={historie} />
                         <div
                             key={`scroll-el-${historie.id}`}
                             ref={e => (this.scrollEl = e)}

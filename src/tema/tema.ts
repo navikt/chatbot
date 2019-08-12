@@ -24,7 +24,14 @@ const tema = {
             bot: '#fff'
         },
         interaksjon: '#0067C5',
-        tekstfelt: '#707070'
+        tekstfelt: '#707070',
+        skriveIndikator: {
+            bakgrunn: '#E7E9E9',
+            dot: {
+                aktiv: '#59514B',
+                inaktiv: '#B7B1A9'
+            }
+        }
     },
     tekstFamilie: 'Arial, sans-serif'
 };

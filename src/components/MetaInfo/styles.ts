@@ -1,15 +1,8 @@
-import React, { Component } from 'react';
-import Moment from 'react-moment';
 import styled from 'styled-components';
-import tema from '../tema/tema';
+import tema from '../../tema/tema';
+import { MetaInfoProps } from './index';
 
-type MetaInfoProps = {
-    nickName?: string;
-    sent?: string;
-    side?: 'VENSTRE' | 'HOYRE';
-};
-
-const Container = styled.div`
+export const Container = styled.div`
     color: ${tema.farger.tekst.klokketekst};
     font-family: ${tema.tekstFamilie};
     font-size: ${tema.storrelser.tekst.metaInfo};
@@ -19,7 +12,7 @@ const Container = styled.div`
         props.side === 'VENSTRE' ? 'flex-start' : 'flex-end'};
 `;
 
-const NickName = styled.div`
+export const NickName = styled.div`
     color: ${(props: MetaInfoProps) =>
         props.side === 'VENSTRE'
             ? tema.farger.tekst.ekstern
@@ -28,15 +21,3 @@ const NickName = styled.div`
     margin: ${(props: MetaInfoProps) =>
         props.side === 'VENSTRE' ? '0 5px 0 0' : '0 0 0 5px'};
 `;
-
-export default class MetaInfo extends Component<MetaInfoProps, {}> {
-    render() {
-        const { nickName, sent } = this.props;
-        return (
-            <Container side={this.props.side}>
-                <NickName side={this.props.side}>{nickName}</NickName>
-                <Moment format='HH:mm'>{sent}</Moment>
-            </Container>
-        );
-    }
-}

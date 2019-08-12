@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
 import styled from 'styled-components';
-import tema from '../tema/tema';
+import tema from '../../tema/tema';
 
-const KnappElement = styled.button`
+export const KnappElement = styled.button`
     outline: none;
     background: #fff;
     border: 1px solid ${tema.farger.interaksjon};
@@ -12,9 +11,3 @@ const KnappElement = styled.button`
     font-family: ${tema.tekstFamilie};
     font-size: ${tema.storrelser.tekst.generell};
 `;
-
-export default class Knapp extends Component {
-    render() {
-        return <KnappElement type='submit'>{this.props.children}</KnappElement>;
-    }
-}
