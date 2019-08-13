@@ -24,6 +24,16 @@ export const Container = styled.div`
     transition: all 300ms cubic-bezier(0.86, 0, 0.07, 1);
     display: flex;
     flex-direction: column;
+    border: 1px solid
+        ${(props: ChatContainerState) =>
+            props.erApen ? '#B5B5B5' : 'transparent'};
+    box-shadow: 6px 6px 6px 0
+        rgba(
+            0,
+            0,
+            0,
+            ${(props: ChatContainerState) => (props.erApen ? '.16' : '0')}
+        );
 
     ${liten} {
         width: ${(props: ChatContainerState) =>
@@ -37,6 +47,8 @@ export const Container = styled.div`
         bottom: ${(props: ChatContainerState) => (props.erApen ? '0' : '20px')};
         left: ${(props: ChatContainerState) =>
             props.erApen ? '0' : undefined};
+        box-shadow: none;
+        border: none;
     }
 `;
 

@@ -5,7 +5,7 @@ import MetaInfo from '../MetaInfo';
 import { Beskjed } from '../Kommunikasjon';
 
 type SkriveindikatorProps = {
-    message: Beskjed;
+    beskjed: Beskjed;
 };
 
 type SkriveindikatorState = {
@@ -21,7 +21,7 @@ export default class Skriveindikator extends Component<
         super(props);
         this.state = {
             vis:
-                moment(this.props.message.sent).valueOf() - moment().valueOf() >
+                moment(this.props.beskjed.sent).valueOf() - moment().valueOf() >
                 this.threshhold
         };
     }
@@ -39,8 +39,8 @@ export default class Skriveindikator extends Component<
             return (
                 <Container>
                     <MetaInfo
-                        sent={this.props.message.sent}
-                        nickName={this.props.message.nickName}
+                        sent={this.props.beskjed.sent}
+                        nickName={this.props.beskjed.nickName}
                         side='VENSTRE'
                     />
                     <Indikator>

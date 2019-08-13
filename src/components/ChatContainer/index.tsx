@@ -28,11 +28,12 @@ export default class ChatContainer extends Component<{}, ChatContainerState> {
                 {this.state.erApen && (
                     <ToppBar navn={this.state.navn} lukk={() => this.lukk()} />
                 )}
-                {this.state.erApen && (
-                    <Interaksjonsvindu
-                        oppdaterNavn={navn => this.oppdaterNavn(navn)}
-                    />
-                )}
+                <Interaksjonsvindu
+                    oppdaterNavn={navn => this.oppdaterNavn(navn)}
+                    lukk={() => this.lukk()}
+                    apne={() => this.apne()}
+                    vis={this.state.erApen}
+                />
             </Container>
         );
     }

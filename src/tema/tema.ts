@@ -32,20 +32,28 @@ const tema = {
             }
         },
         alertstripe: {
-            informasjon: {
-                bakgrunn: '#E0F5FB',
-                ikon: '#679CB4'
+            info: {
+                bakgrunn: '#e0f5fb',
+                border: '#66CBEC'
+            },
+            suksess: {
+                bakgrunn: '#9bd0b0',
+                border: '#06893A'
             },
             advarsel: {
-                bakgrunn: '#FFD399',
-                ikon: '#FF9100'
+                bakgrunn: '#ffe9cc',
+                border: '#FF9100'
+            },
+            feil: {
+                bakgrunn: '#e79999',
+                border: '#BA3A26'
             }
         },
         interaksjon: '#0067C5',
         valgtInteraksjon: '#D3E1F3',
         tekstfelt: '#707070'
     },
-    tekstFamilie: 'Arial, sans-serif'
+    tekstFamilie: `'Source Sans Pro', Arial, sans-serif`
 };
 
 export default tema;

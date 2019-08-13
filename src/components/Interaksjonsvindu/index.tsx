@@ -22,10 +22,14 @@ export interface Bruker {
     userType: string;
     nickName: string;
     role: number;
+    aktiv: boolean;
 }
 
 type InteraksjonsvinduProps = {
     oppdaterNavn: (navn: string) => void;
+    apne: () => void;
+    lukk: () => void;
+    vis: boolean;
 };
 
 type InteraksjonsvinduState = {
@@ -36,6 +40,7 @@ type InteraksjonsvinduState = {
     melding: string;
     brukere: Bruker[];
     sendt: boolean;
+    feil: boolean;
 };
 
 interface Config {
@@ -62,17 +67,82 @@ export default class Interaksjonsvindu extends Component<
             historie: [],
             melding: '',
             brukere: [],
-            sendt: false
+            sendt: false,
+            feil: false
         };
 
+        this.init = this.init.bind(this);
         this.sendMelding = this.sendMelding.bind(this);
         this.oppdaterHistorie = this.oppdaterHistorie.bind(this);
         this.lastHistorie = this.lastHistorie.bind(this);
         this.velg = this.velg.bind(this);
     }
 
-    async componentDidMount() {
-        if (!localStorage.getItem('config')) {
+    componentDidMount() {
+        this.init();
+    }
+
+    render() {
+        if (!this.props.vis) {
+            return null;
+        } else {
+            const { historie } = this.state;
+            let historieListe = historie.map((historieItem: Beskjed) => {
+                return this.lastHistorie(historieItem);
+            });
+            const harAktiveBrukere =
+                this.state.brukere.filter((bruker: Bruker) => bruker.aktiv)
+                    .length === this.state.brukere.length;
+
+            return (
+                <Interaksjon>
+                    {this.state.melding === 'info' && (
+                        <Alertstripe type='info'>
+                            Du blir nå satt over til en veileder.
+                        </Alertstripe>
+                    )}
+                    {!harAktiveBrukere && (
+                        <Alertstripe type='advarsel'>
+                            Det er ikke flere aktive brukere i kanalen.
+                        </Alertstripe>
+                    )}
+                    {this.state.melding === 'suksess' && (
+                        <Alertstripe type='suksess'>Flott.</Alertstripe>
+                    )}
+                    {(this.state.melding === 'feil' || this.state.feil) && (
+                        <Alertstripe type='feil'>
+                            En feil har oppstått.
+                        </Alertstripe>
+                    )}
+                    <Chatlog>{historieListe}</Chatlog>
+                    <Tekstomrade
+                        ref={el => (this.formRef = el)}
+                        onSubmit={e => this.sendMelding(e)}
+                    >
+                        <Tekstfelt
+                            onKeyDown={e => this.handleKeyDown(e)}
+                            onChange={e => this.handleChange(e)}
+                            placeholder={'Skriv spørsmålet ditt'}
+                        />
+                        <SendKnappOgTeller>
+                            <Knapp
+                                disabled={this.state.melding.length > 200}
+                                aktiv={this.state.sendt}
+                            >
+                                {this.state.sendt ? 'Sendt' : 'Send'}
+                            </Knapp>
+                            <Teller error={this.state.melding.length > 200}>
+                                {this.state.melding.length} / 200
+                            </Teller>
+                        </SendKnappOgTeller>
+                    </Tekstomrade>
+                </Interaksjon>
+            );
+        }
+    }
+
+    async init(reset: boolean = false) {
+        if (!localStorage.getItem('config') || reset) {
             let session: { data: SessionCreateResponse } = await axios.post(
                 `${this.baseUrl}/sessions`,
                 {
@@ -108,76 +178,41 @@ export default class Interaksjonsvindu extends Component<
         this.oppdaterHistorie();
 
         setInterval(async () => {
-            this.oppdaterHistorie();
+            if (!this.state.feil) {
+                this.oppdaterHistorie();
+            }
         }, 1000);
 
         sessionStorage.removeItem('brukereSett');
         sessionStorage.removeItem('sisteHistorie');
     }
 
-    render() {
-        const { historie } = this.state;
-        let historieListe = historie.map((historieItem: Beskjed) => {
-            return this.lastHistorie(historieItem);
-        });
-
-        return (
-            <Interaksjon>
-                {this.state.melding === 'info' && (
-                    <Alertstripe
-                        type='INFORMASJON'
-                        tekst='Du blir nå satt over til en veileder'
-                    />
-                )}
-                {this.state.melding === 'advarsel' && (
-                    <Alertstripe
-                        type='ADVARSEL'
-                        tekst='Chatten er frakoblet pga inaktivitet'
-                    />
-                )}
-                <Chatlog>{historieListe}</Chatlog>
-                <Tekstomrade
-                    ref={el => (this.formRef = el)}
-                    onSubmit={e => this.sendMelding(e)}
-                >
-                    <Tekstfelt
-                        onKeyDown={e => this.handleKeyDown(e)}
-                        onChange={e => this.handleChange(e)}
-                        placeholder={'Skriv spørsmålet ditt'}
-                    />
-                    <SendKnappOgTeller>
-                        <Knapp
-                            disabled={this.state.melding.length > 200}
-                            aktiv={this.state.sendt}
-                        >
-                            {this.state.sendt ? 'Sendt' : 'Send'}
-                        </Knapp>
-                        <Teller error={this.state.melding.length > 200}>
-                            {this.state.melding.length} / 200
-                        </Teller>
-                    </SendKnappOgTeller>
-                </Tekstomrade>
-            </Interaksjon>
-        );
-    }
-
     async sendMelding(e?: FormEvent<HTMLFormElement>) {
         if (e) {
             e.preventDefault();
         }
-        if (this.state.melding.trim()) {
+        if (
+            this.state.melding.trim() &&
+            this.state.melding.trim().length <= 200
+        ) {
             const config: InteraksjonsvinduState = JSON.parse(
                 localStorage.getItem('config') as string
             );
 
-            await axios.post(
-                `${this.baseUrl}/sessions/${config.sessionId}/messages`,
-                {
-                    nickName: 'Bruker',
-                    content: this.state.melding.trim(),
-                    type: 'Message'
-                }
-            );
+            try {
+                await axios.post(
+                    `${this.baseUrl}/sessions/${config.sessionId}/messages`,
+                    {
+                        nickName: 'Bruker',
+                        content: this.state.melding.trim(),
+                        type: 'Message'
+                    }
+                );
+            } catch (e) {
+                this.setState({
+                    feil: true
+                });
+            }
 
             this.oppdaterHistorie();
             if (this.formRef) {
@@ -229,6 +264,16 @@ export default class Interaksjonsvindu extends Component<
                         case 'Event':
                             if (_historie.content === 'USER_CONNECTED') {
                                 this.props.oppdaterNavn(_historie.nickName);
+                            } else if (
+                                _historie.content === 'USER_DISCONNECTED'
+                            ) {
+                                const bruker = this.state.brukere.filter(
+                                    (_bruker: Bruker) =>
+                                        _bruker.userId === _historie.userId
+                                )[0];
+                                if (bruker) {
+                                    bruker.aktiv = false;
+                                }
                             }
                         case 'UserInfo':
                             // TODO: Sjekk duplikater
@@ -248,7 +293,9 @@ export default class Interaksjonsvindu extends Component<
                                                 _historie.content.avatarUrl,
                                             nickName: _historie.nickName,
                                             role: _historie.role,
-                                            userType: _historie.content.userType
+                                            userType:
+                                                _historie.content.userType,
+                                            aktiv: true
                                         }
                                     ]
                                 });
@@ -261,6 +308,11 @@ export default class Interaksjonsvindu extends Component<
                     'sisteHistorie',
                     JSON.stringify(res.data[res.data.length - 1].id)
                 );
+            })
+            .catch(() => {
+                this.setState({
+                    feil: true
+                });
             });
     }
 

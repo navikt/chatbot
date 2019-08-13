@@ -4,7 +4,7 @@ import { ToppBarProps } from './index';
 
 export const Bar = styled.div`
     border-bottom: 2px solid #000;
-    font-family: ${tema.tekstFamilie};
+    font-family: Arial, sans-serif;
     font-size: ${tema.storrelser.tekst.toppBar};
     margin: 0;
     display: flex;

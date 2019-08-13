@@ -16,12 +16,12 @@ export default class Eventviser extends Component<KommunikasjonProps, {}> {
 
     private static visEventTekst(event: Beskjed) {
         switch (event.content) {
-            // case 'USER_DISCONNECTED':
-            //     return `${event.nickName} forlot chatten.`;
-            // case 'USER_CONNECTED':
-            //     return `${event.nickName} ble med i chatten.`;
+            case 'USER_DISCONNECTED':
+                return `${event.nickName} forlot chatten.`;
+            case 'USER_CONNECTED':
+                return `${event.nickName} ble med i chatten.`;
             case 'TYPE_MSG':
-                return <Skriveindikator message={event} />;
+                return <Skriveindikator beskjed={event} />;
             default:
                 return;
         }
