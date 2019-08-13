@@ -6,11 +6,14 @@ import { Message, SessionCreateResponse } from '../../api/Sessions';
 import {
     Chatlog,
     Interaksjon,
-    SendKnapp,
+    SendKnappOgTeller,
     Tekstfelt,
-    Tekstomrade
+    Tekstomrade,
+    Teller
 } from './styles';
 import moment from 'moment';
+import Flervalg from '../Flervalg';
+import Knapp from '../Knapp';
 
 export interface Bruker {
     userId: number;
@@ -31,6 +34,7 @@ type InteraksjonsvinduState = {
     historie: any[];
     melding: string;
     brukere: Bruker[];
+    sendt: boolean;
 };
 
 interface Config {
@@ -56,12 +60,14 @@ export default class Interaksjonsvindu extends Component<
             sessionIdPure: '',
             historie: [],
             melding: '',
-            brukere: []
+            brukere: [],
+            sendt: false
         };
 
         this.sendMelding = this.sendMelding.bind(this);
         this.oppdaterHistorie = this.oppdaterHistorie.bind(this);
         this.lastHistorie = this.lastHistorie.bind(this);
+        this.velg = this.velg.bind(this);
     }
 
     async componentDidMount() {
@@ -126,7 +132,17 @@ export default class Interaksjonsvindu extends Component<
                         onChange={e => this.handleChange(e)}
                         placeholder={'Skriv spørsmålet ditt'}
                     />
-                    <SendKnapp>Send</SendKnapp>
+                    <SendKnappOgTeller>
+                        <Knapp
+                            disabled={this.state.melding.length > 200}
+                            aktiv={this.state.sendt}
+                        >
+                            {this.state.sendt ? 'Sendt' : 'Send'}
+                        </Knapp>
+                        <Teller error={this.state.melding.length > 200}>
+                            {this.state.melding.length} / 200
+                        </Teller>
+                    </SendKnappOgTeller>
                 </Tekstomrade>
             </Interaksjon>
         );
@@ -153,7 +169,16 @@ export default class Interaksjonsvindu extends Component<
             this.oppdaterHistorie();
             if (this.formRef) {
                 this.formRef.reset();
+                this.setState({
+                    sendt: true,
+                    melding: ''
+                });
                 this.scrollToBottom();
+                setTimeout(() => {
+                    this.setState({
+                        sendt: false
+                    });
+                }, 3000);
             }
         }
     }
@@ -176,13 +201,21 @@ export default class Interaksjonsvindu extends Component<
                     return;
                 }
                 for (let _historie of historie) {
+                    if (_historie.type === 'Option') {
+                        _historie.content = _historie.content.map((e: any) => ({
+                            tekst: e,
+                            valgt: false
+                        }));
+                    } else if (_historie.type === 'OptionResult') {
+                        const answered = historie.filter((_h: any) => {
+                            return _h.id === _historie.content.messageId;
+                        })[0];
+                        console.log(answered);
+                    }
                     switch (_historie.type) {
                         case 'Event':
                             if (_historie.content === 'USER_CONNECTED') {
                                 this.props.oppdaterNavn(_historie.nickName);
-                            }
-                            if (_historie.content === 'TYPE_MSG') {
-                                console.log('Agent is typing');
                             }
                         case 'UserInfo':
                             // TODO: Sjekk duplikater
@@ -221,6 +254,7 @@ export default class Interaksjonsvindu extends Component<
     lastHistorie(historie: Beskjed) {
         switch (historie.type) {
             case 'Message':
+            case 'OptionResult':
                 return (
                     <div key={`el-${historie.id}`}>
                         <Kommunikasjon key={historie.id} Beskjed={historie} />
@@ -234,6 +268,21 @@ export default class Interaksjonsvindu extends Component<
                 return (
                     <div key={`el-${historie.id}`}>
                         <Eventviser Beskjed={historie} />
+                        <div
+                            key={`scroll-el-${historie.id}`}
+                            ref={e => (this.scrollEl = e)}
+                        />
+                    </div>
+                );
+            case 'Option':
+                return (
+                    <div key={`el-${historie.id}`}>
+                        <Flervalg
+                            beskjed={historie}
+                            velg={(messageId: number, valg: string) =>
+                                this.velg(messageId, valg)
+                            }
+                        />
                         <div
                             key={`scroll-el-${historie.id}`}
                             ref={e => (this.scrollEl = e)}
@@ -260,5 +309,24 @@ export default class Interaksjonsvindu extends Component<
         if (this.scrollEl) {
             this.scrollEl.scrollIntoView({ behavior: 'smooth' });
         }
+    }
+
+    velg(messageId: number, valg: string) {
+        const config: Config = JSON.parse(localStorage.getItem(
+            'config'
+        ) as string);
+        axios
+            .post(`${this.baseUrl}/sessions/${config.sessionId}/messages`, {
+                nickName: 'Bruker',
+                type: 'OptionResult',
+                content: {
+                    messageId: messageId,
+                    optionChoice: valg,
+                    cancelled: false
+                }
+            })
+            .then(res => {
+                console.log(res.data);
+            });
     }
 }

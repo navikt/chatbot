@@ -5,7 +5,8 @@ const tema = {
         tekst: {
             generell: '16px',
             toppBar: '20px',
-            metaInfo: '10px'
+            metaInfo: '10px',
+            teller: '12px'
         }
     },
     farger: {
@@ -24,6 +25,7 @@ const tema = {
             bot: '#fff'
         },
         interaksjon: '#0067C5',
+        valgtInteraksjon: '#D3E1F3',
         tekstfelt: '#707070',
         skriveIndikator: {
             bakgrunn: '#E7E9E9',

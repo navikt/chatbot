@@ -23,8 +23,7 @@ export const Venstre = styled.div`
 export const Hoyre = styled.div`
     margin-left: ${(props: KommunikasjonState) =>
         props.side === 'VENSTRE' ? undefined : 'auto'};
-    max-width: ${(props: KommunikasjonState) =>
-        props.side === 'VENSTRE' ? undefined : '80%'};
+    max-width: 80%;
 `;
 
 export const Brukerbilde = styled.div`
@@ -45,4 +44,11 @@ export const Snakkeboble = styled.div`
             : tema.farger.snakkebobler.bruker};
     border-radius: ${(props: KommunikasjonState) =>
         props.side === 'VENSTRE' ? '0 7px 7px 7px' : '7px 0 7px 7px'};
+    word-break: break-word;
+
+    a,
+    a:visited,
+    :link {
+        color: ${tema.farger.interaksjon};
+    }
 `;

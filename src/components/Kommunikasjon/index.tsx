@@ -11,7 +11,7 @@ import {
 
 export type Beskjed = {
     arguments: any[] | null;
-    content: string;
+    content: any | any[];
     id: number;
     nickName: string;
     role: 0 | 1;
@@ -112,7 +112,11 @@ export default class Kommunikasjon extends Component<
                     >
                         <Snakkeboble
                             dangerouslySetInnerHTML={{
-                                __html: unescape(content)
+                                __html: unescape(
+                                    content.optionChoice
+                                        ? content.optionChoice
+                                        : content
+                                )
                             }}
                             side={this.state.side}
                             visBilde={this.state.visBilde}

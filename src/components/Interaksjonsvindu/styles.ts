@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import tema from '../../tema/tema';
-import Knapp from '../Knapp';
 
 export const Interaksjon = styled.div`
     display: flex;
@@ -18,7 +17,7 @@ export const Tekstomrade = styled.form`
     display: flex;
     border-top: 1px solid ${tema.farger.tekstfelt};
     height: 20%;
-    padding: 10px;
+    padding: 15px;
     align-items: center;
 `;
 export const Tekstfelt = styled.textarea`
@@ -35,6 +34,17 @@ export const Tekstfelt = styled.textarea`
         color: ${tema.farger.tekstfelt};
     }
 `;
-export const SendKnapp = styled(Knapp)`
+
+export const SendKnappOgTeller = styled.div`
     margin-left: auto;
+    display: flex;
+    flex-direction: column;
+`;
+
+export const Teller = styled.div`
+    font-size: ${tema.storrelser.tekst.teller};
+    font-family: ${tema.tekstFamilie};
+    margin-top: 5px;
+    color: ${(props: { error: boolean }) =>
+        props.error ? 'red' : tema.farger.tekst.klokketekst};
 `;
