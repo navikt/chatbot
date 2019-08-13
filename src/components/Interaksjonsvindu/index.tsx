@@ -14,6 +14,7 @@ import {
 import moment from 'moment';
 import Flervalg from '../Flervalg';
 import Knapp from '../Knapp';
+import Alertstripe from '../Alertstripe';
 
 export interface Bruker {
     userId: number;
@@ -122,6 +123,18 @@ export default class Interaksjonsvindu extends Component<
 
         return (
             <Interaksjon>
+                {this.state.melding === 'info' && (
+                    <Alertstripe
+                        type='INFORMASJON'
+                        tekst='Du blir nå satt over til en veileder'
+                    />
+                )}
+                {this.state.melding === 'advarsel' && (
+                    <Alertstripe
+                        type='ADVARSEL'
+                        tekst='Chatten er frakoblet pga inaktivitet'
+                    />
+                )}
                 <Chatlog>{historieListe}</Chatlog>
                 <Tekstomrade
                     ref={el => (this.formRef = el)}

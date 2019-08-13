@@ -6,6 +6,7 @@ export const Interaksjon = styled.div`
     flex-direction: column;
     height: 100%;
     position: relative;
+    overflow-x: hidden;
 `;
 export const Chatlog = styled.div`
     height: 100%;
@@ -28,7 +29,7 @@ export const Tekstfelt = styled.textarea`
     border: none;
     font-size: ${tema.storrelser.tekst.generell};
     font-family: ${tema.tekstFamilie};
-    scroll-behavior: smooth;
+    outline: none;
 
     ::placeholder {
         color: ${tema.farger.tekstfelt};

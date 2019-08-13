@@ -24,16 +24,26 @@ const tema = {
             ekstern: '#59514B',
             bot: '#fff'
         },
-        interaksjon: '#0067C5',
-        valgtInteraksjon: '#D3E1F3',
-        tekstfelt: '#707070',
         skriveIndikator: {
             bakgrunn: '#E7E9E9',
             dot: {
                 aktiv: '#59514B',
                 inaktiv: '#B7B1A9'
             }
-        }
+        },
+        alertstripe: {
+            informasjon: {
+                bakgrunn: '#E0F5FB',
+                ikon: '#679CB4'
+            },
+            advarsel: {
+                bakgrunn: '#FFD399',
+                ikon: '#FF9100'
+            }
+        },
+        interaksjon: '#0067C5',
+        valgtInteraksjon: '#D3E1F3',
+        tekstfelt: '#707070'
     },
     tekstFamilie: 'Arial, sans-serif'
 };
