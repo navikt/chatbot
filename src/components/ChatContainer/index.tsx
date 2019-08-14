@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import ToppBar from '../ToppBar';
-import Interaksjonsvindu from '../Interaksjonsvindu';
+import Interaksjonsvindu, { Config } from '../Interaksjonsvindu';
 import { Container, FridaKnapp } from './styles';
 import { ConnectionConfig } from '../../index';
+import axios from 'axios';
 
 export type ChatContainerState = {
     erApen: boolean;
@@ -13,6 +14,7 @@ export default class ChatContainer extends Component<
     ConnectionConfig,
     ChatContainerState
 > {
+    baseUrl = 'https://devapi.puzzel.com/chat/v1';
     constructor(props: ConnectionConfig) {
         super(props);
         this.state = {
@@ -23,6 +25,7 @@ export default class ChatContainer extends Component<
         this.apne = this.apne.bind(this);
         this.lukk = this.lukk.bind(this);
         this.oppdaterNavn = this.oppdaterNavn.bind(this);
+        this.avslutt = this.avslutt.bind(this);
     }
 
     render() {
@@ -31,7 +34,11 @@ export default class ChatContainer extends Component<
             <Container erApen={this.state.erApen}>
                 {!this.state.erApen && <FridaKnapp onClick={this.apne} />}
                 {this.state.erApen && (
-                    <ToppBar navn={this.state.navn} lukk={() => this.lukk()} />
+                    <ToppBar
+                        navn={this.state.navn}
+                        lukk={() => this.lukk()}
+                        avslutt={() => this.avslutt()}
+                    />
                 )}
                 <Interaksjonsvindu
                     oppdaterNavn={navn => this.oppdaterNavn(navn)}
@@ -40,6 +47,7 @@ export default class ChatContainer extends Component<
                     vis={this.state.erApen}
                     queueKey={queueKey}
                     customerKey={customerKey}
+                    baseUrl={this.baseUrl}
                 />
             </Container>
         );
@@ -57,5 +65,20 @@ export default class ChatContainer extends Component<
         if (this.state.navn !== navn) {
             this.setState({ navn });
         }
+    }
+
+    avslutt(): void {
+        const config: Config = JSON.parse(localStorage.getItem(
+            'config'
+        ) as string);
+        axios
+            .delete(
+                `${this.baseUrl}/sessions/${config.sessionId}/${
+                    config.requestId
+                }`
+            )
+            .then(res => {
+                console.log(res);
+            });
     }
 }

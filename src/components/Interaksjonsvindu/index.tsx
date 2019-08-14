@@ -16,6 +16,7 @@ import Flervalg from '../Flervalg';
 import Knapp from '../Knapp';
 import Alertstripe from '../Alertstripe';
 import { ConnectionConfig } from '../../index';
+import Evaluering from '../Evaluering';
 
 export interface Bruker {
     userId: number;
@@ -31,6 +32,7 @@ type InteraksjonsvinduProps = {
     apne: () => void;
     lukk: () => void;
     vis: boolean;
+    baseUrl: string;
 };
 
 type InteraksjonsvinduState = {
@@ -42,9 +44,10 @@ type InteraksjonsvinduState = {
     brukere: Bruker[];
     sendt: boolean;
     feil: boolean;
+    avsluttet: boolean;
 };
 
-interface Config {
+export interface Config {
     sessionId: string;
     sessionIdPure: string;
     requestId: number;
@@ -55,7 +58,6 @@ export default class Interaksjonsvindu extends Component<
     InteraksjonsvinduProps & ConnectionConfig,
     InteraksjonsvinduState
 > {
-    baseUrl = 'https://devapi.puzzel.com/chat/v1';
     formRef: HTMLFormElement | null;
     scrollEl: HTMLElement | null;
 
@@ -69,7 +71,8 @@ export default class Interaksjonsvindu extends Component<
             melding: '',
             brukere: [],
             sendt: false,
-            feil: false
+            feil: false,
+            avsluttet: false
         };
 
         this.init = this.init.bind(this);
@@ -77,6 +80,7 @@ export default class Interaksjonsvindu extends Component<
         this.oppdaterHistorie = this.oppdaterHistorie.bind(this);
         this.lastHistorie = this.lastHistorie.bind(this);
         this.velg = this.velg.bind(this);
+        this.evaluer = this.evaluer.bind(this);
     }
 
     componentDidMount() {
@@ -147,7 +151,7 @@ export default class Interaksjonsvindu extends Component<
     async init(reset: boolean = false) {
         if (!localStorage.getItem('config') || reset) {
             let session: { data: SessionCreateResponse } = await axios.post(
-                `${this.baseUrl}/sessions`,
+                `${this.props.baseUrl}/sessions`,
                 {
                     customerKey: parseInt(this.props.customerKey),
                     queueKey: this.props.queueKey,
@@ -198,13 +202,15 @@ export default class Interaksjonsvindu extends Component<
             this.state.melding.trim() &&
             this.state.melding.trim().length <= 200
         ) {
-            const config: InteraksjonsvinduState = JSON.parse(
-                localStorage.getItem('config') as string
-            );
+            const config: Config = JSON.parse(localStorage.getItem(
+                'config'
+            ) as string);
 
             try {
                 await axios.post(
-                    `${this.baseUrl}/sessions/${config.sessionId}/messages`,
+                    `${this.props.baseUrl}/sessions/${
+                        config.sessionId
+                    }/messages`,
                     {
                         nickName: 'Bruker',
                         content: this.state.melding.trim(),
@@ -240,7 +246,9 @@ export default class Interaksjonsvindu extends Component<
             'config'
         ) as string);
         axios
-            .get(`${this.baseUrl}/sessions/${config.sessionId}/messages/0`)
+            .get(
+                `${this.props.baseUrl}/sessions/${config.sessionId}/messages/0`
+            )
             .then(res => {
                 const historie = res.data as Message[];
                 const sisteHistorie = sessionStorage.getItem(
@@ -283,6 +291,12 @@ export default class Interaksjonsvindu extends Component<
                             if (bruker) {
                                 bruker.aktiv = false;
                             }
+                        } else if (
+                            _historie.content === 'REQUEST_DISCONNECTED'
+                        ) {
+                            this.setState({
+                                avsluttet: true
+                            });
                         }
                     } else if (_historie.type === 'UserInfo') {
                         // TODO: Sjekk duplikater
@@ -325,56 +339,75 @@ export default class Interaksjonsvindu extends Component<
     }
 
     lastHistorie(historie: Beskjed) {
-        switch (historie.type) {
-            case 'Message':
-            case 'OptionResult':
-                return (
-                    <div key={`el-${historie.id}`}>
-                        <Kommunikasjon
-                            key={historie.id}
-                            Beskjed={historie}
-                            brukere={this.state.brukere}
-                        />
-                        <div
-                            key={`scroll-el-${historie.id}`}
-                            ref={e => (this.scrollEl = e)}
-                            aria-hidden='true'
-                        />
-                    </div>
-                );
-            case 'Event':
-                return (
-                    <div key={`el-${historie.id}`}>
-                        <Eventviser Beskjed={historie} />
-                        <div
-                            key={`scroll-el-${historie.id}`}
-                            ref={e => (this.scrollEl = e)}
-                            aria-hidden='true'
-                        />
-                    </div>
-                );
-            case 'Option':
-                return (
-                    <div key={`el-${historie.id}`}>
-                        <Flervalg
-                            beskjed={historie}
-                            harBlittBesvart={historie.content.find(
-                                (b: { tekst: string; valgt: boolean }) =>
-                                    b.valgt
-                            )}
-                            velg={(messageId: number, valg: string) =>
-                                this.velg(messageId, valg)
-                            }
-                        />
-                        <div
-                            key={`scroll-el-${historie.id}`}
-                            ref={e => (this.scrollEl = e)}
-                            aria-hidden='true'
-                        />
-                    </div>
-                );
-            default:
-                return;
+        if (
+            historie.type === 'Event' &&
+            historie.content === 'REQUEST_DISCONNECTED'
+        ) {
+            return (
+                <div key={`el-${historie.id}`}>
+                    <Evaluering
+                        evaluer={evaluering => this.evaluer(evaluering)}
+                        beskjed={historie}
+                    />
+                    <div
+                        key={`scroll-el-${historie.id}`}
+                        ref={e => (this.scrollEl = e)}
+                        aria-hidden='true'
+                    />
+                </div>
+            );
+        } else {
+            switch (historie.type) {
+                case 'Message':
+                case 'OptionResult':
+                    return (
+                        <div key={`el-${historie.id}`}>
+                            <Kommunikasjon
+                                key={historie.id}
+                                Beskjed={historie}
+                                brukere={this.state.brukere}
+                            />
+                            <div
+                                key={`scroll-el-${historie.id}`}
+                                ref={e => (this.scrollEl = e)}
+                                aria-hidden='true'
+                            />
+                        </div>
+                    );
+                case 'Event':
+                    return (
+                        <div key={`el-${historie.id}`}>
+                            <Eventviser Beskjed={historie} />
+                            <div
+                                key={`scroll-el-${historie.id}`}
+                                ref={e => (this.scrollEl = e)}
+                                aria-hidden='true'
+                            />
+                        </div>
+                    );
+                case 'Option':
+                    return (
+                        <div key={`el-${historie.id}`}>
+                            <Flervalg
+                                beskjed={historie}
+                                harBlittBesvart={historie.content.find(
+                                    (b: { tekst: string; valgt: boolean }) =>
+                                        b.valgt
+                                )}
+                                velg={(messageId: number, valg: string) =>
+                                    this.velg(messageId, valg)
+                                }
+                            />
+                            <div
+                                key={`scroll-el-${historie.id}`}
+                                ref={e => (this.scrollEl = e)}
+                                aria-hidden='true'
+                            />
+                        </div>
+                    );
+                default:
+                    return;
+            }
         }
     }
 
@@ -400,17 +433,24 @@ export default class Interaksjonsvindu extends Component<
             'config'
         ) as string);
         axios
-            .post(`${this.baseUrl}/sessions/${config.sessionId}/messages`, {
-                nickName: 'Bruker',
-                type: 'OptionResult',
-                content: {
-                    messageId: messageId,
-                    optionChoice: valg,
-                    cancelled: false
+            .post(
+                `${this.props.baseUrl}/sessions/${config.sessionId}/messages`,
+                {
+                    nickName: 'Bruker',
+                    type: 'OptionResult',
+                    content: {
+                        messageId: messageId,
+                        optionChoice: valg,
+                        cancelled: false
+                    }
                 }
-            })
+            )
             .then(() => {
                 this.oppdaterHistorie();
             });
+    }
+
+    evaluer(evaluering: 1 | 2 | 3 | 4 | 5) {
+        console.log(evaluering);
     }
 }

@@ -25,6 +25,8 @@ export default class Eventviser extends Component<KommunikasjonProps, {}> {
                 return `${this.props.Beskjed.nickName} forlot chatten.`;
             case 'USER_CONNECTED':
                 return `${this.props.Beskjed.nickName} ble med i chatten.`;
+            case 'REQUEST_DISCONNECTED':
+                return 'Bruker forlot chatten.';
             case 'TYPE_MSG':
                 return <Skriveindikator beskjed={this.props.Beskjed} />;
             default:

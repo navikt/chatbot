@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 
-import minimer from '../../assets/minimer.svg';
-import omstart from '../../assets/omstart.svg';
-import avslutt from '../../assets/avslutt.svg';
+import minimerIkon from '../../assets/minimer.svg';
+import omstartIkon from '../../assets/omstart.svg';
+import avsluttIkon from '../../assets/avslutt.svg';
 import { Bar, Knapp, Knapper, Navn } from './styles';
 
 export type ToppBarProps = {
     lukk?: () => void;
+    avslutt?: () => void;
     navn: string | undefined;
 };
 
@@ -16,7 +17,7 @@ export default class ToppBar extends Component<ToppBarProps, {}> {
     }
 
     render() {
-        const { lukk, navn } = this.props;
+        const { lukk, avslutt, navn } = this.props;
         return (
             <Bar navn={this.props.navn}>
                 <Navn>{navn}</Navn>
@@ -24,15 +25,16 @@ export default class ToppBar extends Component<ToppBarProps, {}> {
                     <Knapp
                         navn={this.props.navn}
                         onClick={lukk}
-                        dangerouslySetInnerHTML={{ __html: minimer }}
+                        dangerouslySetInnerHTML={{ __html: minimerIkon }}
                     />
                     <Knapp
                         navn={this.props.navn}
-                        dangerouslySetInnerHTML={{ __html: omstart }}
+                        dangerouslySetInnerHTML={{ __html: omstartIkon }}
                     />
                     <Knapp
                         navn={this.props.navn}
-                        dangerouslySetInnerHTML={{ __html: avslutt }}
+                        onClick={avslutt}
+                        dangerouslySetInnerHTML={{ __html: avsluttIkon }}
                     />
                 </Knapper>
             </Bar>
