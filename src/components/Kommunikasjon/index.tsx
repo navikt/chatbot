@@ -8,6 +8,7 @@ import {
     Snakkeboble,
     Venstre
 } from './styles';
+import { Bruker } from '../Interaksjonsvindu';
 
 export type Beskjed = {
     arguments: any[] | null;
@@ -31,11 +32,13 @@ export type Beskjed = {
 
 export type KommunikasjonProps = {
     Beskjed: Beskjed;
+    brukere?: Bruker[];
 };
 
 export type KommunikasjonState = {
     side: 'VENSTRE' | 'HOYRE';
     visBilde: boolean;
+    brukerType?: string;
 };
 
 interface BrukerMedBilde {
@@ -53,6 +56,8 @@ export default class Kommunikasjon extends Component<
             side: 'VENSTRE',
             visBilde: false
         };
+
+        this.hentBruker = this.hentBruker.bind(this);
     }
 
     componentDidMount() {
@@ -93,6 +98,7 @@ export default class Kommunikasjon extends Component<
 
     render() {
         const { nickName, sent, content } = this.props.Beskjed;
+        const bruker = this.hentBruker(nickName);
         return (
             <Container>
                 <MetaInfo
@@ -120,10 +126,21 @@ export default class Kommunikasjon extends Component<
                             }}
                             side={this.state.side}
                             visBilde={this.state.visBilde}
+                            brukerType={bruker ? bruker.userType : undefined}
                         />
                     </Hoyre>
                 </Indre>
             </Container>
         );
+    }
+
+    hentBruker(nickName: string): Bruker | undefined {
+        if (this.props.brukere) {
+            return this.props.brukere.find(
+                (bruker: Bruker) => bruker.nickName === nickName
+            );
+        } else {
+            return undefined;
+        }
     }
 }

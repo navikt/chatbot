@@ -327,7 +327,11 @@ export default class Interaksjonsvindu extends Component<
             case 'OptionResult':
                 return (
                     <div key={`el-${historie.id}`}>
-                        <Kommunikasjon key={historie.id} Beskjed={historie} />
+                        <Kommunikasjon
+                            key={historie.id}
+                            Beskjed={historie}
+                            brukere={this.state.brukere}
+                        />
                         <div
                             key={`scroll-el-${historie.id}`}
                             ref={e => (this.scrollEl = e)}

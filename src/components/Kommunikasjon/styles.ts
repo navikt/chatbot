@@ -39,8 +39,10 @@ export const Snakkeboble = styled.div`
     font-size: ${tema.storrelser.tekst.generell};
     padding: 10px;
     background: ${(props: KommunikasjonState) =>
-        props.side === 'VENSTRE'
+        props.brukerType === 'Bot'
             ? tema.farger.snakkebobler.bot
+            : props.brukerType === 'Human'
+            ? tema.farger.snakkebobler.agent
             : tema.farger.snakkebobler.bruker};
     border-radius: ${(props: KommunikasjonState) =>
         props.side === 'VENSTRE' ? '0 7px 7px 7px' : '7px 0 7px 7px'};
