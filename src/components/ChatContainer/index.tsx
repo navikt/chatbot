@@ -2,14 +2,18 @@ import React, { Component } from 'react';
 import ToppBar from '../ToppBar';
 import Interaksjonsvindu from '../Interaksjonsvindu';
 import { Container, FridaKnapp } from './styles';
+import { ConnectionConfig } from '../../index';
 
 export type ChatContainerState = {
     erApen: boolean;
     navn?: string | undefined;
 };
 
-export default class ChatContainer extends Component<{}, ChatContainerState> {
-    constructor(props: ChatContainerState) {
+export default class ChatContainer extends Component<
+    ConnectionConfig,
+    ChatContainerState
+> {
+    constructor(props: ConnectionConfig) {
         super(props);
         this.state = {
             erApen: true,
@@ -22,6 +26,7 @@ export default class ChatContainer extends Component<{}, ChatContainerState> {
     }
 
     render() {
+        const { queueKey, customerKey } = this.props;
         return (
             <Container erApen={this.state.erApen}>
                 {!this.state.erApen && <FridaKnapp onClick={this.apne} />}
@@ -33,6 +38,8 @@ export default class ChatContainer extends Component<{}, ChatContainerState> {
                     lukk={() => this.lukk()}
                     apne={() => this.apne()}
                     vis={this.state.erApen}
+                    queueKey={queueKey}
+                    customerKey={customerKey}
                 />
             </Container>
         );

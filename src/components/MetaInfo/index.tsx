@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Moment from 'react-moment';
 import { Container, NickName } from './styles';
+import * as moment from 'moment';
 
 export type MetaInfoProps = {
     nickName?: string;
@@ -13,9 +14,16 @@ export default class MetaInfo extends Component<MetaInfoProps, {}> {
     render() {
         const { nickName, sent } = this.props;
         return (
-            <Container side={this.props.side}>
-                <NickName side={this.props.side}>{nickName}</NickName>
-                <Moment format='HH:mm'>{sent}</Moment>
+            <Container
+                side={this.props.side}
+                aria-label={`${moment(sent).format('H:mm')}`}
+            >
+                <NickName aria-hidden='true' side={this.props.side}>
+                    {nickName}
+                </NickName>
+                <Moment aria-hidden='true' format='HH:mm'>
+                    {sent}
+                </Moment>
             </Container>
         );
     }

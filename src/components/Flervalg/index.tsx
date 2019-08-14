@@ -27,6 +27,7 @@ export default class Flervalg extends Component<FlervalgProps, {}> {
                     }}
                     valgt={_h.valgt}
                     aktiv={this.props.harBlittBesvart}
+                    aria-label={`Valg ${index + 1}: ${_h.tekst}`}
                 >
                     {_h.tekst}
                 </Valg>
@@ -39,7 +40,13 @@ export default class Flervalg extends Component<FlervalgProps, {}> {
                     sent={this.props.beskjed.sent}
                     side='VENSTRE'
                 />
-                <ValgContainer>{options}</ValgContainer>
+                <ValgContainer
+                    aria-label={`${this.props.beskjed.nickName} har sendt deg ${
+                        options.length
+                    } valgmuligheter.`}
+                >
+                    {options}
+                </ValgContainer>
             </div>
         );
     }

@@ -16,13 +16,12 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js", ".jsx"]
       },
       module: {
-        rules: [{ test: /\.tsx$/, loader: "ts-loader" }]
+        rules: [{ test: /\.ts|\.tsx$/, loader: "ts-loader" }]
       }
     },
     rules: {
       svg: {
-        loader: "svg-inline-loader",
-        options: { classPrefix: true }
+        loader: 'svg-inline-loader?classPrefix'
       }
     }
   }

@@ -14,12 +14,25 @@ const BorderBox = styled.div`
     }
 `;
 
-export default class Chat extends Component {
+export type ConnectionConfig = {
+    queueKey: string;
+    customerKey: string;
+};
+
+export default class Chat extends Component<ConnectionConfig, {}> {
+    constructor(props: ConnectionConfig) {
+        super(props);
+    }
+
     render() {
+        const { queueKey, customerKey } = this.props;
         return (
             <ThemeProvider theme={tema}>
                 <BorderBox>
-                    <ChatContainer />
+                    <ChatContainer
+                        customerKey={customerKey}
+                        queueKey={queueKey}
+                    />
                 </BorderBox>
             </ThemeProvider>
         );

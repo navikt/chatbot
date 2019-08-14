@@ -109,7 +109,7 @@ export default class Kommunikasjon extends Component<
                 <Indre>
                     {this.state.visBilde && this.state.side === 'VENSTRE' && (
                         <Venstre>
-                            <Brukerbilde />
+                            <Brukerbilde aria-hidden='true' />
                         </Venstre>
                     )}
                     <Hoyre
@@ -117,6 +117,13 @@ export default class Kommunikasjon extends Component<
                         visBilde={this.state.visBilde}
                     >
                         <Snakkeboble
+                            aria-label={`${
+                                this.state.side === 'VENSTRE' ? nickName : 'Du'
+                            } skrev: ${
+                                content.optionChoice
+                                    ? content.optionChoice
+                                    : content
+                            }`}
                             dangerouslySetInnerHTML={{
                                 __html: unescape(
                                     content.optionChoice

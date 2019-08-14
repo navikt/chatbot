@@ -15,6 +15,7 @@ import moment from 'moment';
 import Flervalg from '../Flervalg';
 import Knapp from '../Knapp';
 import Alertstripe from '../Alertstripe';
+import { ConnectionConfig } from '../../index';
 
 export interface Bruker {
     userId: number;
@@ -51,14 +52,14 @@ interface Config {
 }
 
 export default class Interaksjonsvindu extends Component<
-    InteraksjonsvinduProps,
+    InteraksjonsvinduProps & ConnectionConfig,
     InteraksjonsvinduState
 > {
     baseUrl = 'https://devapi.puzzel.com/chat/v1';
     formRef: HTMLFormElement | null;
     scrollEl: HTMLElement | null;
 
-    constructor(props: InteraksjonsvinduProps) {
+    constructor(props: InteraksjonsvinduProps & ConnectionConfig) {
         super(props);
         this.state = {
             requestId: 0,
@@ -114,7 +115,9 @@ export default class Interaksjonsvindu extends Component<
                             En feil har oppstått.
                         </Alertstripe>
                     )}
-                    <Chatlog>{historieListe}</Chatlog>
+                    <Chatlog role='region' aria-live='polite'>
+                        {historieListe}
+                    </Chatlog>
                     <Tekstomrade
                         ref={el => (this.formRef = el)}
                         onSubmit={e => this.sendMelding(e)}
@@ -146,8 +149,8 @@ export default class Interaksjonsvindu extends Component<
             let session: { data: SessionCreateResponse } = await axios.post(
                 `${this.baseUrl}/sessions`,
                 {
-                    customerKey: '12345',
-                    queueKey: 'Q_CHAT_AGENT',
+                    customerKey: parseInt(this.props.customerKey),
+                    queueKey: this.props.queueKey,
                     nickName: 'Bruker',
                     chatId: 'test.name@customer.com',
                     languageCode: 'NO',
@@ -335,6 +338,7 @@ export default class Interaksjonsvindu extends Component<
                         <div
                             key={`scroll-el-${historie.id}`}
                             ref={e => (this.scrollEl = e)}
+                            aria-hidden='true'
                         />
                     </div>
                 );
@@ -345,6 +349,7 @@ export default class Interaksjonsvindu extends Component<
                         <div
                             key={`scroll-el-${historie.id}`}
                             ref={e => (this.scrollEl = e)}
+                            aria-hidden='true'
                         />
                     </div>
                 );
@@ -364,6 +369,7 @@ export default class Interaksjonsvindu extends Component<
                         <div
                             key={`scroll-el-${historie.id}`}
                             ref={e => (this.scrollEl = e)}
+                            aria-hidden='true'
                         />
                     </div>
                 );
