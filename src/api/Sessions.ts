@@ -5,7 +5,7 @@ export interface Message {
     userId: number;
     nickName: string;
     type: string;
-    content: any;
+    content: any | any[];
     arguments: {
         additionalProp1: {};
         additionalProp2: {};

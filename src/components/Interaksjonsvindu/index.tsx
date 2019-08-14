@@ -147,7 +147,7 @@ export default class Interaksjonsvindu extends Component<
                 `${this.baseUrl}/sessions`,
                 {
                     customerKey: '12345',
-                    queueKey: 'Q_CHAT_BOT',
+                    queueKey: 'Q_CHAT_AGENT',
                     nickName: 'Bruker',
                     chatId: 'test.name@customer.com',
                     languageCode: 'NO',
@@ -209,6 +209,7 @@ export default class Interaksjonsvindu extends Component<
                     }
                 );
             } catch (e) {
+                console.error(e);
                 this.setState({
                     feil: true
                 });
@@ -258,48 +259,51 @@ export default class Interaksjonsvindu extends Component<
                         const answered = historie.filter((_h: any) => {
                             return _h.id === _historie.content.messageId;
                         })[0];
-                        console.log(answered);
+                        const temp = answered.content.find(
+                            (a: { tekst: string; valgt: boolean }) => {
+                                return (
+                                    a.tekst.toString() ===
+                                    _historie.content.optionChoice.toString()
+                                );
+                            }
+                        );
+                        temp.valgt = true;
                     }
-                    switch (_historie.type) {
-                        case 'Event':
-                            if (_historie.content === 'USER_CONNECTED') {
-                                this.props.oppdaterNavn(_historie.nickName);
-                            } else if (
-                                _historie.content === 'USER_DISCONNECTED'
-                            ) {
-                                const bruker = this.state.brukere.filter(
-                                    (_bruker: Bruker) =>
-                                        _bruker.userId === _historie.userId
-                                )[0];
-                                if (bruker) {
-                                    bruker.aktiv = false;
-                                }
+                    if (_historie.type === 'Event') {
+                        if (_historie.content === 'USER_CONNECTED') {
+                            this.props.oppdaterNavn(_historie.nickName);
+                        } else if (_historie.content === 'USER_DISCONNECTED') {
+                            const bruker = this.state.brukere.filter(
+                                (_bruker: Bruker) =>
+                                    _bruker.userId === _historie.userId
+                            )[0];
+                            if (bruker) {
+                                bruker.aktiv = false;
                             }
-                        case 'UserInfo':
-                            // TODO: Sjekk duplikater
-                            if (
-                                this.state.brukere.filter(
-                                    (bruker: Bruker) =>
-                                        bruker.userId === _historie.userId
-                                ).length === 0 &&
-                                _historie.content.userType
-                            ) {
-                                this.setState({
-                                    brukere: [
-                                        ...this.state.brukere,
-                                        {
-                                            userId: _historie.userId,
-                                            avatarUrl:
-                                                _historie.content.avatarUrl,
-                                            nickName: _historie.nickName,
-                                            role: _historie.role,
-                                            userType:
-                                                _historie.content.userType,
-                                            aktiv: true
-                                        }
-                                    ]
-                                });
-                            }
+                        }
+                    } else if (_historie.type === 'UserInfo') {
+                        // TODO: Sjekk duplikater
+                        if (
+                            this.state.brukere.filter(
+                                (_bruker: Bruker) =>
+                                    _bruker.userId === _historie.userId
+                            ).length === 0 &&
+                            _historie.content.userType
+                        ) {
+                            this.setState({
+                                brukere: [
+                                    ...this.state.brukere,
+                                    {
+                                        userId: _historie.userId,
+                                        avatarUrl: _historie.content.avatarUrl,
+                                        nickName: _historie.nickName,
+                                        role: _historie.role,
+                                        userType: _historie.content.userType,
+                                        aktiv: true
+                                    }
+                                ]
+                            });
+                        }
                     }
                 }
                 this.setState({ historie });
@@ -309,7 +313,8 @@ export default class Interaksjonsvindu extends Component<
                     JSON.stringify(res.data[res.data.length - 1].id)
                 );
             })
-            .catch(() => {
+            .catch(e => {
+                console.error(e);
                 this.setState({
                     feil: true
                 });
@@ -344,6 +349,10 @@ export default class Interaksjonsvindu extends Component<
                     <div key={`el-${historie.id}`}>
                         <Flervalg
                             beskjed={historie}
+                            harBlittBesvart={historie.content.find(
+                                (b: { tekst: string; valgt: boolean }) =>
+                                    b.valgt
+                            )}
                             velg={(messageId: number, valg: string) =>
                                 this.velg(messageId, valg)
                             }
@@ -390,8 +399,8 @@ export default class Interaksjonsvindu extends Component<
                     cancelled: false
                 }
             })
-            .then(res => {
-                console.log(res.data);
+            .then(() => {
+                this.oppdaterHistorie();
             });
     }
 }
