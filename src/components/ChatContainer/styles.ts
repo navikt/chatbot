@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import tema from '../../tema/tema';
 import fridaIkon from '../../assets/frida.svg';
 import { liten } from '../../tema/mediaqueries';
@@ -34,6 +34,16 @@ export const Container = styled.div`
             0,
             ${(props: ChatContainerState) => (props.erApen ? '.16' : '0')}
         );
+
+    ${(props: ChatContainerState) =>
+        !props.erApen &&
+        css`
+            transform: translateY(0);
+
+            &:hover {
+                transform: translateY(-10px);
+            }
+        `}
 
     ${liten} {
         width: ${(props: ChatContainerState) =>
