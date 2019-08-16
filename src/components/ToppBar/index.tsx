@@ -8,6 +8,7 @@ import { Bar, Knapp, Knapper, Navn } from './styles';
 export type ToppBarProps = {
     lukk?: () => void;
     avslutt?: () => void;
+    omstart?: () => void;
     navn: string | undefined;
 };
 
@@ -17,7 +18,7 @@ export default class ToppBar extends Component<ToppBarProps, {}> {
     }
 
     render() {
-        const { lukk, avslutt, navn } = this.props;
+        const { lukk, omstart, avslutt, navn } = this.props;
         return (
             <Bar navn={this.props.navn}>
                 <Navn>{navn}</Navn>
@@ -26,15 +27,19 @@ export default class ToppBar extends Component<ToppBarProps, {}> {
                         navn={this.props.navn}
                         onClick={lukk}
                         dangerouslySetInnerHTML={{ __html: minimerIkon }}
+                        tabIndex={0}
                     />
                     <Knapp
                         navn={this.props.navn}
+                        onClick={omstart}
                         dangerouslySetInnerHTML={{ __html: omstartIkon }}
+                        tabIndex={0}
                     />
                     <Knapp
                         navn={this.props.navn}
                         onClick={avslutt}
                         dangerouslySetInnerHTML={{ __html: avsluttIkon }}
+                        tabIndex={0}
                     />
                 </Knapper>
             </Bar>

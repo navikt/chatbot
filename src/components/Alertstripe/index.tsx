@@ -8,7 +8,7 @@ export type AlertstripeProps = {
 export default class Alertstripe extends Component<AlertstripeProps, {}> {
     render() {
         return (
-            <Container type={this.props.type}>
+            <Container type={this.props.type} tabIndex={0}>
                 <Ikon type={this.props.type} />
                 <Tekst>{this.props.children}</Tekst>
             </Container>

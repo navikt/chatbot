@@ -7,6 +7,7 @@ import {
     Chatlog,
     Interaksjon,
     SendKnappOgTeller,
+    Tabbable,
     Tekstfelt,
     Tekstomrade,
     Teller
@@ -45,6 +46,9 @@ type InteraksjonsvinduState = {
     sendt: boolean;
     feil: boolean;
     avsluttet: boolean;
+    iKo: boolean;
+    evalueringsNokkel: string;
+    harScrollet: boolean;
 };
 
 export interface Config {
@@ -72,7 +76,10 @@ export default class Interaksjonsvindu extends Component<
             brukere: [],
             sendt: false,
             feil: false,
-            avsluttet: false
+            avsluttet: false,
+            iKo: false,
+            evalueringsNokkel: '',
+            harScrollet: false
         };
 
         this.init = this.init.bind(this);
@@ -81,6 +88,8 @@ export default class Interaksjonsvindu extends Component<
         this.lastHistorie = this.lastHistorie.bind(this);
         this.velg = this.velg.bind(this);
         this.evaluer = this.evaluer.bind(this);
+        this.opprettEvaluering = this.opprettEvaluering.bind(this);
+        this.handleScroll = this.handleScroll.bind(this);
     }
 
     componentDidMount() {
@@ -97,20 +106,25 @@ export default class Interaksjonsvindu extends Component<
             });
             const harAktiveBrukere =
                 this.state.brukere.filter((bruker: Bruker) => bruker.aktiv)
-                    .length === this.state.brukere.length;
+                    .length > 0;
 
             return (
-                <Interaksjon>
-                    {this.state.melding === 'info' && (
+                <Interaksjon
+                    onScroll={this.handleScroll}
+                    harScrollet={this.state.harScrollet}
+                >
+                    {this.state.iKo && (
                         <Alertstripe type='info'>
                             Du blir nå satt over til en veileder.
                         </Alertstripe>
                     )}
-                    {!harAktiveBrukere && (
-                        <Alertstripe type='advarsel'>
-                            Det er ikke flere aktive brukere i kanalen.
-                        </Alertstripe>
-                    )}
+                    {this.state.brukere.length > 0 &&
+                        !this.state.iKo &&
+                        !harAktiveBrukere && (
+                            <Alertstripe type='advarsel'>
+                                Det er ikke flere aktive brukere i kanalen.
+                            </Alertstripe>
+                        )}
                     {this.state.melding === 'suksess' && (
                         <Alertstripe type='suksess'>Flott.</Alertstripe>
                     )}
@@ -163,7 +177,9 @@ export default class Interaksjonsvindu extends Component<
             );
 
             let data: Config = {
-                sessionId: '1234-' + session.data.iqSessionId,
+                sessionId: `${this.props.customerKey}-${
+                    session.data.iqSessionId
+                }`,
                 sessionIdPure: session.data.iqSessionId,
                 requestId: session.data.requestId,
                 alive: moment(new Date())
@@ -218,7 +234,7 @@ export default class Interaksjonsvindu extends Component<
                     }
                 );
             } catch (e) {
-                console.error(e);
+                console.error(e.response);
                 this.setState({
                     feil: true
                 });
@@ -283,6 +299,9 @@ export default class Interaksjonsvindu extends Component<
                     if (_historie.type === 'Event') {
                         if (_historie.content === 'USER_CONNECTED') {
                             this.props.oppdaterNavn(_historie.nickName);
+                            this.setState({
+                                iKo: false
+                            });
                         } else if (_historie.content === 'USER_DISCONNECTED') {
                             const bruker = this.state.brukere.filter(
                                 (_bruker: Bruker) =>
@@ -296,6 +315,12 @@ export default class Interaksjonsvindu extends Component<
                         ) {
                             this.setState({
                                 avsluttet: true
+                            });
+                        } else if (
+                            _historie.content.includes('REQUEST_PUTINQUEUE')
+                        ) {
+                            this.setState({
+                                iKo: true
                             });
                         }
                     } else if (_historie.type === 'UserInfo') {
@@ -331,10 +356,14 @@ export default class Interaksjonsvindu extends Component<
                 );
             })
             .catch(e => {
-                console.error(e);
-                this.setState({
-                    feil: true
-                });
+                console.error(e.response);
+                if (e.response.status === 404) {
+                    this.init(true);
+                } else {
+                    this.setState({
+                        feil: true
+                    });
+                }
             });
     }
 
@@ -344,24 +373,27 @@ export default class Interaksjonsvindu extends Component<
             historie.content === 'REQUEST_DISCONNECTED'
         ) {
             return (
-                <div key={`el-${historie.id}`}>
+                <Tabbable key={`el-${historie.id}`} tabIndex={0}>
                     <Evaluering
+                        opprettEvaluering={() => this.opprettEvaluering()}
                         evaluer={evaluering => this.evaluer(evaluering)}
                         beskjed={historie}
+                        baseUrl={this.props.baseUrl}
+                        queueKey={this.props.queueKey}
                     />
                     <div
                         key={`scroll-el-${historie.id}`}
                         ref={e => (this.scrollEl = e)}
                         aria-hidden='true'
                     />
-                </div>
+                </Tabbable>
             );
         } else {
             switch (historie.type) {
                 case 'Message':
                 case 'OptionResult':
                     return (
-                        <div key={`el-${historie.id}`}>
+                        <Tabbable key={`el-${historie.id}`} tabIndex={0}>
                             <Kommunikasjon
                                 key={historie.id}
                                 Beskjed={historie}
@@ -372,22 +404,22 @@ export default class Interaksjonsvindu extends Component<
                                 ref={e => (this.scrollEl = e)}
                                 aria-hidden='true'
                             />
-                        </div>
+                        </Tabbable>
                     );
                 case 'Event':
                     return (
-                        <div key={`el-${historie.id}`}>
+                        <Tabbable key={`el-${historie.id}`} tabIndex={0}>
                             <Eventviser Beskjed={historie} />
                             <div
                                 key={`scroll-el-${historie.id}`}
                                 ref={e => (this.scrollEl = e)}
                                 aria-hidden='true'
                             />
-                        </div>
+                        </Tabbable>
                     );
                 case 'Option':
                     return (
-                        <div key={`el-${historie.id}`}>
+                        <Tabbable key={`el-${historie.id}`} tabIndex={0}>
                             <Flervalg
                                 beskjed={historie}
                                 harBlittBesvart={historie.content.find(
@@ -403,7 +435,7 @@ export default class Interaksjonsvindu extends Component<
                                 ref={e => (this.scrollEl = e)}
                                 aria-hidden='true'
                             />
-                        </div>
+                        </Tabbable>
                     );
                 default:
                     return;
@@ -450,7 +482,57 @@ export default class Interaksjonsvindu extends Component<
             });
     }
 
-    evaluer(evaluering: 1 | 2 | 3 | 4 | 5) {
-        console.log(evaluering);
+    opprettEvaluering() {
+        const config: Config = JSON.parse(localStorage.getItem(
+            'config'
+        ) as string);
+        axios
+            .post(`${this.props.baseUrl}/sessions/${config.sessionId}/survey`, {
+                nickName: 'Bruker',
+                surveyQuestion:
+                    'Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med meg.',
+                surveyMaxScore: 5,
+                surveyMinScore: 1,
+                offerSurvey: true,
+                queueKey: this.props.queueKey
+            })
+            .then(res => {
+                this.setState({
+                    evalueringsNokkel: res.data
+                });
+            });
     }
+
+    evaluer(evaluering: 1 | 2 | 3 | 4 | 5) {
+        const config: Config = JSON.parse(localStorage.getItem(
+            'config'
+        ) as string);
+        axios
+            .post(`${this.props.baseUrl}/sessions/${config.sessionId}/survey`, {
+                nickName: 'Bruker',
+                surveyQuestion:
+                    'Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med meg.',
+                surveyMaxScore: 5,
+                surveyMinScore: 1,
+                offerSurvey: false,
+                queueKey: this.props.queueKey,
+                surveyComment: evaluering,
+                parentSessionId: this.state.evalueringsNokkel
+            })
+            .then(res => {
+                console.log(res);
+            });
+    }
+
+    handleScroll = (e: any) => {
+        if (e.target.scrollTop > 0) {
+            this.setState({
+                harScrollet: true
+            });
+        } else {
+            this.setState({
+                harScrollet: false
+            });
+        }
+    };
 }

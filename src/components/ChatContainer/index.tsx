@@ -26,17 +26,19 @@ export default class ChatContainer extends Component<
         this.lukk = this.lukk.bind(this);
         this.oppdaterNavn = this.oppdaterNavn.bind(this);
         this.avslutt = this.avslutt.bind(this);
+        this.omstart = this.omstart.bind(this);
     }
 
     render() {
         const { queueKey, customerKey } = this.props;
         return (
-            <Container erApen={this.state.erApen}>
+            <Container erApen={this.state.erApen} tabIndex={0}>
                 {!this.state.erApen && <FridaKnapp onClick={this.apne} />}
                 {this.state.erApen && (
                     <ToppBar
                         navn={this.state.navn}
                         lukk={() => this.lukk()}
+                        omstart={() => this.omstart()}
                         avslutt={() => this.avslutt()}
                     />
                 )}
@@ -60,6 +62,8 @@ export default class ChatContainer extends Component<
     lukk(): void {
         this.setState({ erApen: false });
     }
+
+    omstart(): void {}
 
     oppdaterNavn(navn: string): void {
         if (this.state.navn !== navn) {

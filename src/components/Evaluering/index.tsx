@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container, Eval, Snakkeboble } from './styles';
 import rating1 from '../../assets/rating-1.svg';
 import rating2 from '../../assets/rating-2.svg';
-import rating3 from '../../assets/rating-5.svg';
+import rating3 from '../../assets/rating-3.svg';
 import rating4 from '../../assets/rating-4.svg';
 import rating5 from '../../assets/rating-5.svg';
 import MetaInfo from '../MetaInfo';
@@ -10,10 +10,17 @@ import { Beskjed } from '../Kommunikasjon';
 
 type EvalueringProps = {
     beskjed: Beskjed;
+    opprettEvaluering: () => void;
     evaluer: (evaluering: 1 | 2 | 3 | 4 | 5) => void;
+    baseUrl: string;
+    queueKey: string;
 };
 
 export default class Evaluering extends Component<EvalueringProps, {}> {
+    componentDidMount(): void {
+        this.props.opprettEvaluering();
+    }
+
     render() {
         return (
             <div>

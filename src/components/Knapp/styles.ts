@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import tema from '../../tema/tema';
 
 export const KnappElement = styled.button`
-    outline: none;
     background: ${(props: { aktiv: boolean }) =>
         props.aktiv ? tema.farger.interaksjon : '#fff'};
     border: 1px solid ${tema.farger.interaksjon};

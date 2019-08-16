@@ -6,7 +6,7 @@ export const Snakkeboble = styled.div`
     font-size: ${tema.storrelser.tekst.generell};
     padding: 10px;
     background: ${tema.farger.snakkebobler.bot};
-    border-radius: 0 7px 0 0;
+    border-radius: 0 7px 7px 7px;
     word-break: break-word;
     margin-top: 10px;
 
@@ -23,13 +23,21 @@ export const Container = styled.div`
     display: flex;
     justify-content: space-between;
     border-radius: 0 0 7px 7px;
-    padding: 15px;
+    margin-top: -7px;
+    padding-top: 7px;
 `;
 
 export const Eval = styled.div`
+    padding: 15px;
+
     svg {
         width: 30px;
         height: 30px;
         cursor: pointer;
+        transition: all 150ms ease-in-out;
+
+        &:hover {
+            transform: translateY(-5px);
+        }
     }
 `;

@@ -13,6 +13,7 @@ export default class Knapp extends Component<KnappProps, {}> {
                 disabled={this.props.disabled}
                 type='submit'
                 aktiv={this.props.aktiv}
+                tabIndex={0}
             >
                 {this.props.children}
             </KnappElement>

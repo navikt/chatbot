@@ -7,6 +7,18 @@ export const Interaksjon = styled.div`
     height: 100%;
     position: relative;
     overflow-x: hidden;
+
+    &:before {
+        content: '';
+        position: absolute;
+        height: 10px;
+        width: 100%;
+        top: ${(props: { harScrollet: boolean }) =>
+            props.harScrollet ? 0 : '-20px'};
+        display: block;
+        box-shadow: inset 0 10px 5px -6px rgba(0, 0, 0, 0.16);
+        transition: top 150ms ease-in-out;
+    }
 `;
 export const Chatlog = styled.div`
     height: 100%;
@@ -48,4 +60,11 @@ export const Teller = styled.div`
     margin-top: 5px;
     color: ${(props: { error: boolean }) =>
         props.error ? 'red' : tema.farger.tekst.klokketekst};
+`;
+
+export const Tabbable = styled.div`
+    &:focus,
+    &:active {
+        outline: ${tema.farger.interaksjon} solid 2px;
+    }
 `;
