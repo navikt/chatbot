@@ -65,6 +65,6 @@ export const Teller = styled.div`
 export const Tabbable = styled.div`
     &:focus,
     &:active {
-        outline: ${tema.farger.interaksjon} solid 2px;
+        // outline: ${tema.farger.interaksjon} solid 2px;
     }
 `;

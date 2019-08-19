@@ -11,11 +11,11 @@ export const ValgContainer = styled.ul`
 
 export const Valg = styled.li`
     border: 1px solid #000;
-    padding: 10px;
+    padding: 15px;
     font-family: ${tema.tekstFamilie};
     font-size: ${tema.storrelser.tekst.generell};
     margin: 0;
-    border-radius: 3px;
+    border-radius: 5px;
     cursor: pointer;
     padding-left: 50px;
     position: relative;
@@ -26,7 +26,7 @@ export const Valg = styled.li`
         height: 20px;
         width: 20px;
         border: 1px solid #000;
-        left: 10px;
+        left: 15px;
         top: 50%;
         transform: translateY(-50%);
         border-radius: 50%;
@@ -85,7 +85,7 @@ export const Valg = styled.li`
                 )}') no-repeat center center;
             }
             
-            &:hover{
+            &:hover {
                 box-shadow: none;
                 color: #000;
                 cursor: auto;
@@ -99,4 +99,8 @@ export const Valg = styled.li`
                 }
             }
         `}
+`;
+
+export const Container = styled.div`
+    max-width: 80%;
 `;

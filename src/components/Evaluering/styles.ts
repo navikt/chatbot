@@ -4,7 +4,7 @@ import tema from '../../tema/tema';
 export const Snakkeboble = styled.div`
     font-family: ${tema.tekstFamilie};
     font-size: ${tema.storrelser.tekst.generell};
-    padding: 10px;
+    padding: 15px;
     background: ${tema.farger.snakkebobler.bot};
     border-radius: 0 7px 7px 7px;
     word-break: break-word;
@@ -28,7 +28,7 @@ export const Container = styled.div`
 `;
 
 export const Eval = styled.div`
-    padding: 15px;
+    padding: 10px;
 
     svg {
         width: 30px;
@@ -40,4 +40,8 @@ export const Eval = styled.div`
             transform: translateY(-5px);
         }
     }
+`;
+
+export const Outer = styled.div`
+    max-width: 80%;
 `;

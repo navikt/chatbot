@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Beskjed } from '../Kommunikasjon';
 import MetaInfo from '../MetaInfo';
-import { Valg, ValgContainer } from './styles';
+import { Container, Valg, ValgContainer } from './styles';
 
 type FlervalgProps = {
     beskjed: Beskjed;
@@ -34,7 +34,7 @@ export default class Flervalg extends Component<FlervalgProps, {}> {
             )
         );
         return (
-            <div>
+            <Container>
                 <MetaInfo
                     nickName={this.props.beskjed.nickName}
                     sent={this.props.beskjed.sent}
@@ -47,7 +47,7 @@ export default class Flervalg extends Component<FlervalgProps, {}> {
                 >
                     {options}
                 </ValgContainer>
-            </div>
+            </Container>
         );
     }
 }

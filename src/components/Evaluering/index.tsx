@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Eval, Snakkeboble } from './styles';
+import { Container, Eval, Outer, Snakkeboble } from './styles';
 import rating1 from '../../assets/rating-1.svg';
 import rating2 from '../../assets/rating-2.svg';
 import rating3 from '../../assets/rating-3.svg';
@@ -23,7 +23,7 @@ export default class Evaluering extends Component<EvalueringProps, {}> {
 
     render() {
         return (
-            <div>
+            <Outer>
                 <MetaInfo
                     nickName='Chatbot Frida'
                     sent={this.props.beskjed.sent}
@@ -58,7 +58,7 @@ export default class Evaluering extends Component<EvalueringProps, {}> {
                         dangerouslySetInnerHTML={{ __html: rating5 }}
                     />
                 </Container>
-            </div>
+            </Outer>
         );
     }
 }

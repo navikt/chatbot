@@ -37,7 +37,7 @@ export const Brukerbilde = styled.div`
 export const Snakkeboble = styled.div`
     font-family: ${tema.tekstFamilie};
     font-size: ${tema.storrelser.tekst.generell};
-    padding: 10px;
+    padding: 15px;
     background: ${(props: KommunikasjonState) =>
         props.brukerType === 'Bot'
             ? tema.farger.snakkebobler.bot
