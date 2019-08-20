@@ -46,6 +46,11 @@ export const Tekstfelt = styled.textarea`
     ::placeholder {
         color: ${tema.farger.tekstfelt};
     }
+
+    :disabled {
+        opacity: 0.5;
+        background: #fff;
+    }
 `;
 
 export const SendKnappOgTeller = styled.div`

@@ -33,11 +33,19 @@ export const Eval = styled.div`
     svg {
         width: 30px;
         height: 30px;
-        cursor: pointer;
+        cursor: ${(props: { evalValgt: boolean; valgt: boolean }) =>
+            !props.evalValgt ? 'pointer' : 'default'};
         transition: all 150ms ease-in-out;
 
+        circle,
+        path {
+            stroke: ${(props: { evalValgt: boolean; valgt: boolean }) =>
+                props.valgt ? '#0067c5' : props.evalValgt ? '#ccc' : undefined};
+        }
+
         &:hover {
-            transform: translateY(-5px);
+            transform: ${(props: { evalValgt: boolean; valgt: boolean }) =>
+                !props.evalValgt ? 'translateY(-5px)' : undefined};
         }
     }
 `;

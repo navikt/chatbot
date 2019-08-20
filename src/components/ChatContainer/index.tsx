@@ -17,7 +17,8 @@ const defaultState: ChatContainerState = {
     config: loadJSON('config'),
     brukere: [],
     iKo: false,
-    sisteMeldingId: 0
+    sisteMeldingId: 0,
+    avsluttet: false
 };
 
 export default class ChatContainer extends Component<
@@ -47,7 +48,13 @@ export default class ChatContainer extends Component<
                 {!this.state.erApen && <FridaKnapp onClick={this.apne} />}
                 {this.state.erApen && (
                     <ToppBar
-                        navn={this.state.navn}
+                        navn={
+                            this.state.brukere.some(
+                                (bruker: Bruker) => bruker.userType === 'Human'
+                            )
+                                ? `Chat med NAV`
+                                : this.state.navn
+                        }
                         lukk={() => this.lukk()}
                         omstart={() => this.omstart()}
                         avslutt={() => this.avslutt()}
@@ -68,15 +75,18 @@ export default class ChatContainer extends Component<
 
     async start(tving: boolean = false) {
         if (!this.state.config || tving) {
+            deleteJSON('svartEval');
             await this.hentConfig();
         }
         if (this.state.historie && this.state.historie.length < 1) {
             const historie = await this.hentFullHistorie()!;
             const data: any[] = historie.data;
-            this.setState({
-                historie: data,
-                sisteMeldingId: data[data.length - 1].id
-            });
+
+            if (data.length > 0) {
+                for (let historie of data) {
+                    this.handterMelding(historie);
+                }
+            }
         }
 
         setInterval(() => this.hentHistorie(this.state.sisteMeldingId), 1000);

@@ -7,6 +7,7 @@ import rating4 from '../../assets/rating-4.svg';
 import rating5 from '../../assets/rating-5.svg';
 import MetaInfo from '../MetaInfo';
 import { Beskjed } from '../Kommunikasjon';
+import { loadJSON } from '../../services/localStorageService';
 
 type EvalueringProps = {
     beskjed: Beskjed;
@@ -14,9 +15,25 @@ type EvalueringProps = {
     evaluer: (evaluering: 1 | 2 | 3 | 4 | 5) => void;
     baseUrl: string;
     queueKey: string;
+    nickName: string;
 };
 
-export default class Evaluering extends Component<EvalueringProps, {}> {
+export type EvalueringState = {
+    valgt: boolean;
+    valgtSvar: 1 | 2 | 3 | 4 | 5;
+};
+export default class Evaluering extends Component<
+    EvalueringProps,
+    EvalueringState
+> {
+    constructor(props: EvalueringProps) {
+        super(props);
+        this.state = {
+            valgt: !!loadJSON('svartEval'),
+            valgtSvar: loadJSON('svartEval')
+        };
+    }
+
     componentDidMount(): void {
         this.props.opprettEvaluering();
     }
@@ -25,7 +42,7 @@ export default class Evaluering extends Component<EvalueringProps, {}> {
         return (
             <Outer>
                 <MetaInfo
-                    nickName='Chatbot Frida'
+                    nickName={this.props.nickName}
                     sent={this.props.beskjed.sent}
                     side='VENSTRE'
                 />
@@ -40,22 +57,32 @@ export default class Evaluering extends Component<EvalueringProps, {}> {
                     <Eval
                         onClick={() => this.props.evaluer(1)}
                         dangerouslySetInnerHTML={{ __html: rating1 }}
+                        evalValgt={this.state.valgt}
+                        valgt={this.state.valgtSvar === 1}
                     />
                     <Eval
                         onClick={() => this.props.evaluer(2)}
                         dangerouslySetInnerHTML={{ __html: rating2 }}
+                        evalValgt={this.state.valgt}
+                        valgt={this.state.valgtSvar === 2}
                     />
                     <Eval
                         onClick={() => this.props.evaluer(3)}
                         dangerouslySetInnerHTML={{ __html: rating3 }}
+                        evalValgt={this.state.valgt}
+                        valgt={this.state.valgtSvar === 3}
                     />
                     <Eval
                         onClick={() => this.props.evaluer(4)}
                         dangerouslySetInnerHTML={{ __html: rating4 }}
+                        evalValgt={this.state.valgt}
+                        valgt={this.state.valgtSvar === 4}
                     />
                     <Eval
                         onClick={() => this.props.evaluer(5)}
                         dangerouslySetInnerHTML={{ __html: rating5 }}
+                        evalValgt={this.state.valgt}
+                        valgt={this.state.valgtSvar === 5}
                     />
                 </Container>
             </Outer>
