@@ -38,10 +38,10 @@ export const Container = styled.div`
     ${(props: ChatContainerState) =>
         !props.erApen &&
         css`
-            transform: translateY(0);
+            transform: translatey(0);
 
             &:hover {
-                transform: translateY(-10px);
+                transform: translatey(-10px);
             }
         `}
 

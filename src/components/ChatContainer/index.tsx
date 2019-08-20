@@ -10,6 +10,16 @@ export type ChatContainerState = {
     navn?: string | undefined;
 };
 
+const defaultState: ChatContainerState = {
+    erApen: true,
+    navn: 'Chatbot Frida',
+    historie: [],
+    config: loadJSON('config'),
+    brukere: [],
+    iKo: false,
+    sisteMeldingId: 0
+};
+
 export default class ChatContainer extends Component<
     ConnectionConfig,
     ChatContainerState
@@ -22,6 +32,7 @@ export default class ChatContainer extends Component<
             navn: 'Chatbot Frida'
         };
 
+        this.start = this.start.bind(this);
         this.apne = this.apne.bind(this);
         this.lukk = this.lukk.bind(this);
         this.oppdaterNavn = this.oppdaterNavn.bind(this);
@@ -55,6 +66,22 @@ export default class ChatContainer extends Component<
         );
     }
 
+    async start(tving: boolean = false) {
+        if (!this.state.config || tving) {
+            await this.hentConfig();
+        }
+        if (this.state.historie && this.state.historie.length < 1) {
+            const historie = await this.hentFullHistorie()!;
+            const data: any[] = historie.data;
+            this.setState({
+                historie: data,
+                sisteMeldingId: data[data.length - 1].id
+            });
+        }
+
+        setInterval(() => this.hentHistorie(this.state.sisteMeldingId), 1000);
+    }
+
     apne(): void {
         this.setState({ erApen: true });
     }
@@ -63,7 +90,10 @@ export default class ChatContainer extends Component<
         this.setState({ erApen: false });
     }
 
-    omstart(): void {}
+    omstart(): void {
+        this.setState(defaultState);
+        this.start(true);
+    }
 
     oppdaterNavn(navn: string): void {
         if (this.state.navn !== navn) {
