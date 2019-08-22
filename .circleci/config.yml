@@ -6,13 +6,13 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Installeret npm pakker
+          name: Installer npm pakker
           command: |
             npm ci
       - run:
-          name: Bygger React app
+          name: Bygg React app
           command: |
-            npm run build:test-app
+            npm run build
       - persist_to_workspace:
           root: .
           paths:
@@ -42,23 +42,16 @@ jobs:
           ingress1: https://$REPO_NAME.nais.oera-q.local
           ingress2: https://www-q0.nav.no/person/$REPO_NAME
 
-  deploy-til-npm:
+  deploy-til-prod:
     docker:
-      - image: circleci/node:11.7.0
+      - image: navikt/deployment-cli:latest
     steps:
       - checkout
-      - attach_workspace:
-          at: .
-      - run:
-          name: Lanserer ny versjon
-          command: echo "Lanser versjon ${CIRCLE_TAG} til npmjs"
-      - run:
-          name: Autentiser med register
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
-      - run:
-          name: Publiser pakke
-          command: |
-            npm publish
+      - sett-miljovariabler
+      - deploy:
+          til: prod-sbs
+          ingress1: https://$REPO_NAME.nais.oera.no
+          ingress2: https://www.nav.no/person/$REPO_NAME
 
 commands:
   deploy:
@@ -91,7 +84,7 @@ commands:
   sett-miljovariabler:
     steps:
       - run:
-          name:  Definerer git-referanse, versjonsnummer og repo-navn
+          name: Definerer git-referanse, versjonsnummer og repo-navn
           command: |
             echo "export COMMIT_SHORT='$(git rev-parse --short HEAD)'" >> $BASH_ENV
             echo "export IMAGE_VERSION='$CIRCLE_WORKFLOW_ID-${CIRCLE_BRANCH////-}$CIRCLE_TAG'" >> $BASH_ENV
@@ -127,11 +120,19 @@ workflows:
             tags:
               only: /^v.*/
             branches:
-              only:
-                - master
-      - deploy-til-npm:
+              only: master
+      - bekreft-deploy-til-prod:
+          type: approval
           requires:
             - automatisk-deploy-til-dev
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - deploy-til-prod:
+          requires:
+            - bekreft-deploy-til-prod
           filters:
             tags:
               only: /^v.*/
