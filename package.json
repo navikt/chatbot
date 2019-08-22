@@ -1,5 +1,6 @@
 {
     "name": "@navikt/nav-chatbot",
+    "homepage": "/person/chatbot/test",
     "version": "1.0.0",
     "description": "Chatbot Frida for nav.no",
     "license": "MIT",
@@ -17,6 +18,7 @@
     ],
     "scripts": {
         "build": "nwb build-react-component --no-demo",
+        "build:navno-app": "nwb -c ./nwb.navno.config.js build-react-app",
         "clean": "nwb clean-module && nwb clean-demo",
         "prepublishOnly": "npm run build",
         "start": "nwb -c ./nwb.demo.config.js serve-react-demo --copy-files",
@@ -27,6 +29,7 @@
     "dependencies": {
         "axios": "^0.19.0",
         "moment": "^2.24.0",
+        "prettier": "^1.18.2",
         "react-moment": "^0.9.2",
         "styled-components": "^4.3.2"
     },
