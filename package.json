@@ -17,6 +17,7 @@
     ],
     "scripts": {
         "build": "nwb build-react-component --no-demo",
+        "build:test-app": "nwb -c ./nwb.demo.config.js build-react-app --no-demo",
         "clean": "nwb clean-module && nwb clean-demo",
         "prepublishOnly": "npm run build",
         "start": "nwb -c ./nwb.demo.config.js serve-react-demo --copy-files",
