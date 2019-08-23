@@ -2,7 +2,7 @@
 FROM nginx:alpine
 
 # Kopier statiske filer
-COPY ./dist /var/www/person/chatbot/test
+COPY ./build /var/www/person/chatbot/test
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
 # Definer produksjonsvller

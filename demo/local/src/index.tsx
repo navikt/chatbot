@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { render } from 'react-dom';
-
-import Chat from '../../src';
+import Chat from '../../../src';
 
 const Outer = styled.div`
     padding: 0;
