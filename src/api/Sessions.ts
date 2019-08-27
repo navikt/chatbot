@@ -1,12 +1,12 @@
 export interface Message {
-    id: number;
+    id?: number;
     sent: string;
     role: number;
     userId: number;
     nickName: string;
     type: string;
     content: any | any[];
-    arguments: {
+    arguments?: {
         additionalProp1: {};
         additionalProp2: {};
         additionalProp3: {};

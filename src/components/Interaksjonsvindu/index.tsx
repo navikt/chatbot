@@ -19,6 +19,7 @@ import Alertstripe from '../Alertstripe';
 import { ConnectionConfig } from '../../index';
 import Evaluering from '../Evaluering';
 import { loadJSON, saveJSON } from '../../services/localStorageService';
+import { Message } from '../../api/Sessions';
 
 export interface Bruker {
     userId: number;
@@ -31,6 +32,7 @@ export interface Bruker {
 
 type InteraksjonsvinduProps = {
     oppdaterNavn: (navn: string) => void;
+    handterMelding: (melding: Message, oppdater: boolean) => void;
     apne: () => void;
     lukk: () => void;
     vis: boolean;
@@ -321,7 +323,12 @@ export default class Interaksjonsvindu extends Component<
             const sisteBrukerSomSnakket = this.props.historie
                 .slice()
                 .reverse()
-                .find(_historie => _historie.role === 1).nickName;
+                .find(_historie => _historie.role === 1);
+            let sisteBrukerSomSnakketNick;
+
+            if (sisteBrukerSomSnakket) {
+                sisteBrukerSomSnakketNick = sisteBrukerSomSnakket.nickName;
+            }
             return (
                 <Tabbable key={`el-${historie.id}`} tabIndex={0}>
                     <Evaluering
@@ -331,8 +338,9 @@ export default class Interaksjonsvindu extends Component<
                         baseUrl={this.props.baseUrl}
                         queueKey={this.props.queueKey}
                         nickName={
-                            sisteBrukerSomSnakket === 'Chatbot Frida'
-                                ? sisteBrukerSomSnakket
+                            sisteBrukerSomSnakket &&
+                            sisteBrukerSomSnakketNick === 'Chatbot Frida'
+                                ? sisteBrukerSomSnakketNick
                                 : 'NAV Chat'
                         }
                     />
@@ -463,7 +471,7 @@ export default class Interaksjonsvindu extends Component<
         }
     }
 
-    async evaluer(evaluering: 1 | 2 | 3 | 4 | 5) {
+    async evaluer(evaluering: number) {
         if (!loadJSON('svartEval')) {
             await axios.post(
                 `${this.props.baseUrl}/sessions/${
@@ -482,6 +490,17 @@ export default class Interaksjonsvindu extends Component<
                 }
             );
             saveJSON('svartEval', evaluering);
+            this.props.handterMelding(
+                {
+                    nickName: 'Bruker',
+                    sent: new Date().toString(),
+                    role: 0,
+                    userId: 0,
+                    type: 'Evaluation',
+                    content: evaluering
+                },
+                true
+            );
         }
     }
 

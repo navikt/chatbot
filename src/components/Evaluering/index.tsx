@@ -35,7 +35,7 @@ export default class Evaluering extends Component<
     }
 
     componentDidMount(): void {
-        this.props.opprettEvaluering();
+        // this.props.opprettEvaluering();
     }
 
     render() {
