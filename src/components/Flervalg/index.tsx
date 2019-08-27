@@ -16,6 +16,7 @@ export interface ValgProps {
 
 export default class Flervalg extends Component<FlervalgProps, {}> {
     render() {
+        console.log(this.props.beskjed);
         const options = this.props.beskjed.content.map(
             (_h: { tekst: string; valgt: boolean }, index: number) => (
                 <Valg

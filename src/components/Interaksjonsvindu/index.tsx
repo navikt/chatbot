@@ -49,7 +49,6 @@ type InteraksjonsvinduState = {
     sendt: boolean;
     feil: boolean;
     evalueringsNokkel: string;
-    harScrollet: boolean;
 };
 
 export interface Config {
@@ -70,7 +69,6 @@ export default class Interaksjonsvindu extends Component<
         super(props);
 
         this.state = {
-            harScrollet: false,
             evalueringsNokkel: '',
             feil: false,
             sendt: false,
@@ -82,7 +80,6 @@ export default class Interaksjonsvindu extends Component<
         this.velg = this.velg.bind(this);
         this.evaluer = this.evaluer.bind(this);
         this.opprettEvaluering = this.opprettEvaluering.bind(this);
-        this.handleScroll = this.handleScroll.bind(this);
     }
 
     render() {
@@ -98,10 +95,7 @@ export default class Interaksjonsvindu extends Component<
                     .length > 0;
 
             return (
-                <Interaksjon
-                    onScroll={this.handleScroll}
-                    harScrollet={this.state.harScrollet}
-                >
+                <Interaksjon>
                     {this.props.iKo && (
                         <Alertstripe type='info'>
                             Du blir nå satt over til en veileder.
@@ -355,6 +349,7 @@ export default class Interaksjonsvindu extends Component<
             switch (historie.type) {
                 case 'Message':
                 case 'OptionResult':
+                case 'Evaluation':
                     return (
                         <Tabbable key={`el-${historie.id}`} tabIndex={0}>
                             <Kommunikasjon
@@ -490,8 +485,11 @@ export default class Interaksjonsvindu extends Component<
                 }
             );
             saveJSON('svartEval', evaluering);
+            const max = Number.MAX_SAFE_INTEGER;
+            const min = Number.MAX_SAFE_INTEGER - 100000;
             this.props.handterMelding(
                 {
+                    id: Math.floor(Math.random() * (max - min + 1)) + min,
                     nickName: 'Bruker',
                     sent: new Date().toString(),
                     role: 0,
@@ -503,16 +501,4 @@ export default class Interaksjonsvindu extends Component<
             );
         }
     }
-
-    handleScroll = (e: any) => {
-        if (e.target.scrollTop > 0) {
-            this.setState({
-                harScrollet: true
-            });
-        } else {
-            this.setState({
-                harScrollet: false
-            });
-        }
-    };
 }

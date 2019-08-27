@@ -9,6 +9,11 @@ import {
     Venstre
 } from './styles';
 import { Bruker } from '../Interaksjonsvindu';
+import rating1 from '../../assets/rating-1.svg';
+import rating2 from '../../assets/rating-2.svg';
+import rating3 from '../../assets/rating-3.svg';
+import rating4 from '../../assets/rating-4.svg';
+import rating5 from '../../assets/rating-5.svg';
 
 export type Beskjed = {
     arguments: any[] | null;
@@ -26,7 +31,8 @@ export type Beskjed = {
         | 'Command'
         | 'Reaction'
         | 'UserInfo'
-        | 'Template';
+        | 'Template'
+        | 'Evaluation';
     userId: number;
 };
 
@@ -97,8 +103,26 @@ export default class Kommunikasjon extends Component<
     }
 
     render() {
-        const { nickName, sent, content } = this.props.Beskjed;
+        const { nickName, sent, content, type } = this.props.Beskjed;
         const bruker = this.hentBruker(nickName);
+        let htmlToRender;
+        if (type === 'Evaluation') {
+            if (content === 1) {
+                htmlToRender = rating1;
+            } else if (content === 2) {
+                htmlToRender = rating2;
+            } else if (content === 3) {
+                htmlToRender = rating3;
+            } else if (content === 4) {
+                htmlToRender = rating4;
+            } else if (content === 5) {
+                htmlToRender = rating5;
+            }
+        } else {
+            htmlToRender = unescape(
+                content.optionChoice ? content.optionChoice : content
+            );
+        }
         return (
             <Container>
                 <MetaInfo
@@ -125,11 +149,7 @@ export default class Kommunikasjon extends Component<
                                     : content
                             }`}
                             dangerouslySetInnerHTML={{
-                                __html: unescape(
-                                    content.optionChoice
-                                        ? content.optionChoice
-                                        : content
-                                )
+                                __html: htmlToRender as string
                             }}
                             side={this.state.side}
                             visBilde={this.state.visBilde}
