@@ -105,7 +105,6 @@ export default class ChatContainer extends Component<
     }
 
     async start(tving: boolean = false) {
-        console.log(this.state.historie);
         if (!this.state.config || tving) {
             deleteJSON('svartEval');
             this.setState({

@@ -310,6 +310,7 @@ export default class Interaksjonsvindu extends Component<
     // }
 
     lastHistorie(historie: Beskjed) {
+        this.scrollToBottom();
         if (
             historie.type === 'Event' &&
             historie.content === 'REQUEST_DISCONNECTED'
