@@ -48,6 +48,11 @@ export const Snakkeboble = styled.div`
         props.side === 'VENSTRE' ? '0 7px 7px 7px' : '7px 0 7px 7px'};
     word-break: break-word;
 
+    svg {
+        height: 30px;
+        width: 30px;
+    }
+
     a,
     a:visited,
     :link {

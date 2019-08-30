@@ -13,8 +13,7 @@ export const Interaksjon = styled.div`
         position: absolute;
         height: 10px;
         width: 100%;
-        top: ${(props: { harScrollet: boolean }) =>
-            props.harScrollet ? 0 : '-20px'};
+        top: 0;
         display: block;
         box-shadow: inset 0 10px 5px -6px rgba(0, 0, 0, 0.16);
         transition: top 150ms ease-in-out;
@@ -45,6 +44,11 @@ export const Tekstfelt = styled.textarea`
 
     ::placeholder {
         color: ${tema.farger.tekstfelt};
+    }
+
+    :disabled {
+        opacity: 0.5;
+        background: #fff;
     }
 `;
 

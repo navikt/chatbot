@@ -20,28 +20,30 @@ export default class Eventviser extends Component<KommunikasjonProps, {}> {
     }
 
     private visEventTekst() {
-        switch (this.props.Beskjed.content) {
+        const { nickName } = this.props.beskjed;
+        switch (this.props.beskjed.content) {
             case 'USER_DISCONNECTED':
-                return `${this.props.Beskjed.nickName} forlot chatten.`;
+                return `${nickName} forlot chatten.`;
             case 'USER_CONNECTED':
-                return `${this.props.Beskjed.nickName} ble med i chatten.`;
+                return `${nickName} ble med i chatten.`;
             case 'REQUEST_DISCONNECTED':
                 return 'Bruker forlot chatten.';
             case 'TYPE_MSG':
-                return <Skriveindikator beskjed={this.props.Beskjed} />;
+                return <Skriveindikator beskjed={this.props.beskjed} />;
             default:
                 return;
         }
     }
 
     private hentAriaTekst(): string {
-        switch (this.props.Beskjed.content) {
+        const { nickName } = this.props.beskjed;
+        switch (this.props.beskjed.content) {
             case 'USER_DISCONNECTED':
-                return `${this.props.Beskjed.nickName} forlot chatten.`;
+                return `${nickName} forlot chatten.`;
             case 'USER_CONNECTED':
-                return `${this.props.Beskjed.nickName} ble med i chatten.`;
+                return `${nickName} ble med i chatten.`;
             case 'TYPE_MSG':
-                return `${this.props.Beskjed.nickName} skriver...`;
+                return `${nickName} skriver...`;
             default:
                 return '';
         }

@@ -9,6 +9,11 @@ import {
     Venstre
 } from './styles';
 import { Bruker } from '../Interaksjonsvindu';
+import rating1 from '../../assets/rating-1.svg';
+import rating2 from '../../assets/rating-2.svg';
+import rating3 from '../../assets/rating-3.svg';
+import rating4 from '../../assets/rating-4.svg';
+import rating5 from '../../assets/rating-5.svg';
 
 export type Beskjed = {
     arguments: any[] | null;
@@ -26,12 +31,13 @@ export type Beskjed = {
         | 'Command'
         | 'Reaction'
         | 'UserInfo'
-        | 'Template';
+        | 'Template'
+        | 'Evaluation';
     userId: number;
 };
 
 export type KommunikasjonProps = {
-    Beskjed: Beskjed;
+    beskjed: Beskjed;
     brukere?: Bruker[];
 };
 
@@ -68,12 +74,12 @@ export default class Kommunikasjon extends Component<
             );
             settBruker = brukereSett.filter(
                 (bruker: BrukerMedBilde) =>
-                    bruker.nickName === this.props.Beskjed.nickName
+                    bruker.nickName === this.props.beskjed.nickName
             )[0];
             if (!settBruker) {
-                if (this.props.Beskjed.role === 1) {
+                if (this.props.beskjed.role === 1) {
                     brukereSett.push({
-                        nickName: this.props.Beskjed.nickName,
+                        nickName: this.props.beskjed.nickName,
                         harBlittVist: true
                     });
                 }
@@ -85,20 +91,38 @@ export default class Kommunikasjon extends Component<
             sessionStorage.setItem('brukereSett', JSON.stringify(brukereSett));
         } else {
             settBruker = {
-                nickName: this.props.Beskjed.nickName,
+                nickName: this.props.beskjed.nickName,
                 harBlittVist: false
             } as BrukerMedBilde;
             sessionStorage.setItem('brukereSett', JSON.stringify([settBruker]));
         }
         this.setState({
-            side: this.props.Beskjed.role === 1 ? 'VENSTRE' : 'HOYRE',
+            side: this.props.beskjed.role === 1 ? 'VENSTRE' : 'HOYRE',
             visBilde: settBruker ? !settBruker.harBlittVist : true
         });
     }
 
     render() {
-        const { nickName, sent, content } = this.props.Beskjed;
+        const { nickName, sent, content, type } = this.props.beskjed;
         const bruker = this.hentBruker(nickName);
+        let htmlToRender;
+        if (type === 'Evaluation') {
+            if (content === 1) {
+                htmlToRender = rating1;
+            } else if (content === 2) {
+                htmlToRender = rating2;
+            } else if (content === 3) {
+                htmlToRender = rating3;
+            } else if (content === 4) {
+                htmlToRender = rating4;
+            } else if (content === 5) {
+                htmlToRender = rating5;
+            }
+        } else {
+            htmlToRender = unescape(
+                content.optionChoice ? content.optionChoice : content
+            );
+        }
         return (
             <Container>
                 <MetaInfo
@@ -125,11 +149,7 @@ export default class Kommunikasjon extends Component<
                                     : content
                             }`}
                             dangerouslySetInnerHTML={{
-                                __html: unescape(
-                                    content.optionChoice
-                                        ? content.optionChoice
-                                        : content
-                                )
+                                __html: htmlToRender as string
                             }}
                             side={this.state.side}
                             visBilde={this.state.visBilde}

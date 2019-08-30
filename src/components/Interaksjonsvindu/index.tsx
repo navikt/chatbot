@@ -2,7 +2,6 @@ import React, { ChangeEvent, Component, FormEvent } from 'react';
 import axios from 'axios';
 import Kommunikasjon, { Beskjed } from '../Kommunikasjon';
 import Eventviser from '../Eventviser/';
-import { Message, SessionCreateResponse } from '../../api/Sessions';
 import {
     Chatlog,
     Interaksjon,
@@ -12,12 +11,13 @@ import {
     Tekstomrade,
     Teller
 } from './styles';
-import moment from 'moment';
 import Flervalg from '../Flervalg';
 import Knapp from '../Knapp';
 import Alertstripe from '../Alertstripe';
 import { ConnectionConfig } from '../../index';
 import Evaluering from '../Evaluering';
+import { loadJSON, saveJSON } from '../../services/localStorageService';
+import { Message } from '../../api/Sessions';
 
 export interface Bruker {
     userId: number;
@@ -30,25 +30,23 @@ export interface Bruker {
 
 type InteraksjonsvinduProps = {
     oppdaterNavn: (navn: string) => void;
+    handterMelding: (melding: Message, oppdater: boolean) => void;
     apne: () => void;
     lukk: () => void;
     vis: boolean;
     baseUrl: string;
+    historie: any[];
+    brukere: Bruker[];
+    iKo: boolean;
+    avsluttet: boolean;
+    config: Config;
 };
 
 type InteraksjonsvinduState = {
-    sessionId: string;
-    sessionIdPure: string;
-    requestId: number;
-    historie: any[];
     melding: string;
-    brukere: Bruker[];
     sendt: boolean;
     feil: boolean;
-    avsluttet: boolean;
-    iKo: boolean;
     evalueringsNokkel: string;
-    harScrollet: boolean;
 };
 
 export interface Config {
@@ -67,64 +65,53 @@ export default class Interaksjonsvindu extends Component<
 
     constructor(props: InteraksjonsvinduProps & ConnectionConfig) {
         super(props);
+
         this.state = {
-            requestId: 0,
-            sessionId: '',
-            sessionIdPure: '',
-            historie: [],
-            melding: '',
-            brukere: [],
-            sendt: false,
-            feil: false,
-            avsluttet: false,
-            iKo: false,
             evalueringsNokkel: '',
-            harScrollet: false
+            feil: false,
+            sendt: false,
+            melding: ''
         };
 
-        this.init = this.init.bind(this);
         this.sendMelding = this.sendMelding.bind(this);
-        this.oppdaterHistorie = this.oppdaterHistorie.bind(this);
         this.lastHistorie = this.lastHistorie.bind(this);
         this.velg = this.velg.bind(this);
         this.evaluer = this.evaluer.bind(this);
         this.opprettEvaluering = this.opprettEvaluering.bind(this);
-        this.handleScroll = this.handleScroll.bind(this);
-    }
-
-    componentDidMount() {
-        this.init();
     }
 
     render() {
         if (!this.props.vis) {
             return null;
         } else {
-            const { historie } = this.state;
+            const { historie } = this.props;
             let historieListe = historie.map((historieItem: Beskjed) => {
                 return this.lastHistorie(historieItem);
             });
             const harAktiveBrukere =
-                this.state.brukere.filter((bruker: Bruker) => bruker.aktiv)
+                this.props.brukere.filter((bruker: Bruker) => bruker.aktiv)
                     .length > 0;
 
             return (
-                <Interaksjon
-                    onScroll={this.handleScroll}
-                    harScrollet={this.state.harScrollet}
-                >
-                    {this.state.iKo && (
+                <Interaksjon>
+                    {this.props.iKo && !this.props.avsluttet && (
                         <Alertstripe type='info'>
                             Du blir nå satt over til en veileder.
                         </Alertstripe>
                     )}
-                    {this.state.brukere.length > 0 &&
-                        !this.state.iKo &&
+                    {this.props.brukere.length > 0 &&
+                        !this.props.iKo &&
                         !harAktiveBrukere && (
                             <Alertstripe type='advarsel'>
                                 Det er ikke flere aktive brukere i kanalen.
                             </Alertstripe>
                         )}
+
+                    {this.props.avsluttet && (
+                        <Alertstripe type='advarsel'>
+                            Chatten er avsluttet.
+                        </Alertstripe>
+                    )}
                     {this.state.melding === 'suksess' && (
                         <Alertstripe type='suksess'>Flott.</Alertstripe>
                     )}
@@ -144,10 +131,14 @@ export default class Interaksjonsvindu extends Component<
                             onKeyDown={e => this.handleKeyDown(e)}
                             onChange={e => this.handleChange(e)}
                             placeholder={'Skriv spørsmålet ditt'}
+                            disabled={this.props.avsluttet}
                         />
                         <SendKnappOgTeller>
                             <Knapp
-                                disabled={this.state.melding.length > 200}
+                                disabled={
+                                    this.state.melding.length > 200 ||
+                                    this.props.avsluttet
+                                }
                                 aktiv={this.state.sendt}
                             >
                                 {this.state.sendt ? 'Sendt' : 'Send'}
@@ -162,70 +153,19 @@ export default class Interaksjonsvindu extends Component<
         }
     }
 
-    async init(reset: boolean = false) {
-        if (!localStorage.getItem('config') || reset) {
-            let session: { data: SessionCreateResponse } = await axios.post(
-                `${this.props.baseUrl}/sessions`,
-                {
-                    customerKey: parseInt(this.props.customerKey),
-                    queueKey: this.props.queueKey,
-                    nickName: 'Bruker',
-                    chatId: 'test.name@customer.com',
-                    languageCode: 'NO',
-                    denyArchiving: false
-                }
-            );
-
-            let data: Config = {
-                sessionId: `${this.props.customerKey}-${
-                    session.data.iqSessionId
-                }`,
-                sessionIdPure: session.data.iqSessionId,
-                requestId: session.data.requestId,
-                alive: moment(new Date())
-                    .add(2, 'hours')
-                    .valueOf()
-            };
-            localStorage.setItem('config', JSON.stringify(data));
-        }
-
-        const config: Config = JSON.parse(localStorage.getItem(
-            'config'
-        ) as string);
-
-        if (moment().valueOf() >= moment(config.alive).valueOf()) {
-            console.log('Get new config');
-            // TODO: Get new config
-        }
-
-        this.oppdaterHistorie();
-
-        setInterval(async () => {
-            if (!this.state.feil) {
-                this.oppdaterHistorie();
-            }
-        }, 1000);
-
-        sessionStorage.removeItem('brukereSett');
-        sessionStorage.removeItem('sisteHistorie');
-    }
-
     async sendMelding(e?: FormEvent<HTMLFormElement>) {
         if (e) {
             e.preventDefault();
         }
         if (
             this.state.melding.trim() &&
-            this.state.melding.trim().length <= 200
+            this.state.melding.trim().length <= 200 &&
+            !this.props.avsluttet
         ) {
-            const config: Config = JSON.parse(localStorage.getItem(
-                'config'
-            ) as string);
-
             try {
                 await axios.post(
                     `${this.props.baseUrl}/sessions/${
-                        config.sessionId
+                        this.props.config.sessionId
                     }/messages`,
                     {
                         nickName: 'Bruker',
@@ -240,7 +180,6 @@ export default class Interaksjonsvindu extends Component<
                 });
             }
 
-            this.oppdaterHistorie();
             if (this.formRef) {
                 this.formRef.reset();
                 this.setState({
@@ -257,121 +196,21 @@ export default class Interaksjonsvindu extends Component<
         }
     }
 
-    oppdaterHistorie() {
-        const config: Config = JSON.parse(localStorage.getItem(
-            'config'
-        ) as string);
-        axios
-            .get(
-                `${this.props.baseUrl}/sessions/${config.sessionId}/messages/0`
-            )
-            .then(res => {
-                const historie = res.data as Message[];
-                const sisteHistorie = sessionStorage.getItem(
-                    'sisteHistorie'
-                ) as string;
-                if (
-                    sisteHistorie ===
-                    JSON.stringify(historie[historie.length - 1].id)
-                ) {
-                    return;
-                }
-                for (let _historie of historie) {
-                    if (_historie.type === 'Option') {
-                        _historie.content = _historie.content.map((e: any) => ({
-                            tekst: e,
-                            valgt: false
-                        }));
-                    } else if (_historie.type === 'OptionResult') {
-                        const answered = historie.filter((_h: any) => {
-                            return _h.id === _historie.content.messageId;
-                        })[0];
-                        const temp = answered.content.find(
-                            (a: { tekst: string; valgt: boolean }) => {
-                                return (
-                                    a.tekst.toString() ===
-                                    _historie.content.optionChoice.toString()
-                                );
-                            }
-                        );
-                        temp.valgt = true;
-                    }
-                    if (_historie.type === 'Event') {
-                        if (_historie.content === 'USER_CONNECTED') {
-                            this.props.oppdaterNavn(_historie.nickName);
-                            this.setState({
-                                iKo: false
-                            });
-                        } else if (_historie.content === 'USER_DISCONNECTED') {
-                            const bruker = this.state.brukere.filter(
-                                (_bruker: Bruker) =>
-                                    _bruker.userId === _historie.userId
-                            )[0];
-                            if (bruker) {
-                                bruker.aktiv = false;
-                            }
-                        } else if (
-                            _historie.content === 'REQUEST_DISCONNECTED'
-                        ) {
-                            this.setState({
-                                avsluttet: true
-                            });
-                        } else if (
-                            _historie.content.includes('REQUEST_PUTINQUEUE')
-                        ) {
-                            this.setState({
-                                iKo: true
-                            });
-                        }
-                    } else if (_historie.type === 'UserInfo') {
-                        // TODO: Sjekk duplikater
-                        if (
-                            this.state.brukere.filter(
-                                (_bruker: Bruker) =>
-                                    _bruker.userId === _historie.userId
-                            ).length === 0 &&
-                            _historie.content.userType
-                        ) {
-                            this.setState({
-                                brukere: [
-                                    ...this.state.brukere,
-                                    {
-                                        userId: _historie.userId,
-                                        avatarUrl: _historie.content.avatarUrl,
-                                        nickName: _historie.nickName,
-                                        role: _historie.role,
-                                        userType: _historie.content.userType,
-                                        aktiv: true
-                                    }
-                                ]
-                            });
-                        }
-                    }
-                }
-                this.setState({ historie });
-                this.scrollToBottom();
-                sessionStorage.setItem(
-                    'sisteHistorie',
-                    JSON.stringify(res.data[res.data.length - 1].id)
-                );
-            })
-            .catch(e => {
-                console.error(e.response);
-                if (e.response.status === 404) {
-                    this.init(true);
-                } else {
-                    this.setState({
-                        feil: true
-                    });
-                }
-            });
-    }
-
     lastHistorie(historie: Beskjed) {
+        this.scrollToBottom();
         if (
             historie.type === 'Event' &&
             historie.content === 'REQUEST_DISCONNECTED'
         ) {
+            const sisteBrukerSomSnakket = this.props.historie
+                .slice()
+                .reverse()
+                .find(_historie => _historie.role === 1);
+            let sisteBrukerSomSnakketNick;
+
+            if (sisteBrukerSomSnakket) {
+                sisteBrukerSomSnakketNick = sisteBrukerSomSnakket.nickName;
+            }
             return (
                 <Tabbable key={`el-${historie.id}`} tabIndex={0}>
                     <Evaluering
@@ -380,6 +219,12 @@ export default class Interaksjonsvindu extends Component<
                         beskjed={historie}
                         baseUrl={this.props.baseUrl}
                         queueKey={this.props.queueKey}
+                        nickName={
+                            sisteBrukerSomSnakket &&
+                            sisteBrukerSomSnakketNick === 'Chatbot Frida'
+                                ? sisteBrukerSomSnakketNick
+                                : 'NAV Chat'
+                        }
                     />
                     <div
                         key={`scroll-el-${historie.id}`}
@@ -392,12 +237,13 @@ export default class Interaksjonsvindu extends Component<
             switch (historie.type) {
                 case 'Message':
                 case 'OptionResult':
+                case 'Evaluation':
                     return (
                         <Tabbable key={`el-${historie.id}`} tabIndex={0}>
                             <Kommunikasjon
                                 key={historie.id}
-                                Beskjed={historie}
-                                brukere={this.state.brukere}
+                                beskjed={historie}
+                                brukere={this.props.brukere}
                             />
                             <div
                                 key={`scroll-el-${historie.id}`}
@@ -409,7 +255,7 @@ export default class Interaksjonsvindu extends Component<
                 case 'Event':
                     return (
                         <Tabbable key={`el-${historie.id}`} tabIndex={0}>
-                            <Eventviser Beskjed={historie} />
+                            <Eventviser beskjed={historie} />
                             <div
                                 key={`scroll-el-${historie.id}`}
                                 ref={e => (this.scrollEl = e)}
@@ -422,10 +268,14 @@ export default class Interaksjonsvindu extends Component<
                         <Tabbable key={`el-${historie.id}`} tabIndex={0}>
                             <Flervalg
                                 beskjed={historie}
-                                harBlittBesvart={historie.content.find(
-                                    (b: { tekst: string; valgt: boolean }) =>
-                                        b.valgt
-                                )}
+                                harBlittBesvart={
+                                    historie.content.find(
+                                        (b: {
+                                            tekst: string;
+                                            valgt: boolean;
+                                        }) => b.valgt
+                                    ) || this.props.avsluttet
+                                }
                                 velg={(messageId: number, valg: string) =>
                                     this.velg(messageId, valg)
                                 }
@@ -461,12 +311,11 @@ export default class Interaksjonsvindu extends Component<
     }
 
     velg(messageId: number, valg: string) {
-        const config: Config = JSON.parse(localStorage.getItem(
-            'config'
-        ) as string);
         axios
             .post(
-                `${this.props.baseUrl}/sessions/${config.sessionId}/messages`,
+                `${this.props.baseUrl}/sessions/${
+                    this.props.config.sessionId
+                }/messages`,
                 {
                     nickName: 'Bruker',
                     type: 'OptionResult',
@@ -477,62 +326,65 @@ export default class Interaksjonsvindu extends Component<
                     }
                 }
             )
-            .then(() => {
-                this.oppdaterHistorie();
-            });
+            .then(() => {});
     }
 
-    opprettEvaluering() {
-        const config: Config = JSON.parse(localStorage.getItem(
-            'config'
-        ) as string);
-        axios
-            .post(`${this.props.baseUrl}/sessions/${config.sessionId}/survey`, {
-                nickName: 'Bruker',
-                surveyQuestion:
-                    'Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med meg.',
-                surveyMaxScore: 5,
-                surveyMinScore: 1,
-                offerSurvey: true,
-                queueKey: this.props.queueKey
-            })
-            .then(res => {
-                this.setState({
-                    evalueringsNokkel: res.data
-                });
-            });
-    }
-
-    evaluer(evaluering: 1 | 2 | 3 | 4 | 5) {
-        const config: Config = JSON.parse(localStorage.getItem(
-            'config'
-        ) as string);
-        axios
-            .post(`${this.props.baseUrl}/sessions/${config.sessionId}/survey`, {
-                nickName: 'Bruker',
-                surveyQuestion:
-                    'Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med meg.',
-                surveyMaxScore: 5,
-                surveyMinScore: 1,
-                offerSurvey: false,
-                queueKey: this.props.queueKey,
-                surveyComment: evaluering,
-                parentSessionId: this.state.evalueringsNokkel
-            })
-            .then(res => {
-                console.log(res);
-            });
-    }
-
-    handleScroll = (e: any) => {
-        if (e.target.scrollTop > 0) {
+    async opprettEvaluering() {
+        if (!loadJSON('svartEval')) {
+            const evaluering = await axios.post(
+                `${this.props.baseUrl}/sessions/${
+                    this.props.config.sessionId
+                }/survey`,
+                {
+                    nickName: 'Bruker',
+                    surveyQuestion:
+                        'Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med meg.',
+                    surveyMaxScore: 5,
+                    surveyMinScore: 1,
+                    offerSurvey: true,
+                    queueKey: this.props.queueKey
+                }
+            );
             this.setState({
-                harScrollet: true
-            });
-        } else {
-            this.setState({
-                harScrollet: false
+                evalueringsNokkel: evaluering.data
             });
         }
-    };
+    }
+
+    async evaluer(evaluering: number) {
+        if (!loadJSON('svartEval')) {
+            await axios.post(
+                `${this.props.baseUrl}/sessions/${
+                    this.props.config.sessionId
+                }/survey`,
+                {
+                    nickName: 'Bruker',
+                    surveyQuestion:
+                        'Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med meg.',
+                    surveyMaxScore: 5,
+                    surveyMinScore: 1,
+                    offerSurvey: false,
+                    queueKey: this.props.queueKey,
+                    surveyComment: evaluering,
+                    parentSessionId: this.state.evalueringsNokkel
+                }
+            );
+            saveJSON('svartEval', evaluering);
+            const max = Number.MAX_SAFE_INTEGER;
+            const min = Number.MAX_SAFE_INTEGER - 100000;
+            this.props.handterMelding(
+                {
+                    id: Math.floor(Math.random() * (max - min + 1)) + min,
+                    nickName: 'Bruker',
+                    sent: new Date().toString(),
+                    role: 0,
+                    userId: 0,
+                    type: 'Evaluation',
+                    content: evaluering
+                },
+                true
+            );
+            this.scrollToBottom();
+        }
+    }
 }
