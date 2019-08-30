@@ -311,5 +311,11 @@ export default class ChatContainer extends Component<
             this.setState({
                 historie: [...this.state.historie, melding]
             });
+        }
+        this.setState({
+            sisteMeldingId: melding.id!
+        });
+
+        saveJSON('historie', this.state.historie);
     }
 }

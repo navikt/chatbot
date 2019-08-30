@@ -2,7 +2,6 @@ import React, { ChangeEvent, Component, FormEvent } from 'react';
 import axios from 'axios';
 import Kommunikasjon, { Beskjed } from '../Kommunikasjon';
 import Eventviser from '../Eventviser/';
-import { Message, SessionCreateResponse } from '../../api/Sessions';
 import {
     Chatlog,
     Interaksjon,
@@ -12,7 +11,6 @@ import {
     Tekstomrade,
     Teller
 } from './styles';
-import moment from 'moment';
 import Flervalg from '../Flervalg';
 import Knapp from '../Knapp';
 import Alertstripe from '../Alertstripe';
