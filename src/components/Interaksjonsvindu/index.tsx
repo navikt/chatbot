@@ -96,7 +96,7 @@ export default class Interaksjonsvindu extends Component<
 
             return (
                 <Interaksjon>
-                    {this.props.iKo && (
+                    {this.props.iKo && !this.props.avsluttet && (
                         <Alertstripe type='info'>
                             Du blir nå satt over til en veileder.
                         </Alertstripe>
@@ -182,7 +182,6 @@ export default class Interaksjonsvindu extends Component<
                 });
             }
 
-            // this.oppdaterHistorie();
             if (this.formRef) {
                 this.formRef.reset();
                 this.setState({
@@ -198,116 +197,6 @@ export default class Interaksjonsvindu extends Component<
             }
         }
     }
-
-    // oppdaterHistorie() {
-    //     const config: Config = JSON.parse(localStorage.getItem(
-    //         'config'
-    //     ) as string);
-    //     axios
-    //         .get(
-    //             `${this.props.baseUrl}/sessions/${config.sessionId}/messages/0`
-    //         )
-    //         .then(res => {
-    //             const historie = res.data as Message[];
-    //             const sisteHistorie = sessionStorage.getItem(
-    //                 'sisteHistorie'
-    //             ) as string;
-    //             if (
-    //                 sisteHistorie ===
-    //                 JSON.stringify(historie[historie.length - 1].id)
-    //             ) {
-    //                 return;
-    //             }
-    //             for (let _historie of historie) {
-    //                 if (_historie.type === 'Option') {
-    //                     _historie.content = _historie.content.map((e: any) => ({
-    //                         tekst: e,
-    //                         valgt: false
-    //                     }));
-    //                 } else if (_historie.type === 'OptionResult') {
-    //                     const answered = historie.filter((_h: any) => {
-    //                         return _h.id === _historie.content.messageId;
-    //                     })[0];
-    //                     const temp = answered.content.find(
-    //                         (a: { tekst: string; valgt: boolean }) => {
-    //                             return (
-    //                                 a.tekst.toString() ===
-    //                                 _historie.content.optionChoice.toString()
-    //                             );
-    //                         }
-    //                     );
-    //                     temp.valgt = true;
-    //                 }
-    //                 if (_historie.type === 'Event') {
-    //                     if (_historie.content === 'USER_CONNECTED') {
-    //                         this.props.oppdaterNavn(_historie.nickName);
-    //                         this.setState({
-    //                             iKo: false
-    //                         });
-    //                     } else if (_historie.content === 'USER_DISCONNECTED') {
-    //                         const bruker = this.state.brukere.filter(
-    //                             (_bruker: Bruker) =>
-    //                                 _bruker.userId === _historie.userId
-    //                         )[0];
-    //                         if (bruker) {
-    //                             bruker.aktiv = false;
-    //                         }
-    //                     } else if (
-    //                         _historie.content === 'REQUEST_DISCONNECTED'
-    //                     ) {
-    //                         this.setState({
-    //                             avsluttet: true
-    //                         });
-    //                     } else if (
-    //                         _historie.content.includes('REQUEST_PUTINQUEUE')
-    //                     ) {
-    //                         this.setState({
-    //                             iKo: true
-    //                         });
-    //                     }
-    //                 } else if (_historie.type === 'UserInfo') {
-    //                     // TODO: Sjekk duplikater
-    //                     if (
-    //                         this.state.brukere.filter(
-    //                             (_bruker: Bruker) =>
-    //                                 _bruker.userId === _historie.userId
-    //                         ).length === 0 &&
-    //                         _historie.content.userType
-    //                     ) {
-    //                         this.setState({
-    //                             brukere: [
-    //                                 ...this.state.brukere,
-    //                                 {
-    //                                     userId: _historie.userId,
-    //                                     avatarUrl: _historie.content.avatarUrl,
-    //                                     nickName: _historie.nickName,
-    //                                     role: _historie.role,
-    //                                     userType: _historie.content.userType,
-    //                                     aktiv: true
-    //                                 }
-    //                             ]
-    //                         });
-    //                     }
-    //                 }
-    //             }
-    //             this.setState({ historie });
-    //             this.scrollToBottom();
-    //             sessionStorage.setItem(
-    //                 'sisteHistorie',
-    //                 JSON.stringify(res.data[res.data.length - 1].id)
-    //             );
-    //         })
-    //         .catch(e => {
-    //             console.error(e.response);
-    //             if (e.response.status === 404) {
-    //                 this.init(true);
-    //             } else {
-    //                 this.setState({
-    //                     feil: true
-    //                 });
-    //             }
-    //         });
-    // }
 
     lastHistorie(historie: Beskjed) {
         this.scrollToBottom();
@@ -355,7 +244,7 @@ export default class Interaksjonsvindu extends Component<
                         <Tabbable key={`el-${historie.id}`} tabIndex={0}>
                             <Kommunikasjon
                                 key={historie.id}
-                                Beskjed={historie}
+                                beskjed={historie}
                                 brukere={this.props.brukere}
                             />
                             <div
@@ -368,7 +257,7 @@ export default class Interaksjonsvindu extends Component<
                 case 'Event':
                     return (
                         <Tabbable key={`el-${historie.id}`} tabIndex={0}>
-                            <Eventviser Beskjed={historie} />
+                            <Eventviser beskjed={historie} />
                             <div
                                 key={`scroll-el-${historie.id}`}
                                 ref={e => (this.scrollEl = e)}
@@ -424,12 +313,11 @@ export default class Interaksjonsvindu extends Component<
     }
 
     velg(messageId: number, valg: string) {
-        const config: Config = JSON.parse(localStorage.getItem(
-            'config'
-        ) as string);
         axios
             .post(
-                `${this.props.baseUrl}/sessions/${config.sessionId}/messages`,
+                `${this.props.baseUrl}/sessions/${
+                    this.props.config.sessionId
+                }/messages`,
                 {
                     nickName: 'Bruker',
                     type: 'OptionResult',
@@ -440,9 +328,7 @@ export default class Interaksjonsvindu extends Component<
                     }
                 }
             )
-            .then(() => {
-                // this.oppdaterHistorie();
-            });
+            .then(() => {});
     }
 
     async opprettEvaluering() {
@@ -500,6 +386,7 @@ export default class Interaksjonsvindu extends Component<
                 },
                 true
             );
+            this.scrollToBottom();
         }
     }
 }

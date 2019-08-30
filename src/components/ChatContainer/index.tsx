@@ -127,7 +127,7 @@ export default class ChatContainer extends Component<
             }
         }
 
-        setInterval(() => this.hentHistorie(this.state.sisteMeldingId), 1000);
+        setInterval(() => this.hentHistorie(this.state.sisteMeldingId), 5000);
     }
 
     apne(): void {
@@ -138,8 +138,11 @@ export default class ChatContainer extends Component<
         this.setState({ erApen: false });
     }
 
-    omstart(): void {
+    async omstart() {
+        deleteJSON('svartEval');
+        deleteJSON('historie');
         this.setState(defaultState);
+        await this.avslutt();
         this.start(true);
     }
 
@@ -202,8 +205,25 @@ export default class ChatContainer extends Component<
                     }/messages/${sisteMeldingId}`
                 )
                 .then(res => {
-                    if (res.data.length > 0) {
-                        const data: any[] = res.data;
+                    const data: Message[] = res.data;
+                    if (data.length > 0) {
+                        if (
+                            data.length > 1 &&
+                            data.every((d: Message) => d.role === 1)
+                        ) {
+                            /*
+                                Trigger bot typing indicator
+                                Display the indicator
+                                After x time, push next message
+                                Hide indicator, based on the userid of the last message
+                            */
+                            /*
+                                Issue when polling rate is too low, will be alot of work
+                                to implement.
+                                Will have to have a separate history of messages that has not been pushed to the main history.
+                                Have to push to this history every time we poll and there is a new message.
+                            */
+                        }
                         for (let historie of data) {
                             this.handterMelding(historie, true);
                         }
@@ -213,23 +233,31 @@ export default class ChatContainer extends Component<
     }
 
     handterMelding(melding: Message, oppdater: boolean = false) {
-        if (
-            melding.type === 'UserInfo' &&
-            !this.state.brukere.some((b: Bruker) => b.userId === melding.userId)
-        ) {
-            this.setState({
-                brukere: [
-                    ...this.state.brukere,
-                    {
-                        userId: melding.userId,
-                        avatarUrl: melding.content.avatarUrl,
-                        nickName: melding.nickName,
-                        role: melding.role,
-                        userType: melding.content.userType,
-                        aktiv: true
-                    }
-                ]
-            });
+        if (melding.type === 'UserInfo') {
+            if (
+                !this.state.brukere.some(
+                    (b: Bruker) => b.userId === melding.userId
+                )
+            ) {
+                this.setState({
+                    brukere: [
+                        ...this.state.brukere,
+                        {
+                            userId: melding.userId,
+                            avatarUrl: melding.content.avatarUrl,
+                            nickName: melding.nickName,
+                            role: melding.role,
+                            userType: melding.content.userType,
+                            aktiv: true
+                        }
+                    ]
+                });
+            }
+            if (melding.content.userType === 'Human') {
+                this.setState({
+                    iKo: false
+                });
+            }
         } else if (melding.type === 'Option') {
             for (let i = 0; i < melding.content.length; i++) {
                 let m = melding.content[i];
@@ -251,13 +279,7 @@ export default class ChatContainer extends Component<
             );
             temp.valgt = true;
         } else if (melding.type === 'Event') {
-            if (melding.content === 'USER_CONNECTED') {
-                if (melding.content.userType === 'Human') {
-                    this.setState({
-                        iKo: false
-                    });
-                }
-            } else if (melding.content === 'USER_DISCONNECTED') {
+            if (melding.content === 'USER_DISCONNECTED') {
                 const bruker = this.state.brukere.filter(
                     (_bruker: Bruker) => _bruker.userId === melding.userId
                 )[0];
@@ -280,7 +302,12 @@ export default class ChatContainer extends Component<
     leggTilIHistorie(melding: Message, oppdater: boolean = false) {
         console.log(`Legger til i historie: ${melding.type}`);
         console.log(melding);
-        if (oppdater) {
+        if (
+            oppdater &&
+            !this.state.historie.some(
+                (historie: Message) => historie.id === melding.id
+            )
+        ) {
             this.setState({
                 historie: [...this.state.historie, melding]
             });

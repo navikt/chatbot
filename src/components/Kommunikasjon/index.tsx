@@ -37,7 +37,7 @@ export type Beskjed = {
 };
 
 export type KommunikasjonProps = {
-    Beskjed: Beskjed;
+    beskjed: Beskjed;
     brukere?: Bruker[];
 };
 
@@ -74,12 +74,12 @@ export default class Kommunikasjon extends Component<
             );
             settBruker = brukereSett.filter(
                 (bruker: BrukerMedBilde) =>
-                    bruker.nickName === this.props.Beskjed.nickName
+                    bruker.nickName === this.props.beskjed.nickName
             )[0];
             if (!settBruker) {
-                if (this.props.Beskjed.role === 1) {
+                if (this.props.beskjed.role === 1) {
                     brukereSett.push({
-                        nickName: this.props.Beskjed.nickName,
+                        nickName: this.props.beskjed.nickName,
                         harBlittVist: true
                     });
                 }
@@ -91,19 +91,19 @@ export default class Kommunikasjon extends Component<
             sessionStorage.setItem('brukereSett', JSON.stringify(brukereSett));
         } else {
             settBruker = {
-                nickName: this.props.Beskjed.nickName,
+                nickName: this.props.beskjed.nickName,
                 harBlittVist: false
             } as BrukerMedBilde;
             sessionStorage.setItem('brukereSett', JSON.stringify([settBruker]));
         }
         this.setState({
-            side: this.props.Beskjed.role === 1 ? 'VENSTRE' : 'HOYRE',
+            side: this.props.beskjed.role === 1 ? 'VENSTRE' : 'HOYRE',
             visBilde: settBruker ? !settBruker.harBlittVist : true
         });
     }
 
     render() {
-        const { nickName, sent, content, type } = this.props.Beskjed;
+        const { nickName, sent, content, type } = this.props.beskjed;
         const bruker = this.hentBruker(nickName);
         let htmlToRender;
         if (type === 'Evaluation') {
