@@ -14,30 +14,10 @@ import rating2 from '../../assets/rating-2.svg';
 import rating3 from '../../assets/rating-3.svg';
 import rating4 from '../../assets/rating-4.svg';
 import rating5 from '../../assets/rating-5.svg';
-
-export type Beskjed = {
-    arguments: any[] | null;
-    content: any | any[];
-    id: number;
-    nickName: string;
-    role: 0 | 1;
-    sent: string;
-    type:
-        | 'Message'
-        | 'Event'
-        | 'Intro'
-        | 'Option'
-        | 'OptionResult'
-        | 'Command'
-        | 'Reaction'
-        | 'UserInfo'
-        | 'Template'
-        | 'Evaluation';
-    userId: number;
-};
+import { Message } from '../../api/Sessions';
 
 export type KommunikasjonProps = {
-    beskjed: Beskjed;
+    beskjed: Message;
     sisteBrukerId?: number | null;
     brukere?: Bruker[];
 };

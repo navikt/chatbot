@@ -1,6 +1,6 @@
 import React, { ChangeEvent, Component, FormEvent } from 'react';
 import axios from 'axios';
-import Kommunikasjon, { Beskjed } from '../Kommunikasjon';
+import Kommunikasjon from '../Kommunikasjon';
 import Eventviser from '../Eventviser/';
 import {
     Chatlog,
@@ -35,7 +35,7 @@ type InteraksjonsvinduProps = {
     lukk: () => void;
     vis: boolean;
     baseUrl: string;
-    historie: Beskjed[];
+    historie: Message[];
     brukere: Bruker[];
     iKo: boolean;
     avsluttet: boolean;
@@ -86,13 +86,12 @@ export default class Interaksjonsvindu extends Component<
         } else {
             const { historie } = this.props;
             let historieListe = historie.map(
-                (historieItem: Beskjed, index: number) => {
-                    const sistehistorie: Beskjed =
+                (historieItem: Message, index: number) => {
+                    const sistehistorie: Message =
                         this.props.historie[index - 1] &&
                         this.props.historie[index - 1].content !== 'TYPE_MSG'
                             ? this.props.historie[index - 1]
                             : this.props.historie[index - 2];
-                    console.log(sistehistorie);
                     return this.lastHistorie(
                         historieItem,
                         sistehistorie &&
@@ -212,9 +211,7 @@ export default class Interaksjonsvindu extends Component<
         }
     }
 
-    lastHistorie(historie: Beskjed, forrigeHistorieBrukerId: number | null) {
-        console.log(historie.type);
-        console.log(forrigeHistorieBrukerId);
+    lastHistorie(historie: Message, forrigeHistorieBrukerId: number | null) {
         this.scrollToBottom();
         if (
             historie.type === 'Event' &&

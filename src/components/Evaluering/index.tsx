@@ -6,11 +6,11 @@ import rating3 from '../../assets/rating-3.svg';
 import rating4 from '../../assets/rating-4.svg';
 import rating5 from '../../assets/rating-5.svg';
 import MetaInfo from '../MetaInfo';
-import { Beskjed } from '../Kommunikasjon';
 import { loadJSON } from '../../services/localStorageService';
+import { Message } from '../../api/Sessions';
 
 type EvalueringProps = {
-    beskjed: Beskjed;
+    beskjed: Message;
     opprettEvaluering: () => void;
     evaluer: (evaluering: 1 | 2 | 3 | 4 | 5) => void;
     baseUrl: string;

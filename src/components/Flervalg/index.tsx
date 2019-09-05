@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Beskjed } from '../Kommunikasjon';
 import MetaInfo from '../MetaInfo';
 import { Container, Valg, ValgContainer } from './styles';
+import { Message } from '../../api/Sessions';
 
 type FlervalgProps = {
-    beskjed: Beskjed;
+    beskjed: Message;
     harBlittBesvart: boolean;
     velg: (messageId: number, valg: string) => void;
 };

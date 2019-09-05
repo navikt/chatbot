@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { Container, Indikator, IndikatorDot } from './styles';
 import * as moment from 'moment';
 import MetaInfo from '../MetaInfo';
-import { Beskjed } from '../Kommunikasjon';
+import { Message } from '../../api/Sessions';
 
 type SkriveindikatorProps = {
-    beskjed: Beskjed;
+    beskjed: Message;
 };
 
 type SkriveindikatorState = {

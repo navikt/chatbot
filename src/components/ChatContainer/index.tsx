@@ -15,7 +15,8 @@ import moment from 'moment';
 export type ChatContainerState = {
     erApen: boolean;
     navn?: string | undefined;
-    historie: any[];
+    historie: Message[];
+    ikkeLastethistorie: Message[];
     brukere: Bruker[];
     config?: Config;
     iKo: boolean;
@@ -27,6 +28,7 @@ const defaultState: ChatContainerState = {
     erApen: true,
     navn: 'Chatbot Frida',
     historie: loadJSON('historie') || [],
+    ikkeLastethistorie: [],
     config: loadJSON('config'),
     brukere: [],
     iKo: false,
@@ -239,18 +241,18 @@ export default class ChatContainer extends Component<
                     (b: Bruker) => b.userId === melding.userId
                 )
             ) {
-                this.setState({
-                    brukere: [
-                        ...this.state.brukere,
-                        {
-                            userId: melding.userId,
-                            avatarUrl: melding.content.avatarUrl,
-                            nickName: melding.nickName,
-                            role: melding.role,
-                            userType: melding.content.userType,
-                            aktiv: true
-                        }
-                    ]
+                this.setState((state: ChatContainerState) => {
+                    const brukere = state.brukere.concat({
+                        userId: melding.userId,
+                        avatarUrl: melding.content.avatarUrl,
+                        nickName: melding.nickName,
+                        role: melding.role,
+                        userType: melding.content.userType,
+                        aktiv: true
+                    });
+                    return {
+                        brukere
+                    };
                 });
             }
             if (melding.content.userType === 'Human') {
@@ -280,12 +282,17 @@ export default class ChatContainer extends Component<
             temp.valgt = true;
         } else if (melding.type === 'Event') {
             if (melding.content === 'USER_DISCONNECTED') {
-                const bruker = this.state.brukere.filter(
-                    (_bruker: Bruker) => _bruker.userId === melding.userId
-                )[0];
-                if (bruker) {
-                    bruker.aktiv = false;
-                }
+                this.setState((state: ChatContainerState) => {
+                    const brukere = state.brukere.map(bruker => {
+                        if (bruker.userId === melding.userId) {
+                            bruker.aktiv = false;
+                        }
+                        return bruker;
+                    });
+                    return {
+                        brukere
+                    };
+                });
             } else if (melding.content.includes('REQUEST_PUTINQUEUE')) {
                 this.setState({
                     iKo: true
