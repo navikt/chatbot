@@ -127,7 +127,7 @@ export default class ChatContainer extends Component<
             }
         }
 
-        setInterval(() => this.hentHistorie(this.state.sisteMeldingId), 5000);
+        setInterval(() => this.hentHistorie(this.state.sisteMeldingId), 1000);
     }
 
     apne(): void {

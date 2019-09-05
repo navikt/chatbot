@@ -38,6 +38,7 @@ export type Beskjed = {
 
 export type KommunikasjonProps = {
     beskjed: Beskjed;
+    sisteBrukerId?: number | null;
     brukere?: Bruker[];
 };
 
@@ -46,11 +47,6 @@ export type KommunikasjonState = {
     visBilde: boolean;
     brukerType?: string;
 };
-
-interface BrukerMedBilde {
-    nickName: string;
-    harBlittVist: boolean;
-}
 
 export default class Kommunikasjon extends Component<
     KommunikasjonProps,
@@ -67,38 +63,11 @@ export default class Kommunikasjon extends Component<
     }
 
     componentDidMount() {
-        let settBruker;
-        if (sessionStorage.getItem('brukereSett')) {
-            const brukereSett: BrukerMedBilde[] = JSON.parse(
-                sessionStorage.getItem('brukereSett') as string
-            );
-            settBruker = brukereSett.filter(
-                (bruker: BrukerMedBilde) =>
-                    bruker.nickName === this.props.beskjed.nickName
-            )[0];
-            if (!settBruker) {
-                if (this.props.beskjed.role === 1) {
-                    brukereSett.push({
-                        nickName: this.props.beskjed.nickName,
-                        harBlittVist: true
-                    });
-                }
-            } else {
-                brukereSett[
-                    brukereSett.indexOf(settBruker)
-                ].harBlittVist = true;
-            }
-            sessionStorage.setItem('brukereSett', JSON.stringify(brukereSett));
-        } else {
-            settBruker = {
-                nickName: this.props.beskjed.nickName,
-                harBlittVist: false
-            } as BrukerMedBilde;
-            sessionStorage.setItem('brukereSett', JSON.stringify([settBruker]));
-        }
         this.setState({
             side: this.props.beskjed.role === 1 ? 'VENSTRE' : 'HOYRE',
-            visBilde: settBruker ? !settBruker.harBlittVist : true
+            visBilde:
+                this.props.sisteBrukerId !== this.props.beskjed.userId ||
+                !this.props.sisteBrukerId
         });
     }
 

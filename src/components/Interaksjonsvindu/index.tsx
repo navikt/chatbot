@@ -35,7 +35,7 @@ type InteraksjonsvinduProps = {
     lukk: () => void;
     vis: boolean;
     baseUrl: string;
-    historie: any[];
+    historie: Beskjed[];
     brukere: Bruker[];
     iKo: boolean;
     avsluttet: boolean;
@@ -85,9 +85,25 @@ export default class Interaksjonsvindu extends Component<
             return null;
         } else {
             const { historie } = this.props;
-            let historieListe = historie.map((historieItem: Beskjed) => {
-                return this.lastHistorie(historieItem);
-            });
+            let historieListe = historie.map(
+                (historieItem: Beskjed, index: number) => {
+                    const sistehistorie: Beskjed =
+                        this.props.historie[index - 1] &&
+                        this.props.historie[index - 1].content !== 'TYPE_MSG'
+                            ? this.props.historie[index - 1]
+                            : this.props.historie[index - 2];
+                    console.log(sistehistorie);
+                    return this.lastHistorie(
+                        historieItem,
+                        sistehistorie &&
+                            (sistehistorie.type === 'Message' ||
+                            sistehistorie.type === 'Option' ||
+                            sistehistorie.type === 'Evaluation'
+                                ? sistehistorie.userId
+                                : null)
+                    );
+                }
+            );
             const harAktiveBrukere =
                 this.props.brukere.filter((bruker: Bruker) => bruker.aktiv)
                     .length > 0;
@@ -196,7 +212,9 @@ export default class Interaksjonsvindu extends Component<
         }
     }
 
-    lastHistorie(historie: Beskjed) {
+    lastHistorie(historie: Beskjed, forrigeHistorieBrukerId: number | null) {
+        console.log(historie.type);
+        console.log(forrigeHistorieBrukerId);
         this.scrollToBottom();
         if (
             historie.type === 'Event' &&
@@ -244,6 +262,7 @@ export default class Interaksjonsvindu extends Component<
                                 key={historie.id}
                                 beskjed={historie}
                                 brukere={this.props.brukere}
+                                sisteBrukerId={forrigeHistorieBrukerId}
                             />
                             <div
                                 key={`scroll-el-${historie.id}`}
