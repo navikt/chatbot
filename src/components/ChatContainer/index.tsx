@@ -141,9 +141,9 @@ export default class ChatContainer extends Component<
     }
 
     async omstart() {
-        deleteJSON('svartEval');
-        deleteJSON('historie');
-        this.setState(defaultState);
+        localStorage.clear();
+        sessionStorage.clear();
+        await this.setState(defaultState);
         await this.avslutt();
         this.start(true);
     }
