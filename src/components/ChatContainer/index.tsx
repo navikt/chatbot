@@ -36,7 +36,12 @@ const defaultState: ChatContainerState = {
         ? loadJSON('historie')
               .slice()
               .reverse()
-              .find((_historie: any) => _historie.role === 1).id
+              .find((_historie: any) => _historie.role === 1)
+            ? loadJSON('historie')
+                  .slice()
+                  .reverse()
+                  .find((_historie: any) => _historie.role === 1).id
+            : 0
         : 0,
     avsluttet: false
 };
@@ -60,6 +65,7 @@ export default class ChatContainer extends Component<
         this.hentFullHistorie = this.hentFullHistorie.bind(this);
         this.handterMelding = this.handterMelding.bind(this);
         this.leggTilIHistorie = this.leggTilIHistorie.bind(this);
+        this.lesIkkeLastethistorie = this.lesIkkeLastethistorie.bind(this);
     }
 
     componentDidMount() {
@@ -130,6 +136,7 @@ export default class ChatContainer extends Component<
         }
 
         setInterval(() => this.hentHistorie(this.state.sisteMeldingId), 1000);
+        setInterval(() => this.lesIkkeLastethistorie(), 1000);
     }
 
     apne(): void {
@@ -208,24 +215,20 @@ export default class ChatContainer extends Component<
                 )
                 .then(res => {
                     const data: Message[] = res.data;
-                    if (data.length > 0) {
-                        if (
-                            data.length > 1 &&
-                            data.every((d: Message) => d.role === 1)
-                        ) {
-                            /*
-                                Trigger bot typing indicator
-                                Display the indicator
-                                After x time, push next message
-                                Hide indicator, based on the userid of the last message
-                            */
-                            /*
-                                Issue when polling rate is too low, will be alot of work
-                                to implement.
-                                Will have to have a separate history of messages that has not been pushed to the main history.
-                                Have to push to this history every time we poll and there is a new message.
-                            */
+                    if (
+                        data &&
+                        data.length > 0 &&
+                        data.every((d: Message) => d.role === 1)
+                    ) {
+                        for (let historie of data) {
+                            this.setState({
+                                ikkeLastethistorie: [
+                                    ...this.state.ikkeLastethistorie,
+                                    historie
+                                ]
+                            });
                         }
+                    } else {
                         for (let historie of data) {
                             this.handterMelding(historie, true);
                         }
@@ -307,14 +310,14 @@ export default class ChatContainer extends Component<
     }
 
     leggTilIHistorie(melding: Message, oppdater: boolean = false) {
-        console.log(`Legger til i historie: ${melding.type}`);
-        console.log(melding);
         if (
             oppdater &&
             !this.state.historie.some(
                 (historie: Message) => historie.id === melding.id
             )
         ) {
+            console.log(`Legger til i historie: ${melding.type}`);
+            console.log(melding);
             this.setState({
                 historie: [...this.state.historie, melding]
             });
@@ -324,5 +327,32 @@ export default class ChatContainer extends Component<
         });
 
         saveJSON('historie', this.state.historie);
+    }
+
+    lesIkkeLastethistorie() {
+        if (this.state.ikkeLastethistorie.length > 0) {
+            const [historie, ...resten] = this.state.ikkeLastethistorie;
+            const indikator: Message = {
+                ...historie,
+                type: 'Event',
+                content: 'TYPE_MSG',
+                id: historie.id + 100000000
+            };
+
+            if (
+                historie.type === 'Message' ||
+                historie.type === 'Option' ||
+                historie.type === 'Evaluasion'
+            ) {
+                this.handterMelding(indikator, true);
+            }
+            this.handterMelding(historie, true);
+
+            this.setState(() => {
+                return {
+                    ikkeLastethistorie: resten
+                };
+            });
+        }
     }
 }
