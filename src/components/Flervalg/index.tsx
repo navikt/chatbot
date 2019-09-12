@@ -27,6 +27,7 @@ export default class Flervalg extends Component<FlervalgProps, {}> {
                     }}
                     valgt={_h.valgt}
                     aktiv={this.props.harBlittBesvart}
+                    tabIndex={0}
                     aria-label={`Valg ${index + 1}: ${_h.tekst}`}
                 >
                     {_h.tekst}

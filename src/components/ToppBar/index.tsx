@@ -28,18 +28,21 @@ export default class ToppBar extends Component<ToppBarProps, {}> {
                         onClick={lukk}
                         dangerouslySetInnerHTML={{ __html: minimerIkon }}
                         tabIndex={0}
+                        aria-label={`Minimer ${this.props.navn}`}
                     />
                     <Knapp
                         navn={this.props.navn}
                         onClick={omstart}
                         dangerouslySetInnerHTML={{ __html: omstartIkon }}
                         tabIndex={0}
+                        aria-label={`Start ${this.props.navn} på nytt.`}
                     />
                     <Knapp
                         navn={this.props.navn}
                         onClick={avslutt}
                         dangerouslySetInnerHTML={{ __html: avsluttIkon }}
                         tabIndex={0}
+                        aria-label={`Avslutt ${this.props.navn}`}
                     />
                 </Knapper>
             </Bar>

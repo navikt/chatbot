@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Container, Indikator, IndikatorDot } from './styles';
-import * as moment from 'moment';
 import MetaInfo from '../MetaInfo';
 import { Message } from '../../api/Sessions';
 
@@ -16,13 +15,11 @@ export default class Skriveindikator extends Component<
     SkriveindikatorProps,
     SkriveindikatorState
 > {
-    threshhold = -3000;
+    threshhold = 5500;
     constructor(props: SkriveindikatorProps) {
         super(props);
         this.state = {
-            vis:
-                moment(this.props.beskjed.sent).valueOf() - moment().valueOf() >
-                this.threshhold
+            vis: true
         };
     }
 
@@ -31,7 +28,7 @@ export default class Skriveindikator extends Component<
             this.setState({
                 vis: false
             });
-        }, 5000);
+        }, 2500);
     }
 
     render() {

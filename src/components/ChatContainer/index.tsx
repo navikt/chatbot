@@ -22,6 +22,9 @@ export type ChatContainerState = {
     iKo: boolean;
     sisteMeldingId: number;
     avsluttet: boolean;
+    brukereSomSkriver: {
+        [userId: number]: number;
+    };
 };
 
 const defaultState: ChatContainerState = {
@@ -43,7 +46,8 @@ const defaultState: ChatContainerState = {
                   .find((_historie: any) => _historie.role === 1).id
             : 0
         : 0,
-    avsluttet: false
+    avsluttet: false,
+    brukereSomSkriver: {}
 };
 
 export default class ChatContainer extends Component<
@@ -75,7 +79,11 @@ export default class ChatContainer extends Component<
     render() {
         const { queueKey, customerKey } = this.props;
         return (
-            <Container erApen={this.state.erApen} tabIndex={0}>
+            <Container
+                erApen={this.state.erApen}
+                tabIndex={0}
+                aria-label={`Samtalevindu: ${this.state.navn}`}
+            >
                 {!this.state.erApen && <FridaKnapp onClick={this.apne} />}
                 {this.state.erApen && (
                     <ToppBar
@@ -136,7 +144,7 @@ export default class ChatContainer extends Component<
         }
 
         setInterval(() => this.hentHistorie(this.state.sisteMeldingId), 1000);
-        setInterval(() => this.lesIkkeLastethistorie(), 1000);
+        setInterval(() => this.lesIkkeLastethistorie(), 50);
     }
 
     apne(): void {
@@ -148,8 +156,8 @@ export default class ChatContainer extends Component<
     }
 
     async omstart() {
-        localStorage.clear();
-        sessionStorage.clear();
+        await localStorage.clear();
+        await sessionStorage.clear();
         await this.setState(defaultState);
         await this.avslutt();
         this.start(true);
@@ -205,35 +213,31 @@ export default class ChatContainer extends Component<
         );
     }
 
-    hentHistorie(sisteMeldingId: number) {
+    async hentHistorie(sisteMeldingId: number) {
         if (this.state.config && !this.state.avsluttet) {
-            axios
-                .get(
-                    `${this.baseUrl}/sessions/${
-                        this.state.config.sessionId
-                    }/messages/${sisteMeldingId}`
-                )
-                .then(res => {
-                    const data: Message[] = res.data;
-                    if (
-                        data &&
-                        data.length > 0 &&
-                        data.every((d: Message) => d.role === 1)
-                    ) {
-                        for (let historie of data) {
-                            this.setState({
-                                ikkeLastethistorie: [
-                                    ...this.state.ikkeLastethistorie,
-                                    historie
-                                ]
-                            });
-                        }
-                    } else {
-                        for (let historie of data) {
-                            this.handterMelding(historie, true);
-                        }
-                    }
+            const res = await axios.get(
+                `${this.baseUrl}/sessions/${
+                    this.state.config.sessionId
+                }/messages/${sisteMeldingId}`
+            );
+            const data: Message[] = res.data;
+            if (data && data.length > 0) {
+                for (let historie of data) {
+                    this.setState({
+                        ikkeLastethistorie: [
+                            ...this.state.ikkeLastethistorie,
+                            historie
+                        ]
+                    });
+                }
+                this.setState({
+                    sisteMeldingId: data[data.length - 1].id
                 });
+            } else {
+                for (let historie of data) {
+                    this.handterMelding(historie, true);
+                }
+            }
         }
     }
 
@@ -322,14 +326,12 @@ export default class ChatContainer extends Component<
                 historie: [...this.state.historie, melding]
             });
         }
-        this.setState({
-            sisteMeldingId: melding.id!
-        });
 
         saveJSON('historie', this.state.historie);
     }
 
     lesIkkeLastethistorie() {
+        const now = moment();
         if (this.state.ikkeLastethistorie.length > 0) {
             const [historie, ...resten] = this.state.ikkeLastethistorie;
             const indikator: Message = {
@@ -342,17 +344,52 @@ export default class ChatContainer extends Component<
             if (
                 historie.type === 'Message' ||
                 historie.type === 'Option' ||
-                historie.type === 'Evaluasion'
+                historie.type === 'Evaluation'
             ) {
-                this.handterMelding(indikator, true);
+                const tid = this.state.brukereSomSkriver[historie.userId];
+                if (this.state.brukereSomSkriver[historie.userId]) {
+                    if (now.valueOf() - tid >= 3000) {
+                        this.setState(
+                            (state: ChatContainerState) => {
+                                const brukereSomSkriver = {
+                                    ...state.brukereSomSkriver
+                                };
+                                brukereSomSkriver[
+                                    historie.userId
+                                ] = now.valueOf();
+                                return {
+                                    brukereSomSkriver,
+                                    ikkeLastethistorie: resten
+                                };
+                            },
+                            () => {
+                                this.handterMelding(historie, true);
+                            }
+                        );
+                    } else {
+                        this.handterMelding(indikator, true);
+                    }
+                } else {
+                    this.setState((state: ChatContainerState) => {
+                        const brukereSomSkriver = {
+                            ...state.brukereSomSkriver
+                        };
+                        brukereSomSkriver[historie.userId] = now.valueOf();
+                        return {
+                            brukereSomSkriver
+                        };
+                    });
+                }
+            } else {
+                this.setState(
+                    {
+                        ikkeLastethistorie: resten
+                    },
+                    () => {
+                        this.handterMelding(historie, true);
+                    }
+                );
             }
-            this.handterMelding(historie, true);
-
-            this.setState(() => {
-                return {
-                    ikkeLastethistorie: resten
-                };
-            });
         }
     }
 }
