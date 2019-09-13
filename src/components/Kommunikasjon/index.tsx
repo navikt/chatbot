@@ -15,16 +15,19 @@ import rating3 from '../../assets/rating-3.svg';
 import rating4 from '../../assets/rating-4.svg';
 import rating5 from '../../assets/rating-5.svg';
 import { Message } from '../../api/Sessions';
+import Skriveindikator from '../Skriveindikator';
 
 export type KommunikasjonProps = {
     beskjed: Message;
     sisteBrukerId?: number | null;
     brukere?: Bruker[];
+    skriveindikatorTid?: number;
 };
 
 export type KommunikasjonState = {
     side: 'VENSTRE' | 'HOYRE';
     visBilde: boolean;
+    visMelding?: boolean;
     brukerType?: string;
 };
 
@@ -36,7 +39,8 @@ export default class Kommunikasjon extends Component<
         super(props);
         this.state = {
             side: 'VENSTRE',
-            visBilde: false
+            visBilde: false,
+            visMelding: false
         };
 
         this.hentBruker = this.hentBruker.bind(this);
@@ -49,6 +53,11 @@ export default class Kommunikasjon extends Component<
                 this.props.sisteBrukerId !== this.props.beskjed.userId ||
                 !this.props.sisteBrukerId
         });
+        setTimeout(() => {
+            this.setState({
+                visMelding: true
+            });
+        }, 3000);
     }
 
     render() {
@@ -74,36 +83,55 @@ export default class Kommunikasjon extends Component<
         }
         return (
             <Container>
-                <MetaInfo
-                    nickName={nickName}
-                    sent={sent}
-                    side={this.state.side}
-                />
+                {this.state.visBilde && (
+                    <MetaInfo
+                        nickName={nickName}
+                        sent={sent}
+                        side={this.state.side}
+                    />
+                )}
                 <Indre>
-                    {this.state.visBilde && this.state.side === 'VENSTRE' && (
+                    {this.state.side === 'VENSTRE' && (
                         <Venstre>
-                            <Brukerbilde aria-hidden='true' />
+                            {this.state.visBilde && (
+                                <Brukerbilde aria-hidden='true' />
+                            )}
                         </Venstre>
                     )}
                     <Hoyre
                         side={this.state.side}
                         visBilde={this.state.visBilde}
                     >
-                        <Snakkeboble
-                            aria-label={`${
-                                this.state.side === 'VENSTRE' ? nickName : 'Du'
-                            } skrev: ${
-                                content.optionChoice
-                                    ? content.optionChoice
-                                    : content
-                            }`}
-                            dangerouslySetInnerHTML={{
-                                __html: htmlToRender as string
-                            }}
-                            side={this.state.side}
-                            visBilde={this.state.visBilde}
-                            brukerType={bruker ? bruker.userType : undefined}
-                        />
+                        {!this.state.visMelding && (
+                            <Skriveindikator
+                                beskjed={this.props.beskjed}
+                                skriveindikatorTid={
+                                    this.props.skriveindikatorTid || 3000
+                                }
+                                gjemAutomatisk={false}
+                            />
+                        )}
+                        {this.state.visMelding && (
+                            <Snakkeboble
+                                aria-label={`${
+                                    this.state.side === 'VENSTRE'
+                                        ? nickName
+                                        : 'Du'
+                                } skrev: ${
+                                    content.optionChoice
+                                        ? content.optionChoice
+                                        : content
+                                }`}
+                                dangerouslySetInnerHTML={{
+                                    __html: htmlToRender as string
+                                }}
+                                side={this.state.side}
+                                visBilde={this.state.visBilde}
+                                brukerType={
+                                    bruker ? bruker.userType : undefined
+                                }
+                            />
+                        )}
                     </Hoyre>
                 </Indre>
             </Container>

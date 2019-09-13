@@ -40,6 +40,7 @@ type InteraksjonsvinduProps = {
     iKo: boolean;
     avsluttet: boolean;
     config: Config;
+    skriveindikatorTid: number;
 };
 
 type InteraksjonsvinduState = {
@@ -271,7 +272,12 @@ export default class Interaksjonsvindu extends Component<
                 case 'Event':
                     return (
                         <Tabbable key={`el-${historie.id}`} tabIndex={0}>
-                            <Eventviser beskjed={historie} />
+                            <Eventviser
+                                beskjed={historie}
+                                skriveindikatorTid={
+                                    this.props.skriveindikatorTid
+                                }
+                            />
                             <div
                                 key={`scroll-el-${historie.id}`}
                                 ref={e => (this.scrollEl = e)}

@@ -6,8 +6,7 @@ import { ConnectionConfig } from '../../index';
 import axios, { AxiosResponse } from 'axios';
 import { loadJSON, saveJSON } from '../../services/localStorageService';
 import { Message, SessionCreateResponse } from '../../api/Sessions';
-import moment, { unitOfTime } from 'moment';
-import { groupBy, forEach } from 'underscore';
+import moment from 'moment';
 
 export type ChatContainerState = {
     erApen: boolean;
@@ -22,29 +21,26 @@ export type ChatContainerState = {
     brukereSomSkriver: {
         [userId: number]: number;
     };
+    hentHistorie: boolean;
 };
 
 const defaultState: ChatContainerState = {
     erApen: true,
     navn: 'Chatbot Frida',
-    historie: loadJSON('historie') || [],
+    historie: [],
     ikkeLastethistorie: [],
-    config: loadJSON('config'),
+    config: {
+        alive: 0,
+        requestId: 0,
+        sessionId: '',
+        sessionIdPure: ''
+    },
     brukere: [],
     iKo: false,
-    sisteMeldingId: loadJSON('historie')
-        ? loadJSON('historie')
-              .slice()
-              .reverse()
-              .find((_historie: any) => _historie.role === 1)
-            ? loadJSON('historie')
-                  .slice()
-                  .reverse()
-                  .find((_historie: any) => _historie.role === 1).id
-            : 0
-        : 0,
+    sisteMeldingId: 0,
     avsluttet: false,
-    brukereSomSkriver: {}
+    brukereSomSkriver: {},
+    hentHistorie: true
 };
 
 export default class ChatContainer extends Component<
@@ -52,9 +48,27 @@ export default class ChatContainer extends Component<
     ChatContainerState
 > {
     baseUrl = 'https://devapi.puzzel.com/chat/v1';
+    skriveindikatorTid = 3000;
+    hentHistorieIntervall: number;
+    lesIkkeLastethistorieIntervall: number;
     constructor(props: ConnectionConfig) {
         super(props);
-        this.state = defaultState;
+        this.state = {
+            ...defaultState,
+            historie: loadJSON('historie') || [],
+            config: loadJSON('config'),
+            sisteMeldingId: loadJSON('historie')
+                ? loadJSON('historie')
+                      .slice()
+                      .reverse()
+                      .find((_historie: any) => _historie.role === 1)
+                    ? loadJSON('historie')
+                          .slice()
+                          .reverse()
+                          .find((_historie: any) => _historie.role === 1).id
+                    : 0
+                : 0
+        };
 
         this.start = this.start.bind(this);
         this.apne = this.apne.bind(this);
@@ -67,7 +81,6 @@ export default class ChatContainer extends Component<
         this.handterMelding = this.handterMelding.bind(this);
         this.leggTilIHistorie = this.leggTilIHistorie.bind(this);
         this.lesIkkeLastethistorie = this.lesIkkeLastethistorie.bind(this);
-        this.grupperHistorie = this.grupperHistorie.bind(this);
     }
 
     componentDidMount() {
@@ -113,6 +126,7 @@ export default class ChatContainer extends Component<
                     iKo={this.state.iKo}
                     avsluttet={this.state.avsluttet}
                     config={this.state.config!}
+                    skriveindikatorTid={this.skriveindikatorTid}
                 />
             </Container>
         );
@@ -122,8 +136,11 @@ export default class ChatContainer extends Component<
         if (!this.state.config || tving) {
             localStorage.clear();
             sessionStorage.clear();
-            this.setState({ ...defaultState });
             await this.hentConfig();
+            await this.setState({
+                ...defaultState,
+                config: loadJSON('config')
+            });
         }
         if (this.state.historie && this.state.historie.length < 1) {
             // Henter full historie fra API
@@ -141,8 +158,14 @@ export default class ChatContainer extends Component<
             }
         }
 
-        setInterval(() => this.hentHistorie(this.state.sisteMeldingId), 1000);
-        setInterval(() => this.lesIkkeLastethistorie(), 50);
+        this.hentHistorieIntervall = setInterval(
+            () => this.hentHistorie(this.state.sisteMeldingId),
+            1000
+        );
+        this.lesIkkeLastethistorieIntervall = setInterval(
+            () => this.lesIkkeLastethistorie(),
+            50
+        );
     }
 
     apne(): void {
@@ -154,10 +177,9 @@ export default class ChatContainer extends Component<
     }
 
     async omstart() {
-        await localStorage.clear();
-        await sessionStorage.clear();
-        await this.setState(defaultState);
         await this.avslutt();
+        clearInterval(this.hentHistorieIntervall);
+        clearInterval(this.lesIkkeLastethistorieIntervall);
         this.start(true);
     }
 
@@ -212,41 +234,51 @@ export default class ChatContainer extends Component<
     }
 
     async hentHistorie(sisteMeldingId: number) {
-        if (this.state.config && !this.state.avsluttet) {
-            const res = await axios.get(
-                `${this.baseUrl}/sessions/${
-                    this.state.config.sessionId
-                }/messages/${sisteMeldingId}`
-            );
-            const data: Message[] = res.data;
-            if (data && data.length > 0) {
-                for (let historie of data) {
-                    this.setState({
-                        ikkeLastethistorie: [
-                            ...this.state.ikkeLastethistorie,
-                            historie
-                        ]
-                    });
-                }
-                let fantId = false;
-                let sisteId = 1;
-                while (!fantId) {
-                    if (
-                        data[data.length - sisteId] &&
-                        data[data.length - sisteId].content !== 'TYPE_MSG'
-                    ) {
-                        fantId = true;
+        if (
+            this.state.hentHistorie &&
+            this.state.config &&
+            !this.state.avsluttet
+        ) {
+            try {
+                const res = await axios.get(
+                    `${this.baseUrl}/sessions/${
+                        this.state.config.sessionId
+                    }/messages/${sisteMeldingId}`
+                );
+                const data: Message[] = res.data;
+                if (data && data.length > 0) {
+                    for (let historie of data) {
                         this.setState({
-                            sisteMeldingId: data[data.length - sisteId].id
+                            ikkeLastethistorie: [
+                                ...this.state.ikkeLastethistorie,
+                                historie
+                            ]
                         });
-                    } else {
-                        sisteId++;
+                    }
+                    let fantId = false;
+                    let sisteId = 1;
+                    while (!fantId) {
+                        if (
+                            data[data.length - sisteId] &&
+                            data[data.length - sisteId].content !== 'TYPE_MSG'
+                        ) {
+                            fantId = true;
+                            this.setState({
+                                sisteMeldingId: data[data.length - sisteId].id
+                            });
+                        } else {
+                            sisteId++;
+                        }
+                    }
+                } else {
+                    for (let historie of data) {
+                        this.handterMelding(historie, true);
                     }
                 }
-            } else {
-                for (let historie of data) {
-                    this.handterMelding(historie, true);
-                }
+            } catch (e) {
+                this.setState({
+                    hentHistorie: false
+                });
             }
         }
     }
@@ -358,7 +390,7 @@ export default class ChatContainer extends Component<
             ) {
                 const tid = this.state.brukereSomSkriver[historie.userId];
                 if (this.state.brukereSomSkriver[historie.userId]) {
-                    if (now.valueOf() - tid >= 3000) {
+                    if (now.valueOf() - tid >= this.skriveindikatorTid) {
                         this.setState(
                             (state: ChatContainerState) => {
                                 const brukereSomSkriver = {
@@ -403,42 +435,5 @@ export default class ChatContainer extends Component<
                 );
             }
         }
-    }
-
-    grupperHistorie(tid: unitOfTime.StartOf = 'minute') {
-        const tidsGruppe = groupBy(this.state.historie, (historie: Message) =>
-            moment(historie.sent)
-                .startOf(tid)
-                .format()
-        );
-        var arr: any[] = [];
-        forEach(tidsGruppe, e => {
-            arr.push(e);
-        });
-
-        const biter: any[] = [];
-
-        for (let i = 0; i < arr.length; i++) {
-            const minutt: Message[] = arr[i];
-            let sisteBrukerId = 0;
-            const oppdelt: any[] = [];
-            if (minutt && minutt.length > 0) {
-                let bit: any[] = [];
-                for (let j = 0; j < minutt.length; j++) {
-                    const melding = minutt[j] as Message;
-                    if (melding.userId !== sisteBrukerId) {
-                        if (bit.length > 0) oppdelt.push(bit);
-                        bit = [];
-                        bit.push(melding);
-                    } else {
-                        bit.push(melding);
-                    }
-                    if (j + 1 === minutt.length) oppdelt.push(bit);
-                    sisteBrukerId = melding.userId;
-                }
-            }
-            biter.push(oppdelt);
-        }
-        return biter;
     }
 }

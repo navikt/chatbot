@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { KommunikasjonProps } from '../Kommunikasjon';
 import { Event } from './styles';
-import Skriveindikator from '../Skriveindikator';
 
 export default class Eventviser extends Component<KommunikasjonProps, {}> {
     constructor(props: KommunikasjonProps) {
@@ -28,8 +27,7 @@ export default class Eventviser extends Component<KommunikasjonProps, {}> {
                 return `${nickName} ble med i chatten.`;
             case 'REQUEST_DISCONNECTED':
                 return 'Bruker forlot chatten.';
-            case 'TYPE_MSG':
-                return <Skriveindikator beskjed={this.props.beskjed} />;
+
             default:
                 return;
         }

@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Container, Indikator, IndikatorDot } from './styles';
-import MetaInfo from '../MetaInfo';
 import { Message } from '../../api/Sessions';
 
 type SkriveindikatorProps = {
     beskjed: Message;
+    skriveindikatorTid: number;
+    gjemAutomatisk: boolean;
 };
 
 type SkriveindikatorState = {
@@ -15,7 +16,8 @@ export default class Skriveindikator extends Component<
     SkriveindikatorProps,
     SkriveindikatorState
 > {
-    threshhold = 5500;
+    threshhold = this.props.skriveindikatorTid + 2500;
+    gjemTid: number;
     constructor(props: SkriveindikatorProps) {
         super(props);
         this.state = {
@@ -24,22 +26,23 @@ export default class Skriveindikator extends Component<
     }
 
     componentDidMount(): void {
-        setTimeout(() => {
-            this.setState({
-                vis: false
-            });
-        }, 2500);
+        if (this.props.gjemAutomatisk) {
+            this.gjemTid = setTimeout(() => {
+                this.setState({
+                    vis: false
+                });
+            }, this.props.skriveindikatorTid - 500);
+        }
+    }
+
+    componentWillUnmount(): void {
+        clearTimeout(this.gjemTid);
     }
 
     render() {
         if (this.state.vis) {
             return (
                 <Container>
-                    <MetaInfo
-                        sent={this.props.beskjed.sent}
-                        nickName={this.props.beskjed.nickName}
-                        side='VENSTRE'
-                    />
                     <Indikator>
                         <IndikatorDot />
                         <IndikatorDot />
