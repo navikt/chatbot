@@ -4,13 +4,10 @@ import Interaksjonsvindu, { Bruker, Config } from '../Interaksjonsvindu';
 import { Container, FridaKnapp } from './styles';
 import { ConnectionConfig } from '../../index';
 import axios, { AxiosResponse } from 'axios';
-import {
-    deleteJSON,
-    loadJSON,
-    saveJSON
-} from '../../services/localStorageService';
+import { loadJSON, saveJSON } from '../../services/localStorageService';
 import { Message, SessionCreateResponse } from '../../api/Sessions';
-import moment from 'moment';
+import moment, { unitOfTime } from 'moment';
+import { groupBy, forEach } from 'underscore';
 
 export type ChatContainerState = {
     erApen: boolean;
@@ -70,6 +67,7 @@ export default class ChatContainer extends Component<
         this.handterMelding = this.handterMelding.bind(this);
         this.leggTilIHistorie = this.leggTilIHistorie.bind(this);
         this.lesIkkeLastethistorie = this.lesIkkeLastethistorie.bind(this);
+        this.grupperHistorie = this.grupperHistorie.bind(this);
     }
 
     componentDidMount() {
@@ -122,14 +120,13 @@ export default class ChatContainer extends Component<
 
     async start(tving: boolean = false) {
         if (!this.state.config || tving) {
-            deleteJSON('svartEval');
-            this.setState({
-                historie: []
-            });
-            deleteJSON('historie');
+            localStorage.clear();
+            sessionStorage.clear();
+            this.setState({ ...defaultState });
             await this.hentConfig();
         }
         if (this.state.historie && this.state.historie.length < 1) {
+            // Henter full historie fra API
             let historie = await this.hentFullHistorie()!;
             let data: any[] = historie.data;
             if (data.length > 0) {
@@ -138,6 +135,7 @@ export default class ChatContainer extends Component<
                 }
             }
         } else {
+            // Har hentet historie fra localStorage
             for (let historie of this.state.historie) {
                 this.handterMelding(historie);
             }
@@ -230,9 +228,21 @@ export default class ChatContainer extends Component<
                         ]
                     });
                 }
-                this.setState({
-                    sisteMeldingId: data[data.length - 1].id
-                });
+                let fantId = false;
+                let sisteId = 1;
+                while (!fantId) {
+                    if (
+                        data[data.length - sisteId] &&
+                        data[data.length - sisteId].content !== 'TYPE_MSG'
+                    ) {
+                        fantId = true;
+                        this.setState({
+                            sisteMeldingId: data[data.length - sisteId].id
+                        });
+                    } else {
+                        sisteId++;
+                    }
+                }
             } else {
                 for (let historie of data) {
                     this.handterMelding(historie, true);
@@ -338,7 +348,7 @@ export default class ChatContainer extends Component<
                 ...historie,
                 type: 'Event',
                 content: 'TYPE_MSG',
-                id: historie.id + 100000000
+                id: historie.id + 100000
             };
 
             if (
@@ -367,7 +377,9 @@ export default class ChatContainer extends Component<
                             }
                         );
                     } else {
-                        this.handterMelding(indikator, true);
+                        if (historie.role === 1) {
+                            this.handterMelding(indikator, true);
+                        }
                     }
                 } else {
                     this.setState((state: ChatContainerState) => {
@@ -391,5 +403,42 @@ export default class ChatContainer extends Component<
                 );
             }
         }
+    }
+
+    grupperHistorie(tid: unitOfTime.StartOf = 'minute') {
+        const tidsGruppe = groupBy(this.state.historie, (historie: Message) =>
+            moment(historie.sent)
+                .startOf(tid)
+                .format()
+        );
+        var arr: any[] = [];
+        forEach(tidsGruppe, e => {
+            arr.push(e);
+        });
+
+        const biter: any[] = [];
+
+        for (let i = 0; i < arr.length; i++) {
+            const minutt: Message[] = arr[i];
+            let sisteBrukerId = 0;
+            const oppdelt: any[] = [];
+            if (minutt && minutt.length > 0) {
+                let bit: any[] = [];
+                for (let j = 0; j < minutt.length; j++) {
+                    const melding = minutt[j] as Message;
+                    if (melding.userId !== sisteBrukerId) {
+                        if (bit.length > 0) oppdelt.push(bit);
+                        bit = [];
+                        bit.push(melding);
+                    } else {
+                        bit.push(melding);
+                    }
+                    if (j + 1 === minutt.length) oppdelt.push(bit);
+                    sisteBrukerId = melding.userId;
+                }
+            }
+            biter.push(oppdelt);
+        }
+        return biter;
     }
 }

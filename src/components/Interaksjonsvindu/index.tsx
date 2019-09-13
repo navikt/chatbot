@@ -342,7 +342,9 @@ export default class Interaksjonsvindu extends Component<
                     }
                 }
             )
-            .then(() => {});
+            .then(() => {
+                this.scrollToBottom();
+            });
     }
 
     async opprettEvaluering() {
