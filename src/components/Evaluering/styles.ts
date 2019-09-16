@@ -27,8 +27,10 @@ export const Container = styled.div`
     padding-top: 7px;
 `;
 
-export const Eval = styled.div`
+export const Eval = styled.button`
     padding: 10px;
+    background: none;
+    border: none;
 
     svg {
         width: 30px;

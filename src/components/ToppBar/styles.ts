@@ -28,10 +28,12 @@ export const Knapper = styled.div`
     margin-left: auto;
 `;
 
-export const Knapp = styled.div`
+export const Knapp = styled.button`
     flex: 0 1 auto;
     padding: 15px;
     cursor: pointer;
+    background: none;
+    border: none;
 
     svg {
         width: 20px;

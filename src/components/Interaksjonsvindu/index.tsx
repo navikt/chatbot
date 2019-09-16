@@ -232,7 +232,6 @@ export default class Interaksjonsvindu extends Component<
             return (
                 <Tabbable key={`el-${historie.id}`} tabIndex={0}>
                     <Evaluering
-                        opprettEvaluering={() => this.opprettEvaluering()}
                         evaluer={evaluering => this.evaluer(evaluering)}
                         beskjed={historie}
                         baseUrl={this.props.baseUrl}

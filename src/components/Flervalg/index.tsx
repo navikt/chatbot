@@ -36,17 +36,26 @@ export default class Flervalg extends Component<FlervalgProps, FlervalgState> {
             (_h: { tekst: string; valgt: boolean }, index: number) => (
                 <Valg
                     key={index}
-                    onClick={() => {
-                        if (!this.props.harBlittBesvart) {
-                            this.props.velg(this.props.beskjed.id, _h.tekst);
-                        }
-                    }}
                     valgt={_h.valgt}
                     aktiv={this.props.harBlittBesvart}
-                    tabIndex={0}
-                    aria-label={`Valg ${index + 1}: ${_h.tekst}`}
+                    tabIndex={-1}
+                    aria-label={`Valg ${index + 1}: ${_h.tekst}. ${
+                        _h.valgt ? 'Du har valgt dette valget.' : ''
+                    }`}
                 >
-                    {_h.tekst}
+                    <button
+                        onClick={() => {
+                            if (!this.props.harBlittBesvart) {
+                                this.props.velg(
+                                    this.props.beskjed.id,
+                                    _h.tekst
+                                );
+                            }
+                        }}
+                        tabIndex={0}
+                    >
+                        {_h.tekst}
+                    </button>
                 </Valg>
             )
         );

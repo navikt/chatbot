@@ -25,7 +25,7 @@ export type ChatContainerState = {
 };
 
 const defaultState: ChatContainerState = {
-    erApen: true,
+    erApen: false,
     navn: 'Chatbot Frida',
     historie: [],
     ikkeLastethistorie: [],
@@ -139,7 +139,8 @@ export default class ChatContainer extends Component<
             await this.hentConfig();
             await this.setState({
                 ...defaultState,
-                config: loadJSON('config')
+                config: loadJSON('config'),
+                erApen: true
             });
         }
         if (this.state.historie && this.state.historie.length < 1) {
@@ -177,7 +178,7 @@ export default class ChatContainer extends Component<
     }
 
     async omstart() {
-        await this.avslutt();
+        if (!this.state.avsluttet) await this.avslutt();
         clearInterval(this.hentHistorieIntervall);
         clearInterval(this.lesIkkeLastethistorieIntervall);
         this.start(true);

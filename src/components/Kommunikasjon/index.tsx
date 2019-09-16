@@ -127,11 +127,15 @@ export default class Kommunikasjon extends Component<
                                     this.state.side === 'VENSTRE'
                                         ? nickName
                                         : 'Du'
-                                } skrev: ${
+                                } ${
+                                    type === 'Evaluation'
+                                        ? 'ga evaluering'
+                                        : 'skrev'
+                                }: ${
                                     content.optionChoice
                                         ? content.optionChoice
                                         : content
-                                }`}
+                                } ${type === 'Evaluation' ? 'av 5' : ''}`}
                                 dangerouslySetInnerHTML={{
                                     __html: htmlToRender as string
                                 }}

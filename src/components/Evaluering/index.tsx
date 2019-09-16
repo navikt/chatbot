@@ -11,8 +11,7 @@ import { Message } from '../../api/Sessions';
 
 type EvalueringProps = {
     beskjed: Message;
-    opprettEvaluering: () => void;
-    evaluer: (evaluering: 1 | 2 | 3 | 4 | 5) => void;
+    evaluer: (evaluering: number) => void;
     baseUrl: string;
     queueKey: string;
     nickName: string;
@@ -20,12 +19,13 @@ type EvalueringProps = {
 
 export type EvalueringState = {
     valgt: boolean;
-    valgtSvar: 1 | 2 | 3 | 4 | 5;
+    valgtSvar: number;
 };
 export default class Evaluering extends Component<
     EvalueringProps,
     EvalueringState
 > {
+    ratings = [rating1, rating2, rating3, rating4, rating5];
     constructor(props: EvalueringProps) {
         super(props);
         this.state = {
@@ -34,11 +34,21 @@ export default class Evaluering extends Component<
         };
     }
 
-    componentDidMount(): void {
-        // this.props.opprettEvaluering();
-    }
-
     render() {
+        const evalueringer = [];
+        for (let i = 1; i <= 5; i++) {
+            evalueringer.push(
+                <Eval
+                    onClick={() => this.props.evaluer(i)}
+                    dangerouslySetInnerHTML={{ __html: this.ratings[i - 1] }}
+                    evalValgt={this.state.valgt}
+                    valgt={this.state.valgtSvar === i}
+                    aria-label={`Valgmulighet ${i}: Evaluering ${i} av 5`}
+                    tabIndex={0}
+                    key={i}
+                />
+            );
+        }
         return (
             <Outer>
                 <MetaInfo
@@ -46,44 +56,22 @@ export default class Evaluering extends Component<
                     sent={this.props.beskjed.sent}
                     side='VENSTRE'
                 />
-                <Snakkeboble>
+                <Snakkeboble
+                    aria-label={`${this.props.nickName} sa:`}
+                    tabIndex={0}
+                >
                     Håper du fikk svar på det du lurte på. Takk for praten.
                 </Snakkeboble>
-                <Snakkeboble>
+                <Snakkeboble tabIndex={0}>
                     Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med
                     meg.
                 </Snakkeboble>
-                <Container>
-                    <Eval
-                        onClick={() => this.props.evaluer(1)}
-                        dangerouslySetInnerHTML={{ __html: rating1 }}
-                        evalValgt={this.state.valgt}
-                        valgt={this.state.valgtSvar === 1}
-                    />
-                    <Eval
-                        onClick={() => this.props.evaluer(2)}
-                        dangerouslySetInnerHTML={{ __html: rating2 }}
-                        evalValgt={this.state.valgt}
-                        valgt={this.state.valgtSvar === 2}
-                    />
-                    <Eval
-                        onClick={() => this.props.evaluer(3)}
-                        dangerouslySetInnerHTML={{ __html: rating3 }}
-                        evalValgt={this.state.valgt}
-                        valgt={this.state.valgtSvar === 3}
-                    />
-                    <Eval
-                        onClick={() => this.props.evaluer(4)}
-                        dangerouslySetInnerHTML={{ __html: rating4 }}
-                        evalValgt={this.state.valgt}
-                        valgt={this.state.valgtSvar === 4}
-                    />
-                    <Eval
-                        onClick={() => this.props.evaluer(5)}
-                        dangerouslySetInnerHTML={{ __html: rating5 }}
-                        evalValgt={this.state.valgt}
-                        valgt={this.state.valgtSvar === 5}
-                    />
+                <Container
+                    aria-label={`${
+                        this.props.nickName
+                    } har sendt deg en evaluering med 5 valgmuligheter.`}
+                >
+                    {evalueringer}
                 </Container>
             </Outer>
         );
