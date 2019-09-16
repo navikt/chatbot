@@ -79,6 +79,7 @@ export default class Interaksjonsvindu extends Component<
         this.velg = this.velg.bind(this);
         this.evaluer = this.evaluer.bind(this);
         this.opprettEvaluering = this.opprettEvaluering.bind(this);
+        this.scrollTilBunn = this.scrollTilBunn.bind(this);
     }
 
     render() {
@@ -189,6 +190,7 @@ export default class Interaksjonsvindu extends Component<
                         type: 'Message'
                     }
                 );
+                this.scrollTilBunn();
             } catch (e) {
                 console.error(e.response);
                 this.setState({
@@ -202,7 +204,7 @@ export default class Interaksjonsvindu extends Component<
                     sendt: true,
                     melding: ''
                 });
-                this.scrollToBottom();
+                this.scrollTilBunn();
                 setTimeout(() => {
                     this.setState({
                         sendt: false
@@ -213,7 +215,7 @@ export default class Interaksjonsvindu extends Component<
     }
 
     lastHistorie(historie: Message, forrigeHistorieBrukerId: number | null) {
-        this.scrollToBottom();
+        this.scrollTilBunn();
         if (
             historie.type === 'Event' &&
             historie.content === 'REQUEST_DISCONNECTED'
@@ -261,6 +263,7 @@ export default class Interaksjonsvindu extends Component<
                                 beskjed={historie}
                                 brukere={this.props.brukere}
                                 sisteBrukerId={forrigeHistorieBrukerId}
+                                scrollTilBunn={() => this.scrollTilBunn()}
                             />
                             <div
                                 key={`scroll-el-${historie.id}`}
@@ -301,6 +304,7 @@ export default class Interaksjonsvindu extends Component<
                                 velg={(messageId: number, valg: string) =>
                                     this.velg(messageId, valg)
                                 }
+                                sisteBrukerId={forrigeHistorieBrukerId}
                             />
                             <div
                                 key={`scroll-el-${historie.id}`}
@@ -326,7 +330,7 @@ export default class Interaksjonsvindu extends Component<
         }
     }
 
-    scrollToBottom() {
+    scrollTilBunn() {
         if (this.scrollEl) {
             this.scrollEl.scrollIntoView({ behavior: 'smooth' });
         }
@@ -349,7 +353,7 @@ export default class Interaksjonsvindu extends Component<
                 }
             )
             .then(() => {
-                this.scrollToBottom();
+                this.scrollTilBunn();
             });
     }
 
@@ -372,6 +376,7 @@ export default class Interaksjonsvindu extends Component<
             this.setState({
                 evalueringsNokkel: evaluering.data
             });
+            this.scrollTilBunn();
         }
     }
 
@@ -408,7 +413,7 @@ export default class Interaksjonsvindu extends Component<
                 },
                 true
             );
-            this.scrollToBottom();
+            this.scrollTilBunn();
         }
     }
 }

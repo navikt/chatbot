@@ -24,7 +24,6 @@ export const Container = styled.div`
 
 export const Indikator = styled.div`
     padding: 10px;
-    margin: 5px 0 10px 10px;
     border-radius: 10px;
     background: ${tema.farger.skriveIndikator.bakgrunn};
     display: inline-flex;

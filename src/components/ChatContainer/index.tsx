@@ -376,12 +376,6 @@ export default class ChatContainer extends Component<
         const now = moment();
         if (this.state.ikkeLastethistorie.length > 0) {
             const [historie, ...resten] = this.state.ikkeLastethistorie;
-            const indikator: Message = {
-                ...historie,
-                type: 'Event',
-                content: 'TYPE_MSG',
-                id: historie.id + 100000
-            };
 
             if (
                 historie.type === 'Message' ||
@@ -408,10 +402,6 @@ export default class ChatContainer extends Component<
                                 this.handterMelding(historie, true);
                             }
                         );
-                    } else {
-                        if (historie.role === 1) {
-                            this.handterMelding(indikator, true);
-                        }
                     }
                 } else {
                     this.setState((state: ChatContainerState) => {

@@ -103,4 +103,5 @@ export const Valg = styled.li`
 
 export const Container = styled.div`
     max-width: 80%;
+    margin-left: ${(props: ValgProps) => (props.kollaps ? '60px' : null)};
 `;

@@ -22,6 +22,7 @@ export type KommunikasjonProps = {
     sisteBrukerId?: number | null;
     brukere?: Bruker[];
     skriveindikatorTid?: number;
+    scrollTilBunn?: () => void;
 };
 
 export type KommunikasjonState = {
@@ -38,26 +39,34 @@ export default class Kommunikasjon extends Component<
     constructor(props: KommunikasjonProps) {
         super(props);
         this.state = {
-            side: 'VENSTRE',
-            visBilde: false,
-            visMelding: false
+            side: this.props.beskjed.role === 1 ? 'VENSTRE' : 'HOYRE',
+            visBilde:
+                this.props.sisteBrukerId !== this.props.beskjed.userId ||
+                !this.props.sisteBrukerId,
+            visMelding: this.props.beskjed.role === 0
         };
 
         this.hentBruker = this.hentBruker.bind(this);
     }
 
     componentDidMount() {
-        this.setState({
-            side: this.props.beskjed.role === 1 ? 'VENSTRE' : 'HOYRE',
-            visBilde:
-                this.props.sisteBrukerId !== this.props.beskjed.userId ||
-                !this.props.sisteBrukerId
-        });
-        setTimeout(() => {
-            this.setState({
-                visMelding: true
-            });
-        }, 3000);
+        if (this.props.scrollTilBunn) {
+            this.props.scrollTilBunn();
+        }
+        if (this.props.beskjed.role !== 0) {
+            setTimeout(() => {
+                this.setState(
+                    {
+                        visMelding: true
+                    },
+                    () => {
+                        if (this.props.scrollTilBunn) {
+                            this.props.scrollTilBunn();
+                        }
+                    }
+                );
+            }, 3000);
+        }
     }
 
     render() {
@@ -102,15 +111,16 @@ export default class Kommunikasjon extends Component<
                         side={this.state.side}
                         visBilde={this.state.visBilde}
                     >
-                        {!this.state.visMelding && (
-                            <Skriveindikator
-                                beskjed={this.props.beskjed}
-                                skriveindikatorTid={
-                                    this.props.skriveindikatorTid || 3000
-                                }
-                                gjemAutomatisk={false}
-                            />
-                        )}
+                        {!this.state.visMelding &&
+                            this.props.beskjed.role !== 0 && (
+                                <Skriveindikator
+                                    beskjed={this.props.beskjed}
+                                    skriveindikatorTid={
+                                        this.props.skriveindikatorTid || 3000
+                                    }
+                                    gjemAutomatisk={false}
+                                />
+                            )}
                         {this.state.visMelding && (
                             <Snakkeboble
                                 aria-label={`${
