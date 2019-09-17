@@ -99,6 +99,8 @@ workflows:
         jobs:
             - build:
                   filters:
+                      branches:
+                          only: navno
                       tags:
                           only: /.*/
             - bekreft-deploy-til-dev:
