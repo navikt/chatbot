@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
-import Chat from '@navikt/nav-chatbot/umd/@navikt/nav-chatbot';
+import NAVChatBot from '@navikt/nav-chatbot';
 import styled from 'styled-components';
 
 const Outer = styled.div`
@@ -18,7 +18,7 @@ const NAVBackdrop = styled.iframe`
 ReactDOM.render(
     <Outer>
         <NAVBackdrop src='https://familie.nav.no/' title='NAV Famile' />
-        <Chat customerKey='12345' queueKey='Q_CHAT_BOT' />
+        <NAVChatBot customerKey='12345' queueKey='Q_CHAT_BOT' />
     </Outer>,
     document.getElementById('root')
 );
