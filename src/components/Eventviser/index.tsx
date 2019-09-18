@@ -12,7 +12,7 @@ export default class Eventviser extends Component<KommunikasjonProps, {}> {
 
     render() {
         return (
-            <Event aria-label={this.hentAriaTekst()}>
+            <Event aria-label={this.hentAriaTekst()} tabIndex={0}>
                 {this.visEventTekst()}
             </Event>
         );

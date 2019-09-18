@@ -53,5 +53,4 @@ export const Eval = styled.button`
 `;
 
 export const Outer = styled.div`
-    max-width: 80%;
 `;

@@ -60,7 +60,7 @@ export default class Flervalg extends Component<FlervalgProps, FlervalgState> {
             )
         );
         return (
-            <Container kollaps={this.state.kollaps}>
+            <Container kollaps={this.state.kollaps} tabIndex={0}>
                 {!this.state.kollaps && (
                     <MetaInfo
                         nickName={this.props.beskjed.nickName}

@@ -23,7 +23,6 @@ export const Venstre = styled.div`
 export const Hoyre = styled.div`
     margin-left: ${(props: KommunikasjonState) =>
         props.side === 'VENSTRE' ? undefined : 'auto'};
-    max-width: 80%;
 `;
 
 export const Brukerbilde = styled.div`

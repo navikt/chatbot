@@ -230,7 +230,7 @@ export default class Interaksjonsvindu extends Component<
                 sisteBrukerSomSnakketNick = sisteBrukerSomSnakket.nickName;
             }
             return (
-                <Tabbable key={`el-${historie.id}`} tabIndex={0}>
+                <Tabbable key={`el-${historie.id}`}>
                     <Evaluering
                         evaluer={evaluering => this.evaluer(evaluering)}
                         beskjed={historie}
@@ -256,7 +256,7 @@ export default class Interaksjonsvindu extends Component<
                 case 'OptionResult':
                 case 'Evaluation':
                     return (
-                        <Tabbable key={`el-${historie.id}`} tabIndex={0}>
+                        <Tabbable key={`el-${historie.id}`}>
                             <Kommunikasjon
                                 key={historie.id}
                                 beskjed={historie}
@@ -273,7 +273,7 @@ export default class Interaksjonsvindu extends Component<
                     );
                 case 'Event':
                     return (
-                        <Tabbable key={`el-${historie.id}`} tabIndex={0}>
+                        <Tabbable key={`el-${historie.id}`}>
                             <Eventviser
                                 beskjed={historie}
                                 skriveindikatorTid={
@@ -289,7 +289,7 @@ export default class Interaksjonsvindu extends Component<
                     );
                 case 'Option':
                     return (
-                        <Tabbable key={`el-${historie.id}`} tabIndex={0}>
+                        <Tabbable key={`el-${historie.id}`}>
                             <Flervalg
                                 beskjed={historie}
                                 harBlittBesvart={

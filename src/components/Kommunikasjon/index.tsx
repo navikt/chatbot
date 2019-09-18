@@ -47,6 +47,7 @@ export default class Kommunikasjon extends Component<
         };
 
         this.hentBruker = this.hentBruker.bind(this);
+        this.stripHtml = this.stripHtml.bind(this);
     }
 
     componentDidMount() {
@@ -134,7 +135,7 @@ export default class Kommunikasjon extends Component<
                                 }: ${
                                     content.optionChoice
                                         ? content.optionChoice
-                                        : content
+                                        : this.stripHtml(content)
                                 } ${type === 'Evaluation' ? 'av 5' : ''}`}
                                 dangerouslySetInnerHTML={{
                                     __html: htmlToRender as string
@@ -144,6 +145,7 @@ export default class Kommunikasjon extends Component<
                                 brukerType={
                                     bruker ? bruker.userType : undefined
                                 }
+                                tabIndex={0}
                             />
                         )}
                     </Hoyre>
@@ -160,5 +162,10 @@ export default class Kommunikasjon extends Component<
         } else {
             return undefined;
         }
+    }
+
+    stripHtml(html: string): string {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        return doc.body.textContent || '';
     }
 }

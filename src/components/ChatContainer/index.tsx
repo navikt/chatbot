@@ -25,7 +25,7 @@ export type ChatContainerState = {
 };
 
 const defaultState: ChatContainerState = {
-    erApen: false,
+    erApen: true,
     navn: 'Chatbot Frida',
     historie: [],
     ikkeLastethistorie: [],
