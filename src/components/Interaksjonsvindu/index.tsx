@@ -18,6 +18,7 @@ import { ConnectionConfig } from '../../index';
 import Evaluering from '../Evaluering';
 import { loadJSON, saveJSON } from '../../services/localStorageService';
 import { Message } from '../../api/Sessions';
+import { MessageWithIndicator } from '../ChatContainer';
 
 export interface Bruker {
     userId: number;
@@ -30,12 +31,13 @@ export interface Bruker {
 
 type InteraksjonsvinduProps = {
     oppdaterNavn: (navn: string) => void;
-    handterMelding: (melding: Message, oppdater: boolean) => void;
+    handterMelding: (melding: MessageWithIndicator, oppdater: boolean) => void;
+    skjulIndikator: (melding: MessageWithIndicator) => void;
     apne: () => void;
     lukk: () => void;
     vis: boolean;
     baseUrl: string;
-    historie: Message[];
+    historie: MessageWithIndicator[];
     brukere: Bruker[];
     iKo: boolean;
     avsluttet: boolean;
@@ -88,7 +90,7 @@ export default class Interaksjonsvindu extends Component<
         } else {
             const { historie } = this.props;
             let historieListe = historie.map(
-                (historieItem: Message, index: number) => {
+                (historieItem: MessageWithIndicator, index: number) => {
                     const sistehistorie: Message =
                         this.props.historie[index - 1] &&
                         this.props.historie[index - 1].content !== 'TYPE_MSG'
@@ -214,7 +216,10 @@ export default class Interaksjonsvindu extends Component<
         }
     }
 
-    lastHistorie(historie: Message, forrigeHistorieBrukerId: number | null) {
+    lastHistorie(
+        historie: MessageWithIndicator,
+        forrigeHistorieBrukerId: number | null
+    ) {
         this.scrollTilBunn();
         if (
             historie.type === 'Event' &&
@@ -263,6 +268,9 @@ export default class Interaksjonsvindu extends Component<
                                 brukere={this.props.brukere}
                                 sisteBrukerId={forrigeHistorieBrukerId}
                                 scrollTilBunn={() => this.scrollTilBunn()}
+                                skjulIndikator={(
+                                    melding: MessageWithIndicator
+                                ) => this.props.skjulIndikator(melding)}
                             />
                             <div
                                 key={`scroll-el-${historie.id}`}
@@ -408,7 +416,8 @@ export default class Interaksjonsvindu extends Component<
                     role: 0,
                     userId: 0,
                     type: 'Evaluation',
-                    content: evaluering
+                    content: evaluering,
+                    showIndicator: false
                 },
                 true
             );

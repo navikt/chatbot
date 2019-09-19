@@ -11,8 +11,8 @@ import moment from 'moment';
 export type ChatContainerState = {
     erApen: boolean;
     navn?: string | undefined;
-    historie: Message[];
-    ikkeLastethistorie: Message[];
+    historie: MessageWithIndicator[];
+    ikkeLastethistorie: MessageWithIndicator[];
     brukere: Bruker[];
     config?: Config;
     iKo: boolean;
@@ -42,6 +42,12 @@ const defaultState: ChatContainerState = {
     brukereSomSkriver: {},
     hentHistorie: true
 };
+
+export interface ShowIndicator {
+    showIndicator: boolean;
+}
+
+export interface MessageWithIndicator extends Message, ShowIndicator {}
 
 export default class ChatContainer extends Component<
     ConnectionConfig,
@@ -81,6 +87,7 @@ export default class ChatContainer extends Component<
         this.handterMelding = this.handterMelding.bind(this);
         this.leggTilIHistorie = this.leggTilIHistorie.bind(this);
         this.lesIkkeLastethistorie = this.lesIkkeLastethistorie.bind(this);
+        this.skjulIndikator = this.skjulIndikator.bind(this);
     }
 
     componentDidMount() {
@@ -114,6 +121,9 @@ export default class ChatContainer extends Component<
                     oppdaterNavn={navn => this.oppdaterNavn(navn)}
                     handterMelding={(melding, oppdater) =>
                         this.handterMelding(melding, oppdater)
+                    }
+                    skjulIndikator={(melding: MessageWithIndicator) =>
+                        this.skjulIndikator(melding)
                     }
                     lukk={() => this.lukk()}
                     apne={() => this.apne()}
@@ -155,7 +165,7 @@ export default class ChatContainer extends Component<
         } else {
             // Har hentet historie fra localStorage
             for (let historie of this.state.historie) {
-                this.handterMelding(historie);
+                this.handterMelding({ ...historie, showIndicator: false });
             }
         }
 
@@ -249,10 +259,14 @@ export default class ChatContainer extends Component<
                 const data: Message[] = res.data;
                 if (data && data.length > 0) {
                     for (let historie of data) {
+                        let historieMedIndikator: MessageWithIndicator = {
+                            ...historie,
+                            showIndicator: false
+                        };
                         this.setState({
                             ikkeLastethistorie: [
                                 ...this.state.ikkeLastethistorie,
-                                historie
+                                historieMedIndikator
                             ]
                         });
                     }
@@ -273,7 +287,11 @@ export default class ChatContainer extends Component<
                     }
                 } else {
                     for (let historie of data) {
-                        this.handterMelding(historie, true);
+                        let historieMedIndikator: MessageWithIndicator = {
+                            ...historie,
+                            showIndicator: false
+                        };
+                        this.handterMelding(historieMedIndikator, true);
                     }
                 }
             } catch (e) {
@@ -284,7 +302,7 @@ export default class ChatContainer extends Component<
         }
     }
 
-    handterMelding(melding: Message, oppdater: boolean = false) {
+    handterMelding(melding: MessageWithIndicator, oppdater: boolean = false) {
         if (melding.type === 'UserInfo') {
             if (
                 !this.state.brukere.some(
@@ -356,7 +374,7 @@ export default class ChatContainer extends Component<
         this.leggTilIHistorie(melding, oppdater);
     }
 
-    leggTilIHistorie(melding: Message, oppdater: boolean = false) {
+    leggTilIHistorie(melding: MessageWithIndicator, oppdater: boolean = false) {
         if (
             oppdater &&
             !this.state.historie.some(
@@ -400,7 +418,10 @@ export default class ChatContainer extends Component<
                                 };
                             },
                             () => {
-                                this.handterMelding(historie, true);
+                                this.handterMelding(
+                                    { ...historie, showIndicator: true },
+                                    true
+                                );
                             }
                         );
                     }
@@ -426,5 +447,30 @@ export default class ChatContainer extends Component<
                 );
             }
         }
+    }
+
+    skjulIndikator(melding: MessageWithIndicator) {
+        this.setState(
+            (state: ChatContainerState) => {
+                const historier = [...state.historie];
+                let historie = historier.find(
+                    (h: MessageWithIndicator) => h.id === melding.id
+                );
+
+                if (historie) {
+                    const index = historier.indexOf(historie);
+                    state.historie[index] = historie;
+                    historie.showIndicator = false;
+                    return {
+                        historie: historier
+                    };
+                } else {
+                    return state;
+                }
+            },
+            () => {
+                saveJSON('historie', this.state.historie);
+            }
+        );
     }
 }

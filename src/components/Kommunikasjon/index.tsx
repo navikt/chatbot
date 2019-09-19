@@ -16,13 +16,15 @@ import rating4 from '../../assets/rating-4.svg';
 import rating5 from '../../assets/rating-5.svg';
 import { Message } from '../../api/Sessions';
 import Skriveindikator from '../Skriveindikator';
+import { MessageWithIndicator, ShowIndicator } from '../ChatContainer';
 
 export type KommunikasjonProps = {
-    beskjed: Message;
+    beskjed: Message & ShowIndicator;
     sisteBrukerId?: number | null;
     brukere?: Bruker[];
     skriveindikatorTid?: number;
     scrollTilBunn?: () => void;
+    skjulIndikator?: (melding: MessageWithIndicator) => void;
 };
 
 export type KommunikasjonState = {
@@ -43,7 +45,9 @@ export default class Kommunikasjon extends Component<
             visBilde:
                 this.props.sisteBrukerId !== this.props.beskjed.userId ||
                 !this.props.sisteBrukerId,
-            visMelding: this.props.beskjed.role === 0
+            visMelding:
+                !this.props.beskjed.showIndicator ||
+                this.props.beskjed.role === 0
         };
 
         this.hentBruker = this.hentBruker.bind(this);
@@ -54,7 +58,7 @@ export default class Kommunikasjon extends Component<
         if (this.props.scrollTilBunn) {
             this.props.scrollTilBunn();
         }
-        if (this.props.beskjed.role !== 0) {
+        if (!this.state.visMelding) {
             setTimeout(() => {
                 this.setState(
                     {
@@ -64,6 +68,7 @@ export default class Kommunikasjon extends Component<
                         if (this.props.scrollTilBunn) {
                             this.props.scrollTilBunn();
                         }
+                        this.props.skjulIndikator!(this.props.beskjed);
                     }
                 );
             }, 3000);
@@ -113,7 +118,8 @@ export default class Kommunikasjon extends Component<
                         visBilde={this.state.visBilde}
                     >
                         {!this.state.visMelding &&
-                            this.props.beskjed.role !== 0 && (
+                            this.props.beskjed.role !== 0 &&
+                            this.props.beskjed.showIndicator && (
                                 <Skriveindikator
                                     beskjed={this.props.beskjed}
                                     skriveindikatorTid={
