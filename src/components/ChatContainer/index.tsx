@@ -25,7 +25,7 @@ export type ChatContainerState = {
 };
 
 const defaultState: ChatContainerState = {
-    erApen: true,
+    erApen: false,
     navn: 'Chatbot Frida',
     historie: [],
     ikkeLastethistorie: [],
@@ -49,6 +49,12 @@ export interface ShowIndicator {
 
 export interface MessageWithIndicator extends Message, ShowIndicator {}
 
+export enum localStorageKeys {
+    CONFIG = 'chatbot-frida_config',
+    HISTORIE = 'chatbot-frida_historie',
+    APEN = 'chatbot-frida_apen'
+}
+
 export default class ChatContainer extends Component<
     ConnectionConfig,
     ChatContainerState
@@ -61,14 +67,15 @@ export default class ChatContainer extends Component<
         super(props);
         this.state = {
             ...defaultState,
-            historie: loadJSON('historie') || [],
-            config: loadJSON('config'),
-            sisteMeldingId: loadJSON('historie')
-                ? loadJSON('historie')
+            erApen: loadJSON(localStorageKeys.APEN) || false,
+            historie: loadJSON(localStorageKeys.HISTORIE) || [],
+            config: loadJSON(localStorageKeys.CONFIG),
+            sisteMeldingId: loadJSON(localStorageKeys.HISTORIE)
+                ? loadJSON(localStorageKeys.HISTORIE)
                       .slice()
                       .reverse()
                       .find((_historie: any) => _historie.role === 1)
-                    ? loadJSON('historie')
+                    ? loadJSON(localStorageKeys.HISTORIE)
                           .slice()
                           .reverse()
                           .find((_historie: any) => _historie.role === 1).id
@@ -149,8 +156,7 @@ export default class ChatContainer extends Component<
             await this.hentConfig();
             await this.setState({
                 ...defaultState,
-                config: loadJSON('config'),
-                erApen: true
+                config: loadJSON(localStorageKeys.CONFIG)
             });
         }
         if (this.state.historie && this.state.historie.length < 1) {
@@ -180,11 +186,15 @@ export default class ChatContainer extends Component<
     }
 
     apne(): void {
-        this.setState({ erApen: true });
+        this.setState({ erApen: true }, () => {
+            saveJSON(localStorageKeys.APEN, true);
+        });
     }
 
     lukk(): void {
-        this.setState({ erApen: false });
+        this.setState({ erApen: false }, () => {
+            saveJSON(localStorageKeys.APEN, false);
+        });
     }
 
     async omstart() {
@@ -229,7 +239,7 @@ export default class ChatContainer extends Component<
                 .valueOf()
         };
 
-        saveJSON('config', data);
+        saveJSON(localStorageKeys.CONFIG, data);
         this.setState({
             config: data
         });
@@ -388,7 +398,7 @@ export default class ChatContainer extends Component<
             });
         }
 
-        saveJSON('historie', this.state.historie);
+        saveJSON(localStorageKeys.HISTORIE, this.state.historie);
     }
 
     lesIkkeLastethistorie() {
@@ -469,7 +479,7 @@ export default class ChatContainer extends Component<
                 }
             },
             () => {
-                saveJSON('historie', this.state.historie);
+                saveJSON(localStorageKeys.HISTORIE, this.state.historie);
             }
         );
     }
