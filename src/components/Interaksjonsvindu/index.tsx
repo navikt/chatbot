@@ -43,6 +43,7 @@ type InteraksjonsvinduProps = {
     avsluttet: boolean;
     config: Config;
     skriveindikatorTid: number;
+    hentHistorie: () => void;
 };
 
 type InteraksjonsvinduState = {
@@ -82,6 +83,7 @@ export default class Interaksjonsvindu extends Component<
         this.evaluer = this.evaluer.bind(this);
         this.opprettEvaluering = this.opprettEvaluering.bind(this);
         this.scrollTilBunn = this.scrollTilBunn.bind(this);
+        this.hentBrukerType = this.hentBrukerType.bind(this);
     }
 
     render() {
@@ -120,7 +122,8 @@ export default class Interaksjonsvindu extends Component<
                     )}
                     {this.props.brukere.length > 0 &&
                         !this.props.iKo &&
-                        !harAktiveBrukere && (
+                        !harAktiveBrukere &&
+                        !this.props.avsluttet && (
                             <Alertstripe type='advarsel'>
                                 Det er ikke flere aktive brukere i kanalen.
                             </Alertstripe>
@@ -192,6 +195,7 @@ export default class Interaksjonsvindu extends Component<
                         type: 'Message'
                     }
                 );
+                this.props.hentHistorie();
                 this.scrollTilBunn();
             } catch (e) {
                 console.error(e.response);
@@ -202,16 +206,20 @@ export default class Interaksjonsvindu extends Component<
 
             if (this.formRef) {
                 this.formRef.reset();
-                this.setState({
-                    sendt: true,
-                    melding: ''
-                });
-                this.scrollTilBunn();
-                setTimeout(() => {
-                    this.setState({
-                        sendt: false
-                    });
-                }, 3000);
+                this.setState(
+                    {
+                        sendt: true,
+                        melding: ''
+                    },
+                    () => {
+                        this.scrollTilBunn();
+                        setTimeout(() => {
+                            this.setState({
+                                sendt: false
+                            });
+                        }, 3000);
+                    }
+                );
             }
         }
     }
@@ -271,6 +279,9 @@ export default class Interaksjonsvindu extends Component<
                                 skjulIndikator={(
                                     melding: MessageWithIndicator
                                 ) => this.props.skjulIndikator(melding)}
+                                hentBrukerType={(brukerId: number) =>
+                                    this.hentBrukerType(brukerId)
+                                }
                             />
                             <div
                                 key={`scroll-el-${historie.id}`}
@@ -286,6 +297,10 @@ export default class Interaksjonsvindu extends Component<
                                 beskjed={historie}
                                 skriveindikatorTid={
                                     this.props.skriveindikatorTid
+                                }
+                                brukere={this.props.brukere}
+                                hentBrukerType={(brukerId: number) =>
+                                    this.hentBrukerType(brukerId)
                                 }
                             />
                             <div
@@ -422,6 +437,17 @@ export default class Interaksjonsvindu extends Component<
                 true
             );
             this.scrollTilBunn();
+        }
+    }
+
+    hentBrukerType(brukerId: number): string | undefined {
+        if (this.props.brukere) {
+            const bruker = this.props.brukere.find(
+                (b: Bruker) => b.userId === brukerId
+            );
+            return bruker ? bruker.userType : undefined;
+        } else {
+            return undefined;
         }
     }
 }

@@ -16,7 +16,6 @@ export default class Skriveindikator extends Component<
     SkriveindikatorProps,
     SkriveindikatorState
 > {
-    threshhold = this.props.skriveindikatorTid + 2500;
     gjemTid: number;
     constructor(props: SkriveindikatorProps) {
         super(props);
@@ -26,6 +25,7 @@ export default class Skriveindikator extends Component<
     }
 
     componentDidMount(): void {
+        console.log(this.props.skriveindikatorTid);
         if (this.props.gjemAutomatisk) {
             this.gjemTid = setTimeout(() => {
                 this.setState({

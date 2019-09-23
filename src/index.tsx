@@ -12,6 +12,11 @@ const BorderBox = styled.div`
     *:after {
         box-sizing: inherit;
     }
+
+    *:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px #254b6d;
+    }
 `;
 
 export type ConnectionConfig = {

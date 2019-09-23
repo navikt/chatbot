@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { KommunikasjonProps } from '../Kommunikasjon';
 import { Event } from './styles';
+import Skriveindikator from '../Skriveindikator';
 
 export default class Eventviser extends Component<KommunikasjonProps, {}> {
     constructor(props: KommunikasjonProps) {
@@ -19,17 +20,26 @@ export default class Eventviser extends Component<KommunikasjonProps, {}> {
     }
 
     private visEventTekst() {
-        const { nickName } = this.props.beskjed;
-        switch (this.props.beskjed.content) {
-            case 'USER_DISCONNECTED':
-                return `${nickName} forlot chatten.`;
-            case 'USER_CONNECTED':
-                return `${nickName} ble med i chatten.`;
-            case 'REQUEST_DISCONNECTED':
-                return 'Bruker forlot chatten.';
-
-            default:
-                return;
+        const { nickName, userId } = this.props.beskjed;
+        if (this.props.beskjed.content === 'USER_DISCONNECTED') {
+            return `${nickName} forlot chatten.`;
+        } else if (this.props.beskjed.content === 'USER_CONNECTED') {
+            return `${nickName} ble med i chatten.`;
+        } else if (this.props.beskjed.content === 'REQUEST_DISCONNECTED') {
+            return 'Bruker forlot chatten.';
+        } else if (
+            this.props.beskjed.content === 'TYPE_MSG' &&
+            this.props.hentBrukerType(userId) === 'Human'
+        ) {
+            return (
+                <Skriveindikator
+                    beskjed={this.props.beskjed}
+                    skriveindikatorTid={this.props.skriveindikatorTid!}
+                    gjemAutomatisk={true}
+                />
+            );
+        } else {
+            return;
         }
     }
 

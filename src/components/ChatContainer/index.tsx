@@ -144,6 +144,7 @@ export default class ChatContainer extends Component<
                     avsluttet={this.state.avsluttet}
                     config={this.state.config!}
                     skriveindikatorTid={this.skriveindikatorTid}
+                    hentHistorie={() => this.hentHistorie()}
                 />
             </Container>
         );
@@ -176,7 +177,7 @@ export default class ChatContainer extends Component<
         }
 
         this.hentHistorieIntervall = setInterval(
-            () => this.hentHistorie(this.state.sisteMeldingId),
+            () => this.hentHistorie(),
             1000
         );
         this.lesIkkeLastethistorieIntervall = setInterval(
@@ -254,7 +255,7 @@ export default class ChatContainer extends Component<
         );
     }
 
-    async hentHistorie(sisteMeldingId: number) {
+    async hentHistorie() {
         if (
             this.state.hentHistorie &&
             this.state.config &&
@@ -264,29 +265,32 @@ export default class ChatContainer extends Component<
                 const res = await axios.get(
                     `${this.baseUrl}/sessions/${
                         this.state.config.sessionId
-                    }/messages/${sisteMeldingId}`
+                    }/messages/${this.state.sisteMeldingId}`
                 );
                 const data: Message[] = res.data;
+
                 if (data && data.length > 0) {
                     for (let historie of data) {
                         let historieMedIndikator: MessageWithIndicator = {
                             ...historie,
                             showIndicator: false
                         };
-                        this.setState({
-                            ikkeLastethistorie: [
-                                ...this.state.ikkeLastethistorie,
-                                historieMedIndikator
-                            ]
-                        });
+                        this.setState(
+                            {
+                                ikkeLastethistorie: [
+                                    ...this.state.ikkeLastethistorie,
+                                    historieMedIndikator
+                                ]
+                            },
+                            () => {
+                                console.log(this.state);
+                            }
+                        );
                     }
                     let fantId = false;
                     let sisteId = 1;
                     while (!fantId) {
-                        if (
-                            data[data.length - sisteId] &&
-                            data[data.length - sisteId].content !== 'TYPE_MSG'
-                        ) {
+                        if (data[data.length - sisteId]) {
                             fantId = true;
                             this.setState({
                                 sisteMeldingId: data[data.length - sisteId].id
@@ -313,6 +317,7 @@ export default class ChatContainer extends Component<
     }
 
     handterMelding(melding: MessageWithIndicator, oppdater: boolean = false) {
+        console.log(melding);
         if (melding.type === 'UserInfo') {
             if (
                 !this.state.brukere.some(
@@ -360,17 +365,29 @@ export default class ChatContainer extends Component<
             temp.valgt = true;
         } else if (melding.type === 'Event') {
             if (melding.content === 'USER_DISCONNECTED') {
-                this.setState((state: ChatContainerState) => {
-                    const brukere = state.brukere.map(bruker => {
-                        if (bruker.userId === melding.userId) {
-                            bruker.aktiv = false;
+                this.setState(
+                    (state: ChatContainerState) => {
+                        const brukere = state.brukere.map(bruker => {
+                            if (bruker.userId === melding.userId) {
+                                bruker.aktiv = false;
+                            }
+                            return bruker;
+                        });
+                        return {
+                            brukere
+                        };
+                    },
+                    () => {
+                        if (!this.state.avsluttet) {
+                            setTimeout(async () => {
+                                await this.avslutt();
+                                this.setState({
+                                    avsluttet: true
+                                });
+                            }, 5000);
                         }
-                        return bruker;
-                    });
-                    return {
-                        brukere
-                    };
-                });
+                    }
+                );
             } else if (melding.content.includes('REQUEST_PUTINQUEUE')) {
                 this.setState({
                     iKo: true
@@ -402,26 +419,24 @@ export default class ChatContainer extends Component<
     }
 
     lesIkkeLastethistorie() {
-        const now = moment();
+        const now = moment().valueOf();
         if (this.state.ikkeLastethistorie.length > 0) {
             const [historie, ...resten] = this.state.ikkeLastethistorie;
-
             if (
-                historie.type === 'Message' ||
-                historie.type === 'Option' ||
-                historie.type === 'Evaluation'
+                historie.role === 1 &&
+                (historie.type === 'Message' ||
+                    historie.type === 'Option' ||
+                    historie.type === 'Evaluation')
             ) {
                 const tid = this.state.brukereSomSkriver[historie.userId];
                 if (this.state.brukereSomSkriver[historie.userId]) {
-                    if (now.valueOf() - tid >= this.skriveindikatorTid) {
+                    if (now - tid >= this.skriveindikatorTid) {
                         this.setState(
                             (state: ChatContainerState) => {
                                 const brukereSomSkriver = {
                                     ...state.brukereSomSkriver
                                 };
-                                brukereSomSkriver[
-                                    historie.userId
-                                ] = now.valueOf();
+                                brukereSomSkriver[historie.userId] = now;
                                 return {
                                     brukereSomSkriver,
                                     ikkeLastethistorie: resten
@@ -440,7 +455,7 @@ export default class ChatContainer extends Component<
                         const brukereSomSkriver = {
                             ...state.brukereSomSkriver
                         };
-                        brukereSomSkriver[historie.userId] = now.valueOf();
+                        brukereSomSkriver[historie.userId] = now;
                         return {
                             brukereSomSkriver
                         };

@@ -14,17 +14,17 @@ import rating2 from '../../assets/rating-2.svg';
 import rating3 from '../../assets/rating-3.svg';
 import rating4 from '../../assets/rating-4.svg';
 import rating5 from '../../assets/rating-5.svg';
-import { Message } from '../../api/Sessions';
 import Skriveindikator from '../Skriveindikator';
-import { MessageWithIndicator, ShowIndicator } from '../ChatContainer';
+import { MessageWithIndicator } from '../ChatContainer';
 
 export type KommunikasjonProps = {
-    beskjed: Message & ShowIndicator;
+    beskjed: MessageWithIndicator;
     sisteBrukerId?: number | null;
     brukere?: Bruker[];
     skriveindikatorTid?: number;
     scrollTilBunn?: () => void;
     skjulIndikator?: (melding: MessageWithIndicator) => void;
+    hentBrukerType: (brukerId: number) => string | undefined;
 };
 
 export type KommunikasjonState = {
@@ -48,6 +48,7 @@ export default class Kommunikasjon extends Component<
             visMelding:
                 !this.props.beskjed.showIndicator ||
                 this.props.beskjed.role === 0
+            // || this.props.hentBrukerType(this.props.beskjed.userId) !== 'Human' Fjerner indikator for bot og
         };
 
         this.hentBruker = this.hentBruker.bind(this);
@@ -119,7 +120,10 @@ export default class Kommunikasjon extends Component<
                     >
                         {!this.state.visMelding &&
                             this.props.beskjed.role !== 0 &&
-                            this.props.beskjed.showIndicator && (
+                            this.props.beskjed.showIndicator &&
+                            this.props.hentBrukerType(
+                                this.props.beskjed.userId
+                            ) !== 'Human' && (
                                 <Skriveindikator
                                     beskjed={this.props.beskjed}
                                     skriveindikatorTid={
@@ -128,7 +132,10 @@ export default class Kommunikasjon extends Component<
                                     gjemAutomatisk={false}
                                 />
                             )}
-                        {this.state.visMelding && (
+                        {(this.state.visMelding ||
+                            this.props.hentBrukerType(
+                                this.props.beskjed.userId
+                            ) === 'Human') && (
                             <Snakkeboble
                                 aria-label={`${
                                     this.state.side === 'VENSTRE'
