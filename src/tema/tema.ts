@@ -5,7 +5,7 @@ const tema = {
         tekst: {
             generell: '16px',
             toppBar: '20px',
-            metaInfo: '10px',
+            metaInfo: '12px',
             teller: '12px'
         }
     },

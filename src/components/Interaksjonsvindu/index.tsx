@@ -228,7 +228,9 @@ export default class Interaksjonsvindu extends Component<
         historie: MessageWithIndicator,
         forrigeHistorieBrukerId: number | null
     ) {
-        this.scrollTilBunn();
+        setTimeout(() => {
+            this.scrollTilBunn();
+        }, 200);
         if (
             historie.type === 'Event' &&
             historie.content === 'REQUEST_DISCONNECTED'
@@ -358,25 +360,22 @@ export default class Interaksjonsvindu extends Component<
         }
     }
 
-    velg(messageId: number, valg: string) {
-        axios
-            .post(
-                `${this.props.baseUrl}/sessions/${
-                    this.props.config.sessionId
-                }/messages`,
-                {
-                    nickName: 'Bruker',
-                    type: 'OptionResult',
-                    content: {
-                        messageId: messageId,
-                        optionChoice: valg,
-                        cancelled: false
-                    }
+    async velg(messageId: number, valg: string) {
+        await axios.post(
+            `${this.props.baseUrl}/sessions/${
+                this.props.config.sessionId
+            }/messages`,
+            {
+                nickName: 'Bruker',
+                type: 'OptionResult',
+                content: {
+                    messageId: messageId,
+                    optionChoice: valg,
+                    cancelled: false
                 }
-            )
-            .then(() => {
-                this.scrollTilBunn();
-            });
+            }
+        );
+        this.scrollTilBunn();
     }
 
     async opprettEvaluering() {
