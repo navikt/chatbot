@@ -1,10 +1,12 @@
 import styled, { css } from 'styled-components';
 import tema from '../../tema/tema';
 import fridaIkon from '../../assets/frida.svg';
+import defaultIkon from '../../assets/default.svg';
 import { liten } from '../../tema/mediaqueries';
 
 interface Props {
     erApen: boolean;
+    queueKey: string;
 }
 
 export const Container = styled.div`
@@ -17,8 +19,12 @@ export const Container = styled.div`
     background: ${(props: Props) =>
         props.erApen
             ? '#fff'
-            : `transparent url('data:image/svg+xml;base64,${window.btoa(
+            : props.queueKey === 'Q_CHAT_BOT'
+            ? `transparent url('data:image/svg+xml;base64,${window.btoa(
                   fridaIkon
+              )}') no-repeat center center`
+            : `transparent url('data:image/svg+xml;base64,${window.btoa(
+                  defaultIkon
               )}') no-repeat center center`};
     background-size: 100%;
     transition: all 300ms cubic-bezier(0.86, 0, 0.07, 1);

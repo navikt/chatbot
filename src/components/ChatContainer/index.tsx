@@ -106,6 +106,7 @@ export default class ChatContainer extends Component<
         return (
             <Container
                 erApen={this.state.erApen}
+                queueKey={this.props.queueKey}
                 tabIndex={0}
                 aria-label={`Samtalevindu: ${this.state.navn}`}
             >

@@ -52,5 +52,4 @@ export const Eval = styled.button`
     }
 `;
 
-export const Outer = styled.div`
-`;
+export const Outer = styled.div``;
