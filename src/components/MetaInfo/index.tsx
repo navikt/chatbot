@@ -18,9 +18,11 @@ export default class MetaInfo extends Component<MetaInfoProps, {}> {
                 side={this.props.side}
                 aria-label={`${moment(sent).format('H:mm')}`}
             >
-                <NickName aria-hidden='true' side={this.props.side}>
-                    {nickName}
-                </NickName>
+                {nickName !== 'Bruker' && (
+                    <NickName aria-hidden='true' side={this.props.side}>
+                        {nickName}
+                    </NickName>
+                )}
                 <Moment aria-hidden='true' format='HH:mm'>
                     {sent}
                 </Moment>

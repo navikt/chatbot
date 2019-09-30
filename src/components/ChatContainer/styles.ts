@@ -34,6 +34,7 @@ export const Container = styled.div`
         ${(props: Props) => (props.erApen ? '#B5B5B5' : 'transparent')};
     box-shadow: 6px 6px 6px 0
         rgba(0, 0, 0, ${(props: Props) => (props.erApen ? '.16' : '0')});
+    z-index: 9999;
 
     ${(props: Props) =>
         !props.erApen &&
