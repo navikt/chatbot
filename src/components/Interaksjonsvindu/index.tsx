@@ -432,6 +432,7 @@ export default class Interaksjonsvindu extends Component<
                 },
                 true
             );
+            this.props.hentHistorie();
             this.scrollTilBunn();
         }
     }

@@ -125,7 +125,7 @@ export default class ChatContainer extends Component<
                         }
                         lukk={() => this.lukk()}
                         omstart={() => this.omstart()}
-                        avslutt={() => this.avslutt()}
+                        avslutt={() => this.avslutt(true)}
                     />
                 )}
                 <Interaksjonsvindu
@@ -156,12 +156,13 @@ export default class ChatContainer extends Component<
 
     async start(tving: boolean = false) {
         if (!this.state.config || tving) {
+            const apen = loadJSON(localStorageKeys.APEN);
             localStorage.clear();
             sessionStorage.clear();
             await this.hentConfig();
             await this.setState({
                 ...defaultState,
-                erApen: loadJSON(localStorageKeys.APEN),
+                erApen: apen,
                 config: loadJSON(localStorageKeys.CONFIG)
             });
         }
@@ -204,10 +205,12 @@ export default class ChatContainer extends Component<
     }
 
     async omstart() {
-        if (!this.state.avsluttet) await this.avslutt();
-        clearInterval(this.hentHistorieIntervall);
-        clearInterval(this.lesIkkeLastethistorieIntervall);
-        this.start(true);
+        if (confirm('Er du sikker på at du vil starte samtalen på nytt?')) {
+            if (!this.state.avsluttet) await this.avslutt();
+            clearInterval(this.hentHistorieIntervall);
+            clearInterval(this.lesIkkeLastethistorieIntervall);
+            this.start(true);
+        }
     }
 
     oppdaterNavn(navn: string): void {
@@ -216,13 +219,25 @@ export default class ChatContainer extends Component<
         }
     }
 
-    async avslutt() {
-        if (this.state.config && !this.state.avsluttet) {
-            await axios.delete(
-                `${this.baseUrl}/sessions/${this.state.config.sessionId}/${
-                    this.state.config.requestId
-                }`
-            );
+    async avslutt(sporBruker: boolean = false) {
+        if (sporBruker) {
+            if (confirm('Er du sikker på at du vil avslutte samtalen?')) {
+                if (this.state.config && !this.state.avsluttet) {
+                    await axios.delete(
+                        `${this.baseUrl}/sessions/${
+                            this.state.config.sessionId
+                        }/${this.state.config.requestId}`
+                    );
+                }
+            }
+        } else {
+            if (this.state.config && !this.state.avsluttet) {
+                await axios.delete(
+                    `${this.baseUrl}/sessions/${this.state.config.sessionId}/${
+                        this.state.config.requestId
+                    }`
+                );
+            }
         }
     }
 
