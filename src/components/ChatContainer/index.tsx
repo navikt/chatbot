@@ -95,6 +95,9 @@ export default class ChatContainer extends Component<
         this.leggTilIHistorie = this.leggTilIHistorie.bind(this);
         this.lesIkkeLastethistorie = this.lesIkkeLastethistorie.bind(this);
         this.skjulIndikator = this.skjulIndikator.bind(this);
+        this.skjulAlleIndikatorForBruker = this.skjulAlleIndikatorForBruker.bind(
+            this
+        );
     }
 
     componentDidMount() {
@@ -158,6 +161,7 @@ export default class ChatContainer extends Component<
             await this.hentConfig();
             await this.setState({
                 ...defaultState,
+                erApen: loadJSON(localStorageKeys.APEN),
                 config: loadJSON(localStorageKeys.CONFIG)
             });
         }
@@ -213,7 +217,7 @@ export default class ChatContainer extends Component<
     }
 
     async avslutt() {
-        if (this.state.config) {
+        if (this.state.config && !this.state.avsluttet) {
             await axios.delete(
                 `${this.baseUrl}/sessions/${this.state.config.sessionId}/${
                     this.state.config.requestId
@@ -272,9 +276,10 @@ export default class ChatContainer extends Component<
 
                 if (data && data.length > 0) {
                     for (let historie of data) {
+                        let showIndicator = historie.content === 'TYPE_MSG';
                         let historieMedIndikator: MessageWithIndicator = {
                             ...historie,
-                            showIndicator: false
+                            showIndicator: showIndicator
                         };
                         this.setState(
                             {
@@ -310,8 +315,14 @@ export default class ChatContainer extends Component<
                     }
                 }
             } catch (e) {
-                this.setState({
-                    hentHistorie: false
+                this.setState((state: ChatContainerState) => {
+                    return {
+                        hentHistorie: false,
+                        avsluttet:
+                            e.response && e.response.status === 404
+                                ? true
+                                : state.avsluttet
+                    };
                 });
             }
         }
@@ -399,6 +410,7 @@ export default class ChatContainer extends Component<
                 });
             }
         }
+        this.skjulAlleIndikatorForBruker(melding.userId);
         this.leggTilIHistorie(melding, oppdater);
     }
 
@@ -498,5 +510,27 @@ export default class ChatContainer extends Component<
                 saveJSON(localStorageKeys.HISTORIE, this.state.historie);
             }
         );
+    }
+
+    skjulAlleIndikatorForBruker(brukerId: number) {
+        const indikatorer = this.state.historie.filter(
+            (historie: MessageWithIndicator) =>
+                historie.userId === brukerId &&
+                historie.content === 'TYPE_MSG' &&
+                historie.showIndicator
+        );
+
+        indikatorer.forEach((indikator: MessageWithIndicator) => {
+            this.setState((state: ChatContainerState) => {
+                const historier = [...state.historie];
+                indikator.showIndicator = false;
+                const index = historier.indexOf(indikator);
+                state.historie[index] = indikator;
+                return {
+                    historie: historier
+                };
+            });
+        });
+        console.log(indikatorer);
     }
 }

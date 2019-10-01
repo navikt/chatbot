@@ -4,7 +4,7 @@ import ChatContainer from './components/ChatContainer';
 
 import tema from './tema/tema';
 
-const BorderBox = styled.div`
+const Global = styled.div`
     box-sizing: border-box;
 
     *,
@@ -15,7 +15,7 @@ const BorderBox = styled.div`
 
     *:focus {
         outline: none;
-        box-shadow: 0 0 0 3px #254b6d;
+        box-shadow: 0 0 0 3px #ffbd66;
     }
 `;
 
@@ -33,12 +33,12 @@ export default class Chat extends Component<ConnectionConfig, {}> {
         const { queueKey, customerKey } = this.props;
         return (
             <ThemeProvider theme={tema}>
-                <BorderBox>
+                <Global>
                     <ChatContainer
                         customerKey={customerKey}
                         queueKey={queueKey}
                     />
-                </BorderBox>
+                </Global>
             </ThemeProvider>
         );
     }

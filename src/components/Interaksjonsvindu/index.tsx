@@ -134,10 +134,7 @@ export default class Interaksjonsvindu extends Component<
                             Chatten er avsluttet.
                         </Alertstripe>
                     )}
-                    {this.state.melding === 'suksess' && (
-                        <Alertstripe type='suksess'>Flott.</Alertstripe>
-                    )}
-                    {(this.state.melding === 'feil' || this.state.feil) && (
+                    {this.state.feil && (
                         <Alertstripe type='feil'>
                             En feil har oppstått.
                         </Alertstripe>

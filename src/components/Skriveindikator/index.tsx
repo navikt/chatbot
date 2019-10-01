@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Container, Indikator, IndikatorDot } from './styles';
-import { Message } from '../../api/Sessions';
+import { MessageWithIndicator } from '../ChatContainer';
 
 type SkriveindikatorProps = {
-    beskjed: Message;
+    beskjed: MessageWithIndicator;
     skriveindikatorTid: number;
     gjemAutomatisk: boolean;
 };
@@ -20,19 +20,14 @@ export default class Skriveindikator extends Component<
     constructor(props: SkriveindikatorProps) {
         super(props);
         this.state = {
-            vis: true
+            vis: this.props.beskjed.showIndicator
         };
+
+        this.setGjemTimeout = this.setGjemTimeout.bind(this);
     }
 
     componentDidMount(): void {
-        console.log(this.props.skriveindikatorTid);
-        if (this.props.gjemAutomatisk) {
-            this.gjemTid = setTimeout(() => {
-                this.setState({
-                    vis: false
-                });
-            }, this.props.skriveindikatorTid - 500);
-        }
+        this.setGjemTimeout();
     }
 
     componentWillUnmount(): void {
@@ -40,7 +35,7 @@ export default class Skriveindikator extends Component<
     }
 
     render() {
-        if (this.state.vis) {
+        if (this.props.beskjed.showIndicator) {
             return (
                 <Container>
                     <Indikator>
@@ -52,6 +47,16 @@ export default class Skriveindikator extends Component<
             );
         } else {
             return null;
+        }
+    }
+
+    setGjemTimeout() {
+        if (this.props.gjemAutomatisk) {
+            this.gjemTid = setTimeout(() => {
+                this.setState({
+                    vis: false
+                });
+            }, this.props.skriveindikatorTid - 500);
         }
     }
 }
