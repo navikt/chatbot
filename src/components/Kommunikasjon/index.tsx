@@ -48,10 +48,10 @@ export default class Kommunikasjon extends Component<
             visMelding:
                 !this.props.beskjed.showIndicator ||
                 this.props.beskjed.role === 0
-            // || this.props.hentBrukerType(this.props.beskjed.userId) !== 'Human' Fjerner indikator for bot og
         };
 
         this.hentBruker = this.hentBruker.bind(this);
+        this.hentBrukerbilde = this.hentBrukerbilde.bind(this);
         this.stripHtml = this.stripHtml.bind(this);
     }
 
@@ -77,8 +77,8 @@ export default class Kommunikasjon extends Component<
     }
 
     render() {
-        const { nickName, sent, content, type } = this.props.beskjed;
-        const bruker = this.hentBruker(nickName);
+        const { nickName, sent, content, type, userId } = this.props.beskjed;
+        const bruker = this.hentBruker(userId);
         let htmlToRender;
         if (type === 'Evaluation') {
             if (content === 1) {
@@ -110,7 +110,10 @@ export default class Kommunikasjon extends Component<
                     {this.state.side === 'VENSTRE' && (
                         <Venstre>
                             {this.state.visBilde && (
-                                <Brukerbilde aria-hidden='true' />
+                                <Brukerbilde
+                                    aria-hidden='true'
+                                    brukerBilde={this.hentBrukerbilde(userId)}
+                                />
                             )}
                         </Venstre>
                     )}
@@ -167,11 +170,26 @@ export default class Kommunikasjon extends Component<
         );
     }
 
-    hentBruker(nickName: string): Bruker | undefined {
+    hentBruker(brukerId: number): Bruker | undefined {
         if (this.props.brukere) {
             return this.props.brukere.find(
-                (bruker: Bruker) => bruker.nickName === nickName
+                (bruker: Bruker) => bruker.userId === brukerId
             );
+        } else {
+            return undefined;
+        }
+    }
+
+    hentBrukerbilde(brukerId: number): string | undefined {
+        if (this.props.brukere) {
+            const bruker = this.props.brukere.find(
+                (bruker: Bruker) => bruker.userId === brukerId
+            );
+            if (bruker) {
+                return bruker.avatarUrl;
+            } else {
+                return undefined;
+            }
         } else {
             return undefined;
         }

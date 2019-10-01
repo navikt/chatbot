@@ -28,9 +28,12 @@ export const Hoyre = styled.div`
 export const Brukerbilde = styled.div`
     width: 50px;
     height: 50px;
-    background: transparent url('data:image/svg+xml;base64, ${window.btoa(
-        fridaIkon
-    )}') no-repeat center center;
+    ${(props: { brukerBilde: string | undefined }) =>
+        props.brukerBilde
+            ? `background: transparent url('${props.brukerBilde.trim()}') no-repeat center center`
+            : `background: transparent url('data:image/svg+xml;base64, ${window.btoa(
+                  fridaIkon
+              )}') no-repeat center center`};
 `;
 
 export const Snakkeboble = styled.div`

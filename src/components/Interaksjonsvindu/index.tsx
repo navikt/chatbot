@@ -225,9 +225,6 @@ export default class Interaksjonsvindu extends Component<
         historie: MessageWithIndicator,
         forrigeHistorieBrukerId: number | null
     ) {
-        setTimeout(() => {
-            this.scrollTilBunn();
-        }, 200);
         if (
             historie.type === 'Event' &&
             historie.content === 'REQUEST_DISCONNECTED'
@@ -400,24 +397,30 @@ export default class Interaksjonsvindu extends Component<
 
     async evaluer(evaluering: number) {
         if (!loadJSON('svartEval')) {
-            await axios.post(
-                `${this.props.baseUrl}/sessions/${
-                    this.props.config.sessionId
-                }/survey`,
-                {
-                    nickName: 'Bruker',
-                    surveyQuestion:
-                        'Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med meg.',
-                    surveyMaxScore: 5,
-                    surveyMinScore: 1,
-                    offerSurvey: false,
-                    queueKey: this.props.queueKey,
-                    surveyComment: evaluering,
-                    parentSessionId: this.state.evalueringsNokkel
-                }
-            );
+            try {
+                await axios.post(
+                    `${this.props.baseUrl}/sessions/${
+                        this.props.config.sessionId
+                    }/survey`,
+                    {
+                        nickName: 'Bruker',
+                        surveyQuestion:
+                            'Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med meg.',
+                        surveyMaxScore: 5,
+                        surveyMinScore: 1,
+                        offerSurvey: false,
+                        queueKey: this.props.queueKey,
+                        surveyComment: evaluering,
+                        parentSessionId: this.state.evalueringsNokkel
+                    }
+                );
+            } catch (e) {
+                this.setState({
+                    feil: true
+                });
+            }
             saveJSON('svartEval', evaluering);
-            const max = Number.MAX_SAFE_INTEGER;
+            const max = Number.MAX_SAFE_INTEGER - 1000;
             const min = Number.MAX_SAFE_INTEGER - 100000;
             this.props.handterMelding(
                 {
