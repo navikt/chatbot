@@ -405,7 +405,7 @@ export default class ChatContainer extends Component<
                         };
                     },
                     () => {
-                        if (!this.state.avsluttet) {
+                        if (!this.state.iKo) {
                             setTimeout(async () => {
                                 await this.avslutt();
                                 this.setState({
@@ -546,6 +546,5 @@ export default class ChatContainer extends Component<
                 };
             });
         });
-        console.log(indikatorer);
     }
 }

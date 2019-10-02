@@ -94,7 +94,7 @@ export default class Kommunikasjon extends Component<
             }
         } else {
             htmlToRender = unescape(
-                content.optionChoice ? content.optionChoice : content
+                escape(content.optionChoice ? content.optionChoice : content)
             );
         }
         return (

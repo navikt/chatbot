@@ -262,7 +262,6 @@ export default class Interaksjonsvindu extends Component<
         } else {
             switch (historie.type) {
                 case 'Message':
-                case 'OptionResult':
                 case 'Evaluation':
                     return (
                         <Tabbable key={`el-${historie.id}`}>
