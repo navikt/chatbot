@@ -1,3 +1,6 @@
+import 'react-app-polyfill/ie11';
+import 'react-app-polyfill/stable';
+
 import React, { Component } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import ChatContainer from './components/ChatContainer';
@@ -15,7 +18,7 @@ const Global = styled.div`
 
     *:focus {
         outline: none;
-        box-shadow: 0 0 0 3px #ffbd66;
+        box-shadow: 0 0 0 3px #005b82;
     }
 `;
 
