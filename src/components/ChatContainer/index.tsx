@@ -299,17 +299,12 @@ export default class ChatContainer extends Component<
                             ...historie,
                             showIndicator: showIndicator
                         };
-                        this.setState(
-                            {
-                                ikkeLastethistorie: [
-                                    ...this.state.ikkeLastethistorie,
-                                    historieMedIndikator
-                                ]
-                            },
-                            () => {
-                                console.log(this.state);
-                            }
-                        );
+                        this.setState({
+                            ikkeLastethistorie: [
+                                ...this.state.ikkeLastethistorie,
+                                historieMedIndikator
+                            ]
+                        });
                     }
                     let fantId = false;
                     let sisteId = 1;
@@ -347,7 +342,6 @@ export default class ChatContainer extends Component<
     }
 
     handterMelding(melding: MessageWithIndicator, oppdater: boolean = false) {
-        console.log(melding);
         if (melding.type === 'UserInfo') {
             if (
                 !this.state.brukere.some(
@@ -440,8 +434,6 @@ export default class ChatContainer extends Component<
                 (historie: Message) => historie.id === melding.id
             )
         ) {
-            console.log(`Legger til i historie: ${melding.type}`);
-            console.log(melding);
             this.setState({
                 historie: [...this.state.historie, melding]
             });
