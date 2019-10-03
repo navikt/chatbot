@@ -405,12 +405,13 @@ export default class ChatContainer extends Component<
                         };
                     },
                     () => {
-                        if (!this.state.iKo) {
+                        const harAktiveBrukere =
+                            this.state.brukere.filter(
+                                (bruker: Bruker) => bruker.aktiv
+                            ).length > 0;
+                        if (!this.state.iKo && !harAktiveBrukere) {
                             setTimeout(async () => {
                                 await this.avslutt();
-                                this.setState({
-                                    avsluttet: true
-                                });
                             }, 5000);
                         }
                     }
