@@ -77,15 +77,9 @@ export default class Evaluering extends Component<
                     sent={this.props.beskjed.sent}
                     side='VENSTRE'
                 />
-                <Snakkeboble
-                    aria-label={`${this.props.nickName} sa:`}
-                    tabIndex={0}
-                >
-                    Håper du fikk svar på det du lurte på. Takk for praten.
-                </Snakkeboble>
                 <Snakkeboble tabIndex={0}>
-                    Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med
-                    meg.
+                    Hei! Jeg ønsker å lære av din opplevelse. I hvilken grad
+                    fikk du svar på det du lurte på?
                 </Snakkeboble>
                 <Container
                     aria-label={`${
