@@ -101,7 +101,9 @@ export default class ChatContainer extends Component<
     }
 
     componentDidMount() {
-        this.start();
+        if (this.state.erApen) {
+            this.start();
+        }
     }
 
     render() {
@@ -192,10 +194,11 @@ export default class ChatContainer extends Component<
         );
     }
 
-    apne(): void {
-        this.setState({ erApen: true }, () => {
+    async apne() {
+        await this.setState({ erApen: true }, () => {
             saveJSON(localStorageKeys.APEN, true);
         });
+        this.start();
     }
 
     lukk(): void {
