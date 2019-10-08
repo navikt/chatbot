@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
-import { Container, Eval, Outer, Snakkeboble } from './styles';
+import { Container, Eval, Outer } from './styles';
 import rating1 from '../../assets/rating-1.svg';
 import rating2 from '../../assets/rating-2.svg';
 import rating3 from '../../assets/rating-3.svg';
 import rating4 from '../../assets/rating-4.svg';
 import rating5 from '../../assets/rating-5.svg';
-import MetaInfo from '../MetaInfo';
 import { loadJSON } from '../../services/localStorageService';
-import { Message } from '../../api/Sessions';
+import { localStorageKeys } from '../ChatContainer';
 
 type EvalueringProps = {
-    beskjed: Message;
     evaluer: (evaluering: number) => void;
     baseUrl: string;
     queueKey: string;
@@ -30,8 +28,8 @@ export default class Evaluering extends Component<
     constructor(props: EvalueringProps) {
         super(props);
         this.state = {
-            valgt: !!loadJSON('svartEval'),
-            valgtSvar: loadJSON('svartEval')
+            valgt: !!loadJSON(localStorageKeys.EVAL),
+            valgtSvar: loadJSON(localStorageKeys.EVAL)
         };
     }
 
@@ -39,8 +37,8 @@ export default class Evaluering extends Component<
         this.checkLoop = setInterval(() => {
             if (!this.state.valgt && !this.state.valgtSvar) {
                 this.setState({
-                    valgt: !!loadJSON('svartEval'),
-                    valgtSvar: loadJSON('svartEval')
+                    valgt: !!loadJSON(localStorageKeys.EVAL),
+                    valgtSvar: loadJSON(localStorageKeys.EVAL)
                 });
             }
         }, 100);
@@ -72,15 +70,6 @@ export default class Evaluering extends Component<
         }
         return (
             <Outer>
-                <MetaInfo
-                    nickName={this.props.nickName}
-                    sent={this.props.beskjed.sent}
-                    side='VENSTRE'
-                />
-                <Snakkeboble tabIndex={0}>
-                    Hei! Jeg ønsker å lære av din opplevelse. I hvilken grad
-                    fikk du svar på det du lurte på?
-                </Snakkeboble>
                 <Container
                     aria-label={`${
                         this.props.nickName

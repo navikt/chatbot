@@ -85,3 +85,29 @@ export const Tabbable = styled.div`
         // outline: ${tema.farger.interaksjon} solid 2px;
     }
 `;
+
+export const AlertstripeSeksjon = styled.div`
+    & + & {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px dashed ${tema.farger.alertstripe.advarsel.border};
+    }
+`;
+
+export const AlertstripeHeader = styled.h2`
+    margin: 0;
+    font-size: ${tema.storrelser.tekst.toppBar};
+`;
+
+export const AlertstripeForklarendeTekst = styled.p`
+    margin: 0;
+    color: ${tema.farger.tekstfelt};
+
+    &:last-of-type {
+        margin-bottom: 10px;
+    }
+`;
+
+export const UthevetTekst = styled.span`
+    font-weight: bold;
+`;

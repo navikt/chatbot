@@ -18,13 +18,11 @@ export const Snakkeboble = styled.div`
 `;
 
 export const Container = styled.div`
-    border: 2px solid ${tema.farger.snakkebobler.bot};
+    border: 1px solid ${tema.farger.tekstfelt};
     background: #fff;
     display: flex;
     justify-content: space-between;
     border-radius: 0 0 7px 7px;
-    margin-top: -7px;
-    padding-top: 7px;
 `;
 
 export const Eval = styled.button`

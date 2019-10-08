@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { KnappElement } from './styles';
 
 export type KnappProps = {
-    disabled: boolean;
-    aktiv: boolean;
+    disabled?: boolean;
+    aktiv?: boolean;
+    prosent?: number;
 };
 
 export default class Knapp extends Component<KnappProps, {}> {
@@ -14,6 +15,7 @@ export default class Knapp extends Component<KnappProps, {}> {
                 type='submit'
                 aktiv={this.props.aktiv}
                 tabIndex={0}
+                prosent={this.props.prosent}
             >
                 {this.props.children}
             </KnappElement>

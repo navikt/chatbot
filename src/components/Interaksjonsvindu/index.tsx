@@ -9,7 +9,11 @@ import {
     Tabbable,
     Tekstfelt,
     Tekstomrade,
-    Teller
+    Teller,
+    AlertstripeHeader,
+    AlertstripeForklarendeTekst,
+    AlertstripeSeksjon,
+    UthevetTekst
 } from './styles';
 import Flervalg from '../Flervalg';
 import Knapp from '../Knapp';
@@ -18,7 +22,9 @@ import { ConnectionConfig } from '../../index';
 import Evaluering from '../Evaluering';
 import { loadJSON, saveJSON } from '../../services/localStorageService';
 import { Message } from '../../api/Sessions';
-import { MessageWithIndicator } from '../ChatContainer';
+import { MessageWithIndicator, localStorageKeys } from '../ChatContainer';
+import EmailFeedback from '../EmailFeedback';
+import moment from 'moment';
 
 export interface Bruker {
     userId: number;
@@ -51,6 +57,7 @@ type InteraksjonsvinduState = {
     sendt: boolean;
     feil: boolean;
     evalueringsNokkel: string;
+    tidIgjen?: Tidigjen;
 };
 
 export interface Config {
@@ -60,12 +67,18 @@ export interface Config {
     alive: number;
 }
 
+interface Tidigjen {
+    formatert: string;
+    tid: number;
+}
+
 export default class Interaksjonsvindu extends Component<
     InteraksjonsvinduProps & ConnectionConfig,
     InteraksjonsvinduState
 > {
     formRef: HTMLFormElement | null;
     scrollEl: HTMLElement | null;
+    tidIgjen: number;
 
     constructor(props: InteraksjonsvinduProps & ConnectionConfig) {
         super(props);
@@ -86,11 +99,43 @@ export default class Interaksjonsvindu extends Component<
         this.hentBrukerType = this.hentBrukerType.bind(this);
     }
 
+    async componentDidMount() {
+        moment.locale('nb-NO');
+        this.tidIgjen = setInterval(() => {
+            if (this.props.avsluttet) {
+                this.setState({
+                    tidIgjen: {
+                        formatert: moment().to(
+                            loadJSON(localStorageKeys.MAILTIMEOUT),
+                            true
+                        ),
+                        tid: moment(
+                            loadJSON(localStorageKeys.MAILTIMEOUT)
+                        ).diff(moment())
+                    }
+                });
+            }
+        }, 1000);
+    }
+
+    componentWillUnmount(): void {
+        clearInterval(this.tidIgjen);
+    }
+
     render() {
         if (!this.props.vis) {
             return null;
         } else {
             const { historie } = this.props;
+            const sisteBrukerSomSnakket = historie
+                .slice()
+                .reverse()
+                .find(_historie => _historie.role === 1);
+            let sisteBrukerSomSnakketNick;
+
+            if (sisteBrukerSomSnakket) {
+                sisteBrukerSomSnakketNick = sisteBrukerSomSnakket.nickName;
+            }
             let historieListe = historie.map(
                 (historieItem: MessageWithIndicator, index: number) => {
                     const sistehistorie: Message =
@@ -131,7 +176,64 @@ export default class Interaksjonsvindu extends Component<
 
                     {this.props.avsluttet && (
                         <Alertstripe type='advarsel'>
-                            Chatten er avsluttet.
+                            <AlertstripeSeksjon>
+                                <AlertstripeHeader>
+                                    Chatten er avsluttet.
+                                </AlertstripeHeader>
+                            </AlertstripeSeksjon>
+                            {this.state.tidIgjen &&
+                                this.state.tidIgjen.tid >= 0 && (
+                                    <AlertstripeSeksjon>
+                                        <AlertstripeHeader>
+                                            Trenger du en kopi?
+                                        </AlertstripeHeader>
+                                        <AlertstripeForklarendeTekst>
+                                            Vi sender deg gjerne chat-dialogen
+                                            på e-post.
+                                        </AlertstripeForklarendeTekst>
+                                        {this.state.tidIgjen && (
+                                            <AlertstripeForklarendeTekst>
+                                                Du kan få chat-dialogen tilsendt
+                                                i{' '}
+                                                <UthevetTekst>
+                                                    {
+                                                        this.state.tidIgjen
+                                                            .formatert
+                                                    }{' '}
+                                                </UthevetTekst>
+                                                til.
+                                            </AlertstripeForklarendeTekst>
+                                        )}
+                                        <EmailFeedback
+                                            baseUrl={this.props.baseUrl}
+                                            config={this.props.config}
+                                        />
+                                    </AlertstripeSeksjon>
+                                )}
+                            <AlertstripeSeksjon>
+                                <AlertstripeHeader>
+                                    Evaulering
+                                </AlertstripeHeader>
+                                <AlertstripeForklarendeTekst>
+                                    {loadJSON(localStorageKeys.EVAL)
+                                        ? 'Takk for din tilbakemelding!'
+                                        : 'Hei! Jeg ønsker å lære av din opplevelse. I hvilken grad fikk du svar på det du lurte på?'}
+                                </AlertstripeForklarendeTekst>
+                                <Evaluering
+                                    evaluer={evaluering =>
+                                        this.evaluer(evaluering)
+                                    }
+                                    baseUrl={this.props.baseUrl}
+                                    queueKey={this.props.queueKey}
+                                    nickName={
+                                        sisteBrukerSomSnakket &&
+                                        sisteBrukerSomSnakketNick ===
+                                            'Chatbot Frida'
+                                            ? sisteBrukerSomSnakketNick
+                                            : 'NAV Chat'
+                                    }
+                                />
+                            </AlertstripeSeksjon>
                         </Alertstripe>
                     )}
                     {this.state.feil && (
@@ -225,114 +327,73 @@ export default class Interaksjonsvindu extends Component<
         historie: MessageWithIndicator,
         forrigeHistorieBrukerId: number | null
     ) {
-        if (
-            historie.type === 'Event' &&
-            historie.content === 'REQUEST_DISCONNECTED'
-        ) {
-            const sisteBrukerSomSnakket = this.props.historie
-                .slice()
-                .reverse()
-                .find(_historie => _historie.role === 1);
-            let sisteBrukerSomSnakketNick;
-
-            if (sisteBrukerSomSnakket) {
-                sisteBrukerSomSnakketNick = sisteBrukerSomSnakket.nickName;
-            }
-            return (
-                <Tabbable key={`el-${historie.id}`}>
-                    <Evaluering
-                        evaluer={evaluering => this.evaluer(evaluering)}
-                        beskjed={historie}
-                        baseUrl={this.props.baseUrl}
-                        queueKey={this.props.queueKey}
-                        nickName={
-                            sisteBrukerSomSnakket &&
-                            sisteBrukerSomSnakketNick === 'Chatbot Frida'
-                                ? sisteBrukerSomSnakketNick
-                                : 'NAV Chat'
-                        }
-                    />
-                    <div
-                        key={`scroll-el-${historie.id}`}
-                        ref={e => (this.scrollEl = e)}
-                        aria-hidden='true'
-                    />
-                </Tabbable>
-            );
-        } else {
-            switch (historie.type) {
-                case 'Message':
-                case 'Evaluation':
-                    return (
-                        <Tabbable key={`el-${historie.id}`}>
-                            <Kommunikasjon
-                                key={historie.id}
-                                beskjed={historie}
-                                brukere={this.props.brukere}
-                                sisteBrukerId={forrigeHistorieBrukerId}
-                                scrollTilBunn={() => this.scrollTilBunn()}
-                                skjulIndikator={(
-                                    melding: MessageWithIndicator
-                                ) => this.props.skjulIndikator(melding)}
-                                hentBrukerType={(brukerId: number) =>
-                                    this.hentBrukerType(brukerId)
-                                }
-                            />
-                            <div
-                                key={`scroll-el-${historie.id}`}
-                                ref={e => (this.scrollEl = e)}
-                                aria-hidden='true'
-                            />
-                        </Tabbable>
-                    );
-                case 'Event':
-                    return (
-                        <Tabbable key={`el-${historie.id}`}>
-                            <Eventviser
-                                beskjed={historie}
-                                skriveindikatorTid={
-                                    this.props.skriveindikatorTid
-                                }
-                                brukere={this.props.brukere}
-                                hentBrukerType={(brukerId: number) =>
-                                    this.hentBrukerType(brukerId)
-                                }
-                            />
-                            <div
-                                key={`scroll-el-${historie.id}`}
-                                ref={e => (this.scrollEl = e)}
-                                aria-hidden='true'
-                            />
-                        </Tabbable>
-                    );
-                case 'Option':
-                    return (
-                        <Tabbable key={`el-${historie.id}`}>
-                            <Flervalg
-                                beskjed={historie}
-                                harBlittBesvart={
-                                    historie.content.find(
-                                        (b: {
-                                            tekst: string;
-                                            valgt: boolean;
-                                        }) => b.valgt
-                                    ) || this.props.avsluttet
-                                }
-                                velg={(messageId: number, valg: string) =>
-                                    this.velg(messageId, valg)
-                                }
-                                sisteBrukerId={forrigeHistorieBrukerId}
-                            />
-                            <div
-                                key={`scroll-el-${historie.id}`}
-                                ref={e => (this.scrollEl = e)}
-                                aria-hidden='true'
-                            />
-                        </Tabbable>
-                    );
-                default:
-                    return;
-            }
+        switch (historie.type) {
+            case 'Message':
+                return (
+                    <Tabbable key={`el-${historie.id}`}>
+                        <Kommunikasjon
+                            key={historie.id}
+                            beskjed={historie}
+                            brukere={this.props.brukere}
+                            sisteBrukerId={forrigeHistorieBrukerId}
+                            scrollTilBunn={() => this.scrollTilBunn()}
+                            skjulIndikator={(melding: MessageWithIndicator) =>
+                                this.props.skjulIndikator(melding)
+                            }
+                            hentBrukerType={(brukerId: number) =>
+                                this.hentBrukerType(brukerId)
+                            }
+                        />
+                        <div
+                            key={`scroll-el-${historie.id}`}
+                            ref={e => (this.scrollEl = e)}
+                            aria-hidden='true'
+                        />
+                    </Tabbable>
+                );
+            case 'Event':
+                return (
+                    <Tabbable key={`el-${historie.id}`}>
+                        <Eventviser
+                            beskjed={historie}
+                            skriveindikatorTid={this.props.skriveindikatorTid}
+                            brukere={this.props.brukere}
+                            hentBrukerType={(brukerId: number) =>
+                                this.hentBrukerType(brukerId)
+                            }
+                        />
+                        <div
+                            key={`scroll-el-${historie.id}`}
+                            ref={e => (this.scrollEl = e)}
+                            aria-hidden='true'
+                        />
+                    </Tabbable>
+                );
+            case 'Option':
+                return (
+                    <Tabbable key={`el-${historie.id}`}>
+                        <Flervalg
+                            beskjed={historie}
+                            harBlittBesvart={
+                                historie.content.find(
+                                    (b: { tekst: string; valgt: boolean }) =>
+                                        b.valgt
+                                ) || this.props.avsluttet
+                            }
+                            velg={(messageId: number, valg: string) =>
+                                this.velg(messageId, valg)
+                            }
+                            sisteBrukerId={forrigeHistorieBrukerId}
+                        />
+                        <div
+                            key={`scroll-el-${historie.id}`}
+                            ref={e => (this.scrollEl = e)}
+                            aria-hidden='true'
+                        />
+                    </Tabbable>
+                );
+            default:
+                return;
         }
     }
 
@@ -372,7 +433,7 @@ export default class Interaksjonsvindu extends Component<
     }
 
     async opprettEvaluering() {
-        if (!loadJSON('svartEval')) {
+        if (!loadJSON(localStorageKeys.EVAL)) {
             const evaluering = await axios.post(
                 `${this.props.baseUrl}/sessions/${
                     this.props.config.sessionId
@@ -395,7 +456,7 @@ export default class Interaksjonsvindu extends Component<
     }
 
     async evaluer(evaluering: number) {
-        if (!loadJSON('svartEval')) {
+        if (!loadJSON(localStorageKeys.EVAL)) {
             try {
                 await axios.post(
                     `${this.props.baseUrl}/sessions/${
@@ -418,7 +479,7 @@ export default class Interaksjonsvindu extends Component<
                     feil: true
                 });
             }
-            saveJSON('svartEval', evaluering);
+            saveJSON(localStorageKeys.EVAL, evaluering);
             const max = Number.MAX_SAFE_INTEGER - 1000;
             const min = Number.MAX_SAFE_INTEGER - 100000;
             this.props.handterMelding(
@@ -434,8 +495,6 @@ export default class Interaksjonsvindu extends Component<
                 },
                 true
             );
-            this.props.hentHistorie();
-            this.scrollTilBunn();
         }
     }
 

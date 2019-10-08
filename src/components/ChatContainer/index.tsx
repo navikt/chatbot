@@ -52,7 +52,9 @@ export interface MessageWithIndicator extends Message, ShowIndicator {}
 export enum localStorageKeys {
     CONFIG = 'chatbot-frida_config',
     HISTORIE = 'chatbot-frida_historie',
-    APEN = 'chatbot-frida_apen'
+    APEN = 'chatbot-frida_apen',
+    EVAL = 'chatbot-frida_eval',
+    MAILTIMEOUT = 'chatbot-frida_mail-timeout'
 }
 
 export default class ChatContainer extends Component<
@@ -231,6 +233,14 @@ export default class ChatContainer extends Component<
                             this.state.config.sessionId
                         }/${this.state.config.requestId}`
                     );
+                    if (!loadJSON(localStorageKeys.MAILTIMEOUT)) {
+                        saveJSON(
+                            localStorageKeys.MAILTIMEOUT,
+                            moment()
+                                .add(4, 'm')
+                                .valueOf()
+                        );
+                    }
                 }
             }
         } else {
@@ -240,6 +250,14 @@ export default class ChatContainer extends Component<
                         this.state.config.requestId
                     }`
                 );
+                if (!loadJSON(localStorageKeys.MAILTIMEOUT)) {
+                    saveJSON(
+                        localStorageKeys.MAILTIMEOUT,
+                        moment()
+                            .add(4, 'm')
+                            .valueOf()
+                    );
+                }
             }
         }
     }

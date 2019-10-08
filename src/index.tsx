@@ -9,6 +9,8 @@ import tema from './tema/tema';
 
 const Global = styled.div`
     box-sizing: border-box;
+    font-family: ${tema.tekstFamilie};
+    font-size: ${tema.storrelser.tekst.generell};
 
     *,
     *:before,
