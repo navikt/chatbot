@@ -7,8 +7,10 @@ import {
     EpostFelt,
     Feilmelding,
     Form,
+    Hoyre,
     SendKnapp,
-    Suksessmelding
+    Suksessmelding,
+    Venstre
 } from './styles';
 
 type EmailFeedbackProps = {
@@ -19,6 +21,7 @@ type EmailFeedbackProps = {
 type EmailFeedbackState = {
     melding: string;
     tilbakemelding: Tilbakemelding;
+    sendt: boolean;
 };
 
 interface Tilbakemelding {
@@ -35,6 +38,7 @@ export default class EmailFeedback extends Component<
 
         this.state = {
             melding: '',
+            sendt: false,
             tilbakemelding: {
                 error: '',
                 suksess: ''
@@ -46,26 +50,36 @@ export default class EmailFeedback extends Component<
     }
 
     render() {
-        return (
-            <Form onSubmit={e => this.sendMail(e)} noValidate>
-                <EpostFelt
-                    type='email'
-                    placeholder='Din e-post'
-                    onChange={e => this.handleChange(e)}
-                    required
-                    error={!!this.state.tilbakemelding.error}
-                />
-                <SendKnapp>Send</SendKnapp>
-                {this.state.tilbakemelding.error && (
-                    <Feilmelding>{this.state.tilbakemelding.error}</Feilmelding>
-                )}
-                {this.state.tilbakemelding.suksess && (
-                    <Suksessmelding>
-                        {this.state.tilbakemelding.suksess}
-                    </Suksessmelding>
-                )}
-            </Form>
-        );
+        if (this.state.sendt) {
+            return null;
+        } else {
+            return (
+                <Form onSubmit={e => this.sendMail(e)} noValidate>
+                    <Venstre>
+                        <EpostFelt
+                            type='email'
+                            placeholder='Din e-post'
+                            onChange={e => this.handleChange(e)}
+                            required
+                            error={!!this.state.tilbakemelding.error}
+                        />
+                        {this.state.tilbakemelding.error && (
+                            <Feilmelding>
+                                {this.state.tilbakemelding.error}
+                            </Feilmelding>
+                        )}
+                        {this.state.tilbakemelding.suksess && (
+                            <Suksessmelding>
+                                {this.state.tilbakemelding.suksess}
+                            </Suksessmelding>
+                        )}
+                    </Venstre>
+                    <Hoyre>
+                        <SendKnapp>Send</SendKnapp>
+                    </Hoyre>
+                </Form>
+            );
+        }
     }
 
     async sendMail(e?: FormEvent<HTMLFormElement>) {
@@ -97,7 +111,6 @@ export default class EmailFeedback extends Component<
                 }
             });
         }
-        debugger;
         if (!this.state.tilbakemelding.error) {
             try {
                 await axios.post(
@@ -144,6 +157,7 @@ export default class EmailFeedback extends Component<
                         setTimeout(() => {
                             this.setState({
                                 melding: '',
+                                sendt: true,
                                 tilbakemelding: {
                                     ...this.state.tilbakemelding,
                                     suksess: ''

@@ -26,7 +26,7 @@ export default class Eventviser extends Component<KommunikasjonProps, {}> {
         } else if (this.props.beskjed.content === 'USER_CONNECTED') {
             return `${nickName} ble med i chatten.`;
         } else if (this.props.beskjed.content === 'REQUEST_DISCONNECTED') {
-            return 'Bruker forlot chatten.';
+            return 'Du avsluttet chatten.';
         } else if (
             this.props.beskjed.content === 'TYPE_MSG' &&
             this.props.hentBrukerType(userId) === 'Human'

@@ -153,6 +153,7 @@ export default class ChatContainer extends Component<
                     config={this.state.config!}
                     skriveindikatorTid={this.skriveindikatorTid}
                     hentHistorie={() => this.hentHistorie()}
+                    evaluationMessage={this.props.evaluationMessage}
                 />
             </Container>
         );
@@ -160,7 +161,7 @@ export default class ChatContainer extends Component<
 
     async start(tving: boolean = false) {
         if (!this.state.config || tving) {
-            const apen = loadJSON(localStorageKeys.APEN);
+            const apen = loadJSON(localStorageKeys.APEN) || true;
             localStorage.clear();
             sessionStorage.clear();
             await this.hentConfig();
@@ -226,8 +227,32 @@ export default class ChatContainer extends Component<
 
     async avslutt(sporBruker: boolean = false) {
         if (sporBruker) {
-            if (confirm('Er du sikker på at du vil avslutte samtalen?')) {
-                if (this.state.config && !this.state.avsluttet) {
+            if (!this.state.avsluttet) {
+                if (this.state.config) {
+                    if (
+                        confirm('Er du sikker på at du vil avslutte samtalen?')
+                    ) {
+                        await axios.delete(
+                            `${this.baseUrl}/sessions/${
+                                this.state.config.sessionId
+                            }/${this.state.config.requestId}`
+                        );
+                        if (!loadJSON(localStorageKeys.MAILTIMEOUT)) {
+                            saveJSON(
+                                localStorageKeys.MAILTIMEOUT,
+                                moment()
+                                    .add(4, 'm')
+                                    .valueOf()
+                            );
+                        }
+                    }
+                }
+            } else {
+                this.lukk();
+            }
+        } else {
+            if (!this.state.avsluttet) {
+                if (this.state.config) {
                     await axios.delete(
                         `${this.baseUrl}/sessions/${
                             this.state.config.sessionId
@@ -242,22 +267,8 @@ export default class ChatContainer extends Component<
                         );
                     }
                 }
-            }
-        } else {
-            if (this.state.config && !this.state.avsluttet) {
-                await axios.delete(
-                    `${this.baseUrl}/sessions/${this.state.config.sessionId}/${
-                        this.state.config.requestId
-                    }`
-                );
-                if (!loadJSON(localStorageKeys.MAILTIMEOUT)) {
-                    saveJSON(
-                        localStorageKeys.MAILTIMEOUT,
-                        moment()
-                            .add(4, 'm')
-                            .valueOf()
-                    );
-                }
+            } else {
+                this.lukk();
             }
         }
     }

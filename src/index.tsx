@@ -27,6 +27,7 @@ const Global = styled.div`
 export type ConnectionConfig = {
     queueKey: string;
     customerKey: string;
+    evaluationMessage?: string;
 };
 
 export default class Chat extends Component<ConnectionConfig, {}> {
@@ -35,13 +36,14 @@ export default class Chat extends Component<ConnectionConfig, {}> {
     }
 
     render() {
-        const { queueKey, customerKey } = this.props;
+        const { queueKey, customerKey, evaluationMessage } = this.props;
         return (
             <ThemeProvider theme={tema}>
                 <Global>
                     <ChatContainer
                         customerKey={customerKey}
                         queueKey={queueKey}
+                        evaluationMessage={evaluationMessage}
                     />
                 </Global>
             </ThemeProvider>

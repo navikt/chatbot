@@ -50,6 +50,7 @@ type InteraksjonsvinduProps = {
     config: Config;
     skriveindikatorTid: number;
     hentHistorie: () => void;
+    evaluationMessage?: string;
 };
 
 type InteraksjonsvinduState = {
@@ -176,14 +177,14 @@ export default class Interaksjonsvindu extends Component<
 
                     {this.props.avsluttet && (
                         <Alertstripe type='advarsel'>
-                            <AlertstripeSeksjon>
+                            <AlertstripeSeksjon tabIndex={0}>
                                 <AlertstripeHeader>
                                     Chatten er avsluttet.
                                 </AlertstripeHeader>
                             </AlertstripeSeksjon>
                             {this.state.tidIgjen &&
                                 this.state.tidIgjen.tid >= 0 && (
-                                    <AlertstripeSeksjon>
+                                    <AlertstripeSeksjon tabIndex={0}>
                                         <AlertstripeHeader>
                                             Trenger du en kopi?
                                         </AlertstripeHeader>
@@ -210,13 +211,15 @@ export default class Interaksjonsvindu extends Component<
                                         />
                                     </AlertstripeSeksjon>
                                 )}
-                            <AlertstripeSeksjon>
+                            <AlertstripeSeksjon tabIndex={0}>
                                 <AlertstripeHeader>
                                     Evaulering
                                 </AlertstripeHeader>
                                 <AlertstripeForklarendeTekst>
                                     {loadJSON(localStorageKeys.EVAL)
                                         ? 'Takk for din tilbakemelding!'
+                                        : this.props.evaluationMessage
+                                        ? this.props.evaluationMessage
                                         : 'Hei! Jeg ønsker å lære av din opplevelse. I hvilken grad fikk du svar på det du lurte på?'}
                                 </AlertstripeForklarendeTekst>
                                 <Evaluering
