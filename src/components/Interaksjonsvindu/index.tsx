@@ -25,6 +25,7 @@ import { Message } from '../../api/Sessions';
 import { MessageWithIndicator, localStorageKeys } from '../ChatContainer';
 import EmailFeedback from '../EmailFeedback';
 import moment from 'moment';
+import Bekreftelsesboks from '../Bekreftelsesboks';
 
 export interface Bruker {
     userId: number;
@@ -51,6 +52,10 @@ type InteraksjonsvinduProps = {
     skriveindikatorTid: number;
     hentHistorie: () => void;
     evaluationMessage?: string;
+    visBekreftelse: 'OMSTART' | 'AVSLUTT' | undefined;
+    confirmAvslutt: () => void;
+    confirmCancel: () => void;
+    confirmOmstart: () => void;
 };
 
 type InteraksjonsvinduState = {
@@ -161,6 +166,26 @@ export default class Interaksjonsvindu extends Component<
 
             return (
                 <Interaksjon>
+                    {this.props.visBekreftelse &&
+                        this.props.visBekreftelse === 'OMSTART' && (
+                            <Bekreftelsesboks
+                                tekst={
+                                    'Er du sikker på at du vil starte samtalen på nytt?'
+                                }
+                                ja={() => this.props.confirmOmstart()}
+                                nei={() => this.props.confirmCancel()}
+                            />
+                        )}
+                    {this.props.visBekreftelse &&
+                        this.props.visBekreftelse === 'AVSLUTT' && (
+                            <Bekreftelsesboks
+                                tekst={
+                                    'Er du sikker på at du vil avslutte samtalen?'
+                                }
+                                ja={() => this.props.confirmAvslutt()}
+                                nei={() => this.props.confirmCancel()}
+                            />
+                        )}
                     {this.props.iKo && !this.props.avsluttet && (
                         <Alertstripe type='info'>
                             Du blir nå satt over til en veileder.

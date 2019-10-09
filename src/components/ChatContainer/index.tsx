@@ -22,6 +22,7 @@ export type ChatContainerState = {
         [userId: number]: number;
     };
     hentHistorie: boolean;
+    visBekreftelse: 'OMSTART' | 'AVSLUTT' | undefined;
 };
 
 const defaultState: ChatContainerState = {
@@ -40,7 +41,8 @@ const defaultState: ChatContainerState = {
     sisteMeldingId: 0,
     avsluttet: false,
     brukereSomSkriver: {},
-    hentHistorie: true
+    hentHistorie: true,
+    visBekreftelse: undefined
 };
 
 export interface ShowIndicator {
@@ -100,6 +102,9 @@ export default class ChatContainer extends Component<
         this.skjulAlleIndikatorForBruker = this.skjulAlleIndikatorForBruker.bind(
             this
         );
+        this.confirmAvslutt = this.confirmAvslutt.bind(this);
+        this.confirmCancel = this.confirmCancel.bind(this);
+        this.confirmOmstart = this.confirmOmstart.bind(this);
     }
 
     componentDidMount() {
@@ -117,7 +122,9 @@ export default class ChatContainer extends Component<
                 tabIndex={0}
                 aria-label={`Samtalevindu: ${this.state.navn}`}
             >
-                {!this.state.erApen && <FridaKnapp onClick={this.apne} />}
+                {!this.state.erApen && (
+                    <FridaKnapp onClick={this.apne} aria-hidden={true} />
+                )}
                 {this.state.erApen && (
                     <ToppBar
                         navn={
@@ -154,6 +161,10 @@ export default class ChatContainer extends Component<
                     skriveindikatorTid={this.skriveindikatorTid}
                     hentHistorie={() => this.hentHistorie()}
                     evaluationMessage={this.props.evaluationMessage}
+                    visBekreftelse={this.state.visBekreftelse}
+                    confirmAvslutt={() => this.confirmAvslutt()}
+                    confirmOmstart={() => this.confirmOmstart()}
+                    confirmCancel={() => this.confirmCancel()}
                 />
             </Container>
         );
@@ -210,13 +221,17 @@ export default class ChatContainer extends Component<
         });
     }
 
-    async omstart() {
-        if (confirm('Er du sikker på at du vil starte samtalen på nytt?')) {
-            if (!this.state.avsluttet) await this.avslutt();
-            clearInterval(this.hentHistorieIntervall);
-            clearInterval(this.lesIkkeLastethistorieIntervall);
-            this.start(true);
-        }
+    omstart() {
+        this.setState({
+            visBekreftelse: 'OMSTART'
+        });
+    }
+
+    async confirmOmstart() {
+        if (!this.state.avsluttet) await this.avslutt();
+        clearInterval(this.hentHistorieIntervall);
+        clearInterval(this.lesIkkeLastethistorieIntervall);
+        this.start(true);
     }
 
     oppdaterNavn(navn: string): void {
@@ -229,23 +244,9 @@ export default class ChatContainer extends Component<
         if (sporBruker) {
             if (!this.state.avsluttet) {
                 if (this.state.config) {
-                    if (
-                        confirm('Er du sikker på at du vil avslutte samtalen?')
-                    ) {
-                        await axios.delete(
-                            `${this.baseUrl}/sessions/${
-                                this.state.config.sessionId
-                            }/${this.state.config.requestId}`
-                        );
-                        if (!loadJSON(localStorageKeys.MAILTIMEOUT)) {
-                            saveJSON(
-                                localStorageKeys.MAILTIMEOUT,
-                                moment()
-                                    .add(4, 'm')
-                                    .valueOf()
-                            );
-                        }
-                    }
+                    await this.setState({
+                        visBekreftelse: 'AVSLUTT'
+                    });
                 }
             } else {
                 this.lukk();
@@ -253,24 +254,35 @@ export default class ChatContainer extends Component<
         } else {
             if (!this.state.avsluttet) {
                 if (this.state.config) {
-                    await axios.delete(
-                        `${this.baseUrl}/sessions/${
-                            this.state.config.sessionId
-                        }/${this.state.config.requestId}`
-                    );
-                    if (!loadJSON(localStorageKeys.MAILTIMEOUT)) {
-                        saveJSON(
-                            localStorageKeys.MAILTIMEOUT,
-                            moment()
-                                .add(4, 'm')
-                                .valueOf()
-                        );
-                    }
+                    this.confirmAvslutt();
                 }
             } else {
                 this.lukk();
             }
         }
+    }
+
+    async confirmAvslutt() {
+        await axios.delete(
+            `${this.baseUrl}/sessions/${this.state.config!.sessionId}/${
+                this.state.config!.requestId
+            }`
+        );
+        if (!loadJSON(localStorageKeys.MAILTIMEOUT)) {
+            saveJSON(
+                localStorageKeys.MAILTIMEOUT,
+                moment()
+                    .add(4, 'm')
+                    .valueOf()
+            );
+        }
+        this.confirmCancel();
+    }
+
+    confirmCancel() {
+        this.setState({
+            visBekreftelse: undefined
+        });
     }
 
     async hentConfig(): Promise<AxiosResponse<SessionCreateResponse>> {
