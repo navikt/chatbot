@@ -1,7 +1,7 @@
 {
     "name": "@navikt/nav-chatbot",
     "homepage": "/person/chatbot/test",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Chatbot Frida for nav.no",
     "license": "MIT",
     "repository": {
