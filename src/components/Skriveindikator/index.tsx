@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Container, Indikator, IndikatorDot } from './styles';
-import * as moment from 'moment';
-import MetaInfo from '../MetaInfo';
-import { Beskjed } from '../Kommunikasjon';
+import { MessageWithIndicator } from '../ChatContainer';
 
 type SkriveindikatorProps = {
-    beskjed: Beskjed;
+    beskjed: MessageWithIndicator;
+    skriveindikatorTid: number;
+    gjemAutomatisk: boolean;
 };
 
 type SkriveindikatorState = {
@@ -16,33 +16,28 @@ export default class Skriveindikator extends Component<
     SkriveindikatorProps,
     SkriveindikatorState
 > {
-    threshhold = -3000;
+    gjemTid: number;
     constructor(props: SkriveindikatorProps) {
         super(props);
         this.state = {
-            vis:
-                moment(this.props.beskjed.sent).valueOf() - moment().valueOf() >
-                this.threshhold
+            vis: this.props.beskjed.showIndicator
         };
+
+        this.setGjemTimeout = this.setGjemTimeout.bind(this);
     }
 
     componentDidMount(): void {
-        setTimeout(() => {
-            this.setState({
-                vis: false
-            });
-        }, 5000);
+        this.setGjemTimeout();
+    }
+
+    componentWillUnmount(): void {
+        clearTimeout(this.gjemTid);
     }
 
     render() {
-        if (this.state.vis) {
+        if (this.props.beskjed.showIndicator) {
             return (
                 <Container>
-                    <MetaInfo
-                        sent={this.props.beskjed.sent}
-                        nickName={this.props.beskjed.nickName}
-                        side='VENSTRE'
-                    />
                     <Indikator>
                         <IndikatorDot />
                         <IndikatorDot />
@@ -52,6 +47,16 @@ export default class Skriveindikator extends Component<
             );
         } else {
             return null;
+        }
+    }
+
+    setGjemTimeout() {
+        if (this.props.gjemAutomatisk) {
+            this.gjemTid = setTimeout(() => {
+                this.setState({
+                    vis: false
+                });
+            }, this.props.skriveindikatorTid - 500);
         }
     }
 }

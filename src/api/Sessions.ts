@@ -6,7 +6,7 @@ export interface Message {
     nickName: string;
     type: string;
     content: any | any[];
-    arguments: {
+    arguments?: {
         additionalProp1: {};
         additionalProp2: {};
         additionalProp3: {};

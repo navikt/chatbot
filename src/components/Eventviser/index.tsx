@@ -13,35 +13,45 @@ export default class Eventviser extends Component<KommunikasjonProps, {}> {
 
     render() {
         return (
-            <Event aria-label={this.hentAriaTekst()}>
+            <Event aria-label={this.hentAriaTekst()} tabIndex={0}>
                 {this.visEventTekst()}
             </Event>
         );
     }
 
     private visEventTekst() {
-        switch (this.props.Beskjed.content) {
-            case 'USER_DISCONNECTED':
-                return `${this.props.Beskjed.nickName} forlot chatten.`;
-            case 'USER_CONNECTED':
-                return `${this.props.Beskjed.nickName} ble med i chatten.`;
-            case 'REQUEST_DISCONNECTED':
-                return 'Bruker forlot chatten.';
-            case 'TYPE_MSG':
-                return <Skriveindikator beskjed={this.props.Beskjed} />;
-            default:
-                return;
+        const { nickName, userId } = this.props.beskjed;
+        if (this.props.beskjed.content === 'USER_DISCONNECTED') {
+            return `${nickName} forlot chatten.`;
+        } else if (this.props.beskjed.content === 'USER_CONNECTED') {
+            return `${nickName} ble med i chatten.`;
+        } else if (this.props.beskjed.content === 'REQUEST_DISCONNECTED') {
+            return 'Du avsluttet chatten.';
+        } else if (
+            this.props.beskjed.content === 'TYPE_MSG' &&
+            this.props.hentBrukerType(userId) === 'Human'
+        ) {
+            return (
+                <Skriveindikator
+                    beskjed={this.props.beskjed}
+                    skriveindikatorTid={this.props.skriveindikatorTid!}
+                    gjemAutomatisk={false}
+                />
+            );
+        } else {
+            return;
         }
     }
 
     private hentAriaTekst(): string {
-        switch (this.props.Beskjed.content) {
+        const { nickName } = this.props.beskjed;
+        switch (this.props.beskjed.content) {
             case 'USER_DISCONNECTED':
-                return `${this.props.Beskjed.nickName} forlot chatten.`;
+                return `${nickName} forlot chatten.`;
             case 'USER_CONNECTED':
-                return `${this.props.Beskjed.nickName} ble med i chatten.`;
+                return `${nickName} ble med i chatten.`;
             case 'TYPE_MSG':
-                return `${this.props.Beskjed.nickName} skriver...`;
+                return `${nickName} skriver...`;
             default:
                 return '';
         }

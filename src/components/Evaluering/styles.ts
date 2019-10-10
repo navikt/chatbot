@@ -18,30 +18,36 @@ export const Snakkeboble = styled.div`
 `;
 
 export const Container = styled.div`
-    border: 2px solid ${tema.farger.snakkebobler.bot};
+    border: 1px solid ${tema.farger.tekstfelt};
     background: #fff;
     display: flex;
     justify-content: space-between;
     border-radius: 0 0 7px 7px;
-    margin-top: -7px;
-    padding-top: 7px;
 `;
 
-export const Eval = styled.div`
+export const Eval = styled.button`
     padding: 10px;
+    background: none;
+    border: none;
 
     svg {
         width: 30px;
         height: 30px;
-        cursor: pointer;
+        cursor: ${(props: { evalValgt: boolean; valgt: boolean }) =>
+            !props.evalValgt ? 'pointer' : 'default'};
         transition: all 150ms ease-in-out;
 
+        circle,
+        path {
+            stroke: ${(props: { evalValgt: boolean; valgt: boolean }) =>
+                props.valgt ? '#0067c5' : props.evalValgt ? '#ccc' : undefined};
+        }
+
         &:hover {
-            transform: translateY(-5px);
+            transform: ${(props: { evalValgt: boolean; valgt: boolean }) =>
+                !props.evalValgt ? 'translateY(-5px)' : undefined};
         }
     }
 `;
 
-export const Outer = styled.div`
-    max-width: 80%;
-`;
+export const Outer = styled.div``;

@@ -23,15 +23,17 @@ export const Venstre = styled.div`
 export const Hoyre = styled.div`
     margin-left: ${(props: KommunikasjonState) =>
         props.side === 'VENSTRE' ? undefined : 'auto'};
-    max-width: 80%;
 `;
 
 export const Brukerbilde = styled.div`
     width: 50px;
     height: 50px;
-    background: transparent url('data:image/svg+xml;base64, ${window.btoa(
-        fridaIkon
-    )}') no-repeat center center;
+    ${(props: { brukerBilde: string | undefined }) =>
+        props.brukerBilde
+            ? `background: transparent url('${props.brukerBilde.trim()}') no-repeat center center`
+            : `background: transparent url('data:image/svg+xml;base64, ${window.btoa(
+                  fridaIkon
+              )}') no-repeat center center`};
 `;
 
 export const Snakkeboble = styled.div`
@@ -47,6 +49,11 @@ export const Snakkeboble = styled.div`
     border-radius: ${(props: KommunikasjonState) =>
         props.side === 'VENSTRE' ? '0 7px 7px 7px' : '7px 0 7px 7px'};
     word-break: break-word;
+
+    svg {
+        height: 30px;
+        width: 30px;
+    }
 
     a,
     a:visited,

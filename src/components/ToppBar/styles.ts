@@ -9,11 +9,11 @@ export const Bar = styled.div`
     margin: 0;
     display: flex;
     background: ${(props: ToppBarProps) =>
-        props.navn === 'Net Nordic'
+        props.navn === 'Chatbot Frida'
             ? tema.farger.toppBar.bot
             : tema.farger.toppBar.ekstern};
     color: ${(props: ToppBarProps) =>
-        props.navn === 'Net Nordic' ? undefined : '#fff'};
+        props.navn === 'Chatbot Frida' ? undefined : '#fff'};
     transition: all 300ms ease-in-out;
 `;
 
@@ -28,10 +28,12 @@ export const Knapper = styled.div`
     margin-left: auto;
 `;
 
-export const Knapp = styled.div`
+export const Knapp = styled.button`
     flex: 0 1 auto;
     padding: 15px;
     cursor: pointer;
+    background: none;
+    border: none;
 
     svg {
         width: 20px;
@@ -40,7 +42,7 @@ export const Knapp = styled.div`
         line,
         path {
             stroke: ${(props: ToppBarProps) =>
-                props.navn === 'Net Nordic' ? undefined : '#fff'};
+                props.navn === 'Chatbot Frida' ? undefined : '#fff'};
             transition: all 300ms ease-in-out;
         }
     }

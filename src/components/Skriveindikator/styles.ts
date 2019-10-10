@@ -7,16 +7,27 @@ const blink = keyframes`
   }
 `;
 
+const visAnimasjon = keyframes`
+    from { 
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+`;
+
 export const Container = styled.div`
     font-style: normal;
 `;
 
 export const Indikator = styled.div`
     padding: 10px;
-    margin: 5px 0 10px 10px;
     border-radius: 10px;
     background: ${tema.farger.skriveIndikator.bakgrunn};
     display: inline-flex;
+    animation: ${visAnimasjon} 300ms;
 `;
 
 export const IndikatorDot = styled.span`
@@ -36,5 +47,6 @@ export const IndikatorDot = styled.span`
 
     &:nth-of-type(3) {
         animation: ${blink} 1s infinite ${3 * 0.3333}s;
+        margin-right: 0;
     }
 `;

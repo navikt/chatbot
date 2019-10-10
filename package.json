@@ -1,14 +1,13 @@
 {
     "name": "@navikt/nav-chatbot",
-    "homepage": "/person/chatbot/test",
-    "version": "1.0.3",
+    "version": "1.1.6",
     "description": "Chatbot Frida for nav.no",
     "license": "MIT",
     "repository": {
         "type": "git",
         "url": "https://github.com/navikt/chatbot.git"
     },
-    "main": "lib/index.js",
+    "main": "umd/@navikt/nav-chatbot.min.js",
     "module": "es/index.js",
     "files": [
         "css",
@@ -17,8 +16,7 @@
         "umd"
     ],
     "scripts": {
-        "build": "nwb build-react-component --no-demo",
-        "build:navno-app": "nwb -c ./nwb.navno.config.js build-react-app",
+        "build": "nwb build-react-component --no-demo && import-path --path umd/@navikt/nav-chatbot.min.js",
         "clean": "nwb clean-module && nwb clean-demo",
         "prepublishOnly": "npm run build",
         "start": "nwb -c ./nwb.demo.config.js serve-react-demo --copy-files",
@@ -29,7 +27,7 @@
     "dependencies": {
         "axios": "^0.19.0",
         "moment": "^2.24.0",
-        "prettier": "^1.18.2",
+        "react-app-polyfill": "^1.0.3",
         "react-moment": "^0.9.2",
         "styled-components": "^4.3.2"
     },
@@ -40,6 +38,7 @@
         "@types/react": "^16.8.24",
         "@types/react-dom": "^16.8.5",
         "@types/styled-components": "^4.1.18",
+        "import-path": "^1.0.14",
         "nwb": "^0.23.0",
         "react": "^16.8.6",
         "react-dom": "^16.8.6",

@@ -54,11 +54,11 @@ export const Ikon = styled.div`
         `transparent url('data:image/svg+xml;base64,${window.btoa(
             ikon(props.type)
         )}') no-repeat center center`};
+    align-self: flex-start;
 `;
 
 export const Tekst = styled.div`
-    font-family: ${tema.tekstFamilie};
-    font-size: ${tema.storrelser.tekst.generell};
+    flex: 1;
 
     a,
     a:visited,

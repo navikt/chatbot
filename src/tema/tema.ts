@@ -5,7 +5,7 @@ const tema = {
         tekst: {
             generell: '16px',
             toppBar: '20px',
-            metaInfo: '10px',
+            metaInfo: '12px',
             teller: '12px'
         }
     },
@@ -47,6 +47,10 @@ const tema = {
             feil: {
                 bakgrunn: '#e79999',
                 border: '#BA3A26'
+            },
+            comfirm: {
+                bakgrunn: '#E9E7E7',
+                border: '#575757'
             }
         },
         interaksjon: '#0067C5',
