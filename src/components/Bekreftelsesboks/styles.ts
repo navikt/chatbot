@@ -28,19 +28,19 @@ export const Knapp = styled.button`
 
     &:nth-of-type(1) {
         line,
-        path,
-        stroke {
+        path {
             outline: ${tema.farger.alertstripe.suksess.border};
             fill: ${tema.farger.alertstripe.suksess.border};
+            stroke: ${tema.farger.alertstripe.suksess.border};
         }
     }
 
     &:nth-of-type(2) {
         line,
-        path,
-        stroke {
+        path {
             outline: ${tema.farger.alertstripe.feil.border};
             fill: ${tema.farger.alertstripe.feil.border};
+            stroke: ${tema.farger.alertstripe.feil.border};
         }
     }
 `;

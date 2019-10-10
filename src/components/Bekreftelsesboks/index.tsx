@@ -21,12 +21,14 @@ export default class Bekreftelsesboks extends Component<
                     <Knapp
                         dangerouslySetInnerHTML={{ __html: checkIkon }}
                         onClick={() => this.props.ja!()}
+                        aria-label={'Ja'}
                     />
                 )}
                 {this.props.nei && (
                     <Knapp
                         dangerouslySetInnerHTML={{ __html: avsluttIkon }}
                         onClick={() => this.props.nei!()}
+                        aria-label={'Nei'}
                     />
                 )}
             </Boks>
