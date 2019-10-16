@@ -65,3 +65,7 @@ export interface SurveySend {
     offerSurvey: boolean;
     queueKey: string;
 }
+
+export interface ConfigurationResponse {
+    botMessageTimerMs: string;
+}

@@ -6,7 +6,11 @@ import { Container, FridaKnapp } from './styles';
 import { ConnectionConfig } from '../../index';
 import axios, { AxiosResponse } from 'axios';
 import { loadJSON, saveJSON } from '../../services/localStorageService';
-import { Message, SessionCreateResponse } from '../../api/Sessions';
+import {
+    ConfigurationResponse,
+    Message,
+    SessionCreateResponse
+} from '../../api/Sessions';
 import moment from 'moment';
 
 export type ChatContainerState = {
@@ -110,6 +114,7 @@ export default class ChatContainer extends Component<
         this.confirmOmstart = this.confirmOmstart.bind(this);
         this.leggTilLenkeHandler = this.leggTilLenkeHandler.bind(this);
         this.lukkOgAvslutt = this.lukkOgAvslutt.bind(this);
+        this.settTimerConfig = this.settTimerConfig.bind(this);
     }
 
     componentDidMount() {
@@ -207,6 +212,7 @@ export default class ChatContainer extends Component<
         }
 
         if (!this.state.feil && this.state.erApen) {
+            await this.settTimerConfig();
             const node = ReactDOM.findDOMNode(this) as HTMLElement;
             node.focus();
             if (this.state.historie && this.state.historie.length < 1) {
@@ -668,5 +674,15 @@ export default class ChatContainer extends Component<
                 this.events.push(lenke);
             }
         }
+    }
+
+    async settTimerConfig() {
+        const res = await axios.get(
+            `${this.baseUrl}/configurations/${
+                this.props.customerKey
+            }-c34298fe-3ea4-4d88-9343-c2d4e7bb3e10`
+        );
+        const config = res.data as ConfigurationResponse;
+        this.skriveindikatorTid = parseInt(config.botMessageTimerMs);
     }
 }
