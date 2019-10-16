@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import { Container, Ikon, Tekst } from './styles';
 
 export type AlertstripeProps = {
@@ -6,6 +7,11 @@ export type AlertstripeProps = {
 };
 
 export default class Alertstripe extends Component<AlertstripeProps, {}> {
+    componentDidMount() {
+        const node = ReactDOM.findDOMNode(this) as HTMLElement;
+        node.focus();
+    }
+
     render() {
         return (
             <Container type={this.props.type} tabIndex={0}>

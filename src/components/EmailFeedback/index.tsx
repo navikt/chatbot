@@ -54,30 +54,33 @@ export default class EmailFeedback extends Component<
             return null;
         } else {
             return (
-                <Form onSubmit={e => this.sendMail(e)} noValidate>
-                    <Venstre>
-                        <EpostFelt
-                            type='email'
-                            placeholder='Din e-post'
-                            onChange={e => this.handleChange(e)}
-                            required
-                            error={!!this.state.tilbakemelding.error}
-                        />
-                        {this.state.tilbakemelding.error && (
-                            <Feilmelding>
-                                {this.state.tilbakemelding.error}
-                            </Feilmelding>
-                        )}
-                        {this.state.tilbakemelding.suksess && (
-                            <Suksessmelding>
-                                {this.state.tilbakemelding.suksess}
-                            </Suksessmelding>
-                        )}
-                    </Venstre>
-                    <Hoyre>
-                        <SendKnapp>Send</SendKnapp>
-                    </Hoyre>
-                </Form>
+                <div>
+                    {this.state.tilbakemelding.suksess ? (
+                        <Suksessmelding>
+                            {this.state.tilbakemelding.suksess}
+                        </Suksessmelding>
+                    ) : (
+                        <Form onSubmit={e => this.sendMail(e)} noValidate>
+                            <Venstre>
+                                <EpostFelt
+                                    type='email'
+                                    placeholder='Din e-post'
+                                    onChange={e => this.handleChange(e)}
+                                    required
+                                    error={!!this.state.tilbakemelding.error}
+                                />
+                                {this.state.tilbakemelding.error && (
+                                    <Feilmelding>
+                                        {this.state.tilbakemelding.error}
+                                    </Feilmelding>
+                                )}
+                            </Venstre>
+                            <Hoyre>
+                                <SendKnapp>Send</SendKnapp>
+                            </Hoyre>
+                        </Form>
+                    )}
+                </div>
             );
         }
     }
@@ -150,18 +153,15 @@ export default class EmailFeedback extends Component<
                         melding: '',
                         tilbakemelding: {
                             error: '',
-                            suksess: 'E-post sendt!'
+                            suksess: `E-posten ble sendt til ${
+                                this.state.melding
+                            }`
                         }
                     },
                     () => {
                         setTimeout(() => {
                             this.setState({
-                                melding: '',
-                                sendt: true,
-                                tilbakemelding: {
-                                    ...this.state.tilbakemelding,
-                                    suksess: ''
-                                }
+                                sendt: true
                             });
                         }, 5000);
                     }

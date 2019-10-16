@@ -37,11 +37,8 @@ export interface Bruker {
 }
 
 type InteraksjonsvinduProps = {
-    oppdaterNavn: (navn: string) => void;
     handterMelding: (melding: MessageWithIndicator, oppdater: boolean) => void;
     skjulIndikator: (melding: MessageWithIndicator) => void;
-    apne: () => void;
-    lukk: () => void;
     vis: boolean;
     baseUrl: string;
     historie: MessageWithIndicator[];
@@ -52,10 +49,13 @@ type InteraksjonsvinduProps = {
     skriveindikatorTid: number;
     hentHistorie: () => void;
     evaluationMessage?: string;
-    visBekreftelse: 'OMSTART' | 'AVSLUTT' | undefined;
+    visBekreftelse: 'OMSTART' | 'AVSLUTT' | 'NY_FANE' | undefined;
     confirmAvslutt: () => void;
     confirmCancel: () => void;
     confirmOmstart: () => void;
+    lukkOgAvslutt: () => void;
+    href: string | null;
+    feil: boolean;
 };
 
 type InteraksjonsvinduState = {
@@ -85,13 +85,14 @@ export default class Interaksjonsvindu extends Component<
     formRef: HTMLFormElement | null;
     scrollEl: HTMLElement | null;
     tidIgjen: number;
+    maxTegn = 110;
 
     constructor(props: InteraksjonsvinduProps & ConnectionConfig) {
         super(props);
 
         this.state = {
             evalueringsNokkel: '',
-            feil: false,
+            feil: this.props.feil,
             sendt: false,
             melding: ''
         };
@@ -103,23 +104,35 @@ export default class Interaksjonsvindu extends Component<
         this.opprettEvaluering = this.opprettEvaluering.bind(this);
         this.scrollTilBunn = this.scrollTilBunn.bind(this);
         this.hentBrukerType = this.hentBrukerType.bind(this);
+        this.sendTilLenke = this.sendTilLenke.bind(this);
     }
 
     async componentDidMount() {
         moment.locale('nb-NO');
         this.tidIgjen = setInterval(() => {
             if (this.props.avsluttet) {
-                this.setState({
-                    tidIgjen: {
-                        formatert: moment().to(
-                            loadJSON(localStorageKeys.MAILTIMEOUT),
-                            true
-                        ),
-                        tid: moment(
-                            loadJSON(localStorageKeys.MAILTIMEOUT)
-                        ).diff(moment())
+                this.setState(
+                    {
+                        tidIgjen: {
+                            formatert: moment().to(
+                                loadJSON(localStorageKeys.MAILTIMEOUT),
+                                true
+                            ),
+                            tid: moment(
+                                loadJSON(localStorageKeys.MAILTIMEOUT)
+                            ).diff(moment())
+                        }
+                    },
+                    () => {
+                        if (
+                            this.state.tidIgjen &&
+                            this.state.tidIgjen.tid <= 0
+                        ) {
+                            saveJSON(localStorageKeys.APEN, false);
+                            this.props.lukkOgAvslutt();
+                        }
                     }
-                });
+                );
             }
         }, 1000);
     }
@@ -167,6 +180,15 @@ export default class Interaksjonsvindu extends Component<
             return (
                 <Interaksjon>
                     {this.props.visBekreftelse &&
+                        this.props.visBekreftelse === 'NY_FANE' && (
+                            <Bekreftelsesboks
+                                tekst={'Åpne i ny fane?'}
+                                undertekst={this.props.href}
+                                ja={() => this.sendTilLenke()}
+                                nei={() => this.props.confirmCancel()}
+                            />
+                        )}
+                    {this.props.visBekreftelse &&
                         this.props.visBekreftelse === 'OMSTART' && (
                             <Bekreftelsesboks
                                 tekst={
@@ -201,7 +223,7 @@ export default class Interaksjonsvindu extends Component<
                         )}
 
                     {this.props.avsluttet && (
-                        <Alertstripe type='advarsel'>
+                        <Alertstripe type='info'>
                             <AlertstripeSeksjon tabIndex={0}>
                                 <AlertstripeHeader>
                                     Chatten er avsluttet.
@@ -264,7 +286,7 @@ export default class Interaksjonsvindu extends Component<
                             </AlertstripeSeksjon>
                         </Alertstripe>
                     )}
-                    {this.state.feil && (
+                    {this.props.feil && (
                         <Alertstripe type='feil'>
                             En feil har oppstått.
                         </Alertstripe>
@@ -285,15 +307,17 @@ export default class Interaksjonsvindu extends Component<
                         <SendKnappOgTeller>
                             <Knapp
                                 disabled={
-                                    this.state.melding.length > 200 ||
+                                    this.state.melding.length > this.maxTegn ||
                                     this.props.avsluttet
                                 }
                                 aktiv={this.state.sendt}
                             >
                                 {this.state.sendt ? 'Sendt' : 'Send'}
                             </Knapp>
-                            <Teller error={this.state.melding.length > 200}>
-                                {this.state.melding.length} / 200
+                            <Teller
+                                error={this.state.melding.length > this.maxTegn}
+                            >
+                                {this.state.melding.length} / {this.maxTegn}
                             </Teller>
                         </SendKnappOgTeller>
                     </Tekstomrade>
@@ -371,6 +395,7 @@ export default class Interaksjonsvindu extends Component<
                             hentBrukerType={(brukerId: number) =>
                                 this.hentBrukerType(brukerId)
                             }
+                            skriveindikatorTid={this.props.skriveindikatorTid}
                         />
                         <div
                             key={`scroll-el-${historie.id}`}
@@ -412,6 +437,7 @@ export default class Interaksjonsvindu extends Component<
                                 this.velg(messageId, valg)
                             }
                             sisteBrukerId={forrigeHistorieBrukerId}
+                            scrollTilBunn={() => this.scrollTilBunn()}
                         />
                         <div
                             key={`scroll-el-${historie.id}`}
@@ -534,6 +560,12 @@ export default class Interaksjonsvindu extends Component<
             return bruker ? bruker.userType : undefined;
         } else {
             return undefined;
+        }
+    }
+
+    sendTilLenke() {
+        if (this.props.href) {
+            window.open(this.props.href, '_blank');
         }
     }
 }

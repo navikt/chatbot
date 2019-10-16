@@ -8,6 +8,7 @@ type FlervalgProps = {
     harBlittBesvart: boolean;
     velg: (messageId: number, valg: string) => void;
     sisteBrukerId: number | null;
+    scrollTilBunn?: () => void;
 };
 
 type FlervalgState = {
@@ -29,6 +30,12 @@ export default class Flervalg extends Component<FlervalgProps, FlervalgState> {
                     this.props.sisteBrukerId === this.props.beskjed.userId) ||
                 false
         };
+    }
+
+    componentDidMount() {
+        if (this.props.scrollTilBunn) {
+            this.props.scrollTilBunn();
+        }
     }
 
     render() {

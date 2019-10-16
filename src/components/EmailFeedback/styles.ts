@@ -21,8 +21,8 @@ export const EpostFelt = styled.input`
     height: 45px;
     border-color: ${(props: { error: boolean }) =>
         props.error
-            ? tema.farger.alertstripe.feil.bakgrunn
-            : tema.farger.tekstfelt};
+            ? tema.farger.alertstripe.email.feilmelding
+            : tema.farger.alertstripe.email};
     width: 100%;
 `;
 
@@ -35,7 +35,7 @@ export const SendKnapp = styled(KnappElement)`
 `;
 
 export const Feilmelding = styled.p`
-    color: ${tema.farger.alertstripe.feil.bakgrunn};
+    color: ${tema.farger.alertstripe.email.feilmelding};
     margin: 0;
 `;
 

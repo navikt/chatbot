@@ -48,9 +48,10 @@ const tema = {
                 bakgrunn: '#e79999',
                 border: '#BA3A26'
             },
-            comfirm: {
-                bakgrunn: '#E9E7E7',
-                border: '#575757'
+            email: {
+                feilmelding: '#BA3A26',
+                bakgrunn: '#E0F5FB',
+                inputBakgrunn: '#78706A'
             }
         },
         interaksjon: '#0067C5',

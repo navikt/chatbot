@@ -21,7 +21,7 @@ export type KommunikasjonProps = {
     beskjed: MessageWithIndicator;
     sisteBrukerId?: number | null;
     brukere?: Bruker[];
-    skriveindikatorTid?: number;
+    skriveindikatorTid: number;
     scrollTilBunn?: () => void;
     skjulIndikator?: (melding: MessageWithIndicator) => void;
     hentBrukerType: (brukerId: number) => string | undefined;
@@ -72,7 +72,7 @@ export default class Kommunikasjon extends Component<
                         this.props.skjulIndikator!(this.props.beskjed);
                     }
                 );
-            }, 3000);
+            }, this.props.skriveindikatorTid);
         }
     }
 
@@ -130,7 +130,7 @@ export default class Kommunikasjon extends Component<
                                 <Skriveindikator
                                     beskjed={this.props.beskjed}
                                     skriveindikatorTid={
-                                        this.props.skriveindikatorTid || 3000
+                                        this.props.skriveindikatorTid
                                     }
                                     gjemAutomatisk={false}
                                 />

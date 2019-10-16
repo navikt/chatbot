@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import ToppBar from '../ToppBar';
 import Interaksjonsvindu, { Bruker, Config } from '../Interaksjonsvindu';
 import { Container, FridaKnapp } from './styles';
@@ -22,7 +23,9 @@ export type ChatContainerState = {
         [userId: number]: number;
     };
     hentHistorie: boolean;
-    visBekreftelse: 'OMSTART' | 'AVSLUTT' | undefined;
+    visBekreftelse: 'OMSTART' | 'AVSLUTT' | 'NY_FANE' | undefined;
+    lastHref: string | null;
+    feil: boolean;
 };
 
 const defaultState: ChatContainerState = {
@@ -30,19 +33,16 @@ const defaultState: ChatContainerState = {
     navn: 'Chatbot Frida',
     historie: [],
     ikkeLastethistorie: [],
-    config: {
-        alive: 0,
-        requestId: 0,
-        sessionId: '',
-        sessionIdPure: ''
-    },
+    config: undefined,
     brukere: [],
     iKo: false,
     sisteMeldingId: 0,
     avsluttet: false,
     brukereSomSkriver: {},
     hentHistorie: true,
-    visBekreftelse: undefined
+    visBekreftelse: undefined,
+    lastHref: '',
+    feil: false
 };
 
 export interface ShowIndicator {
@@ -64,9 +64,12 @@ export default class ChatContainer extends Component<
     ChatContainerState
 > {
     baseUrl = 'https://devapi.puzzel.com/chat/v1';
-    skriveindikatorTid = 3000;
+    skriveindikatorTid = 1000;
     hentHistorieIntervall: number;
     lesIkkeLastethistorieIntervall: number;
+    leggTilLenkeHandlerIntervall: number;
+    events: Element[] = [];
+
     constructor(props: ConnectionConfig) {
         super(props);
         this.state = {
@@ -105,6 +108,8 @@ export default class ChatContainer extends Component<
         this.confirmAvslutt = this.confirmAvslutt.bind(this);
         this.confirmCancel = this.confirmCancel.bind(this);
         this.confirmOmstart = this.confirmOmstart.bind(this);
+        this.leggTilLenkeHandler = this.leggTilLenkeHandler.bind(this);
+        this.lukkOgAvslutt = this.lukkOgAvslutt.bind(this);
     }
 
     componentDidMount() {
@@ -113,17 +118,37 @@ export default class ChatContainer extends Component<
         }
     }
 
+    componentWillUnmount(): void {
+        clearInterval(this.hentHistorieIntervall);
+        clearInterval(this.lesIkkeLastethistorieIntervall);
+        clearInterval(this.leggTilLenkeHandlerIntervall);
+    }
+
     render() {
         const { queueKey, customerKey } = this.props;
         return (
             <Container
                 erApen={this.state.erApen}
                 queueKey={this.props.queueKey}
-                tabIndex={0}
-                aria-label={`Samtalevindu: ${this.state.navn}`}
+                tabIndex={this.state.erApen ? 0 : -1}
+                aria-label={
+                    this.state.erApen
+                        ? `Samtalevindu: ${this.state.navn}`
+                        : undefined
+                }
+                lang={this.state.erApen ? 'no' : undefined}
             >
                 {!this.state.erApen && (
-                    <FridaKnapp onClick={this.apne} aria-hidden={true} />
+                    <FridaKnapp
+                        onClick={this.apne}
+                        tabIndex={this.state.erApen ? -1 : 0}
+                        aria-label={
+                            this.state.erApen
+                                ? undefined
+                                : `Samtalevindu: ${this.state.navn}`
+                        }
+                        lang={this.state.erApen ? undefined : 'no'}
+                    />
                 )}
                 {this.state.erApen && (
                     <ToppBar
@@ -140,15 +165,12 @@ export default class ChatContainer extends Component<
                     />
                 )}
                 <Interaksjonsvindu
-                    oppdaterNavn={navn => this.oppdaterNavn(navn)}
                     handterMelding={(melding, oppdater) =>
                         this.handterMelding(melding, oppdater)
                     }
                     skjulIndikator={(melding: MessageWithIndicator) =>
                         this.skjulIndikator(melding)
                     }
-                    lukk={() => this.lukk()}
-                    apne={() => this.apne()}
                     vis={this.state.erApen}
                     queueKey={queueKey}
                     customerKey={customerKey}
@@ -165,60 +187,85 @@ export default class ChatContainer extends Component<
                     confirmAvslutt={() => this.confirmAvslutt()}
                     confirmOmstart={() => this.confirmOmstart()}
                     confirmCancel={() => this.confirmCancel()}
+                    lukkOgAvslutt={() => this.lukkOgAvslutt()}
+                    href={this.state.lastHref}
+                    feil={this.state.feil}
                 />
             </Container>
         );
     }
 
-    async start(tving: boolean = false) {
+    async start(tving: boolean = false, beholdApen: boolean = false) {
         if (!this.state.config || tving) {
-            const apen = loadJSON(localStorageKeys.APEN) || true;
-            localStorage.clear();
-            sessionStorage.clear();
             await this.hentConfig();
             await this.setState({
                 ...defaultState,
-                erApen: apen,
+                erApen: beholdApen,
+                historie: loadJSON(localStorageKeys.HISTORIE) || [],
                 config: loadJSON(localStorageKeys.CONFIG)
             });
         }
-        if (this.state.historie && this.state.historie.length < 1) {
-            // Henter full historie fra API
-            let historie = await this.hentFullHistorie()!;
-            let data: any[] = historie.data;
-            if (data.length > 0) {
-                for (let historie of data) {
-                    this.handterMelding(historie, true);
-                }
-            }
-        } else {
-            // Har hentet historie fra localStorage
-            for (let historie of this.state.historie) {
-                this.handterMelding({ ...historie, showIndicator: false });
-            }
-        }
 
-        this.hentHistorieIntervall = setInterval(
-            () => this.hentHistorie(),
-            1000
-        );
-        this.lesIkkeLastethistorieIntervall = setInterval(
-            () => this.lesIkkeLastethistorie(),
-            50
-        );
+        if (!this.state.feil && this.state.erApen) {
+            const node = ReactDOM.findDOMNode(this) as HTMLElement;
+            node.focus();
+            if (this.state.historie && this.state.historie.length < 1) {
+                // Henter full historie fra API
+                try {
+                    let historie = await this.hentFullHistorie();
+                    if (historie) {
+                        let data: any[] = historie.data;
+                        if (data.length > 0) {
+                            for (let historie of data) {
+                                this.handterMelding(historie, true);
+                            }
+                        }
+                        this.setState({
+                            erApen: beholdApen
+                        });
+                    }
+                } catch (e) {
+                    console.error(e);
+                    this.setState({
+                        feil: true
+                    });
+                }
+            } else {
+                // Har hentet historie fra localStorage
+                for (let historie of this.state.historie) {
+                    this.handterMelding({ ...historie, showIndicator: false });
+                }
+                this.setState({
+                    erApen: true
+                });
+            }
+
+            this.hentHistorieIntervall = setInterval(
+                () => this.hentHistorie(),
+                1000
+            );
+            this.lesIkkeLastethistorieIntervall = setInterval(
+                () => this.lesIkkeLastethistorie(),
+                50
+            );
+            this.leggTilLenkeHandlerIntervall = setInterval(
+                () => this.leggTilLenkeHandler(),
+                100
+            );
+        }
     }
 
     async apne() {
-        await this.setState({ erApen: true }, () => {
-            saveJSON(localStorageKeys.APEN, true);
+        saveJSON(localStorageKeys.APEN, true);
+        await this.setState({
+            erApen: true
         });
-        this.start();
+        this.start(false, true);
     }
 
-    lukk(): void {
-        this.setState({ erApen: false }, () => {
-            saveJSON(localStorageKeys.APEN, false);
-        });
+    async lukk() {
+        await this.setState({ erApen: false });
+        saveJSON(localStorageKeys.APEN, false);
     }
 
     omstart() {
@@ -231,7 +278,12 @@ export default class ChatContainer extends Component<
         if (!this.state.avsluttet) await this.avslutt();
         clearInterval(this.hentHistorieIntervall);
         clearInterval(this.lesIkkeLastethistorieIntervall);
-        this.start(true);
+        clearInterval(this.leggTilLenkeHandlerIntervall);
+        const apen = loadJSON(localStorageKeys.APEN) == true;
+        sessionStorage.clear();
+        localStorage.clear();
+        saveJSON(localStorageKeys.APEN, apen);
+        this.start(true, apen);
     }
 
     oppdaterNavn(navn: string): void {
@@ -249,7 +301,7 @@ export default class ChatContainer extends Component<
                     });
                 }
             } else {
-                this.lukk();
+                this.confirmOmstart();
             }
         } else {
             if (!this.state.avsluttet) {
@@ -257,7 +309,7 @@ export default class ChatContainer extends Component<
                     this.confirmAvslutt();
                 }
             } else {
-                this.lukk();
+                this.confirmOmstart();
             }
         }
     }
@@ -272,7 +324,7 @@ export default class ChatContainer extends Component<
             saveJSON(
                 localStorageKeys.MAILTIMEOUT,
                 moment()
-                    .add(4, 'm')
+                    .add(4.5, 'm')
                     .valueOf()
             );
         }
@@ -282,6 +334,15 @@ export default class ChatContainer extends Component<
     confirmCancel() {
         this.setState({
             visBekreftelse: undefined
+        });
+    }
+
+    lukkOgAvslutt() {
+        localStorage.clear();
+        sessionStorage.clear();
+        this.setState({
+            ...defaultState,
+            erApen: false
         });
     }
 
@@ -312,11 +373,15 @@ export default class ChatContainer extends Component<
     }
 
     hentFullHistorie() {
-        return axios.get(
-            `${this.baseUrl}/sessions/${
-                this.state.config!.sessionId
-            }/messages/0`
-        );
+        if (this.state.config) {
+            return axios.get(
+                `${this.baseUrl}/sessions/${
+                    this.state.config.sessionId
+                }/messages/0`
+            );
+        } else {
+            return undefined;
+        }
     }
 
     async hentHistorie() {
@@ -485,7 +550,7 @@ export default class ChatContainer extends Component<
 
     lesIkkeLastethistorie() {
         const now = moment().valueOf();
-        if (this.state.ikkeLastethistorie.length > 0) {
+        if (this.state.erApen && this.state.ikkeLastethistorie.length > 0) {
             const [historie, ...resten] = this.state.ikkeLastethistorie;
             if (
                 historie.role === 1 &&
@@ -583,5 +648,25 @@ export default class ChatContainer extends Component<
                 };
             });
         });
+    }
+
+    leggTilLenkeHandler() {
+        const lenker = document.getElementsByClassName('bbcode-link');
+        for (const lenke of Array.from(lenker)) {
+            if (!(this.events.indexOf(lenke) > -1)) {
+                lenke.addEventListener('click', (e: Event) => {
+                    e.preventDefault();
+                    if (lenke.getAttribute('target') === '_blank') {
+                        this.setState({
+                            visBekreftelse: 'NY_FANE',
+                            lastHref: lenke.getAttribute('href')
+                        });
+                    } else if (lenke.getAttribute('href')) {
+                        window.location.href = lenke.getAttribute('href')!;
+                    }
+                });
+                this.events.push(lenke);
+            }
+        }
     }
 }

@@ -90,7 +90,7 @@ export const AlertstripeSeksjon = styled.div`
     & + & {
         margin-top: 10px;
         padding-top: 10px;
-        border-top: 1px dashed ${tema.farger.alertstripe.advarsel.border};
+        border-top: 1px dashed ${tema.farger.alertstripe.info.border};
     }
 `;
 
