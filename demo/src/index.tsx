@@ -20,7 +20,11 @@ class Demo extends Component {
         return (
             <Outer>
                 <NAVBackdrop src='https://familie.nav.no/' title='NAV Famile' />
-                <Chat customerKey='12345' queueKey='Q_CHAT_BOT' />
+                <Chat
+                    customerKey='12345'
+                    queueKey='Q_CHAT_BOT'
+                    configId='c34298fe-3ea4-4d88-9343-c2d4e7bb3e10'
+                />
             </Outer>
         );
     }

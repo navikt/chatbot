@@ -15,6 +15,7 @@ export const Bar = styled.div`
     color: ${(props: ToppBarProps) =>
         props.navn === 'Chatbot Frida' ? undefined : '#fff'};
     transition: all 300ms ease-in-out;
+    z-index: 10;
 `;
 
 export const Navn = styled.div`

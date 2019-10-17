@@ -26,6 +26,7 @@ export interface SessionCreate {
     chatId: string;
     languageCode: string;
     denyArchiving: boolean;
+    intro: SessionCreateIntro;
 }
 
 export interface SessionCreateResponse {
@@ -67,5 +68,64 @@ export interface SurveySend {
 }
 
 export interface ConfigurationResponse {
-    botMessageTimerMs: string;
+    [key: string]: string;
+}
+
+export interface SessionCreateIntro {
+    /**
+     * Is enduser on a mobile?
+     */
+    isMobile?: boolean;
+    /**
+     * Variables to add
+     */
+    variables?: { [key: string]: string };
+    /**
+     * Welcome message header
+     */
+    msgWelcomeHeader?: string;
+    /**
+     * Welcome message
+     */
+    msgWelcome?: string;
+    /**
+     * Welcome message when theree are no agents logged on
+     */
+    msgWelcomeEmpty?: string;
+    /**
+     * Welcome message when all agents are in pause
+     */
+    msgWelcomePause?: string;
+    /**
+     * Welcome message when the queue is full
+     */
+    msgWelcomeFull?: string;
+    /**
+     * Welcome message when enduser is rejected to enter queue
+     */
+    msgReject?: string;
+    /**
+     * Show IP Address in intro?
+     */
+    showIpAddress?: boolean;
+    /**
+     * Show Number of endusersr in queue in intro?
+     */
+    showNumberInQueue?: boolean;
+    /**
+     * Show Agents logged on in intro?
+     */
+    showAgentLoggedOn?: boolean;
+    /**
+     * Show active agents in intro?
+     */
+    showAgentActive?: boolean;
+    /**
+     * Show variables in intro?
+     */
+    showVariables?: boolean;
+    /**
+     * Show whether user is on mobile in intro?
+     */
+    showIsMobile?: boolean;
 }

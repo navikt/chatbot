@@ -29,6 +29,7 @@ const Global = styled.div`
 export type ConnectionConfig = {
     queueKey: string;
     customerKey: string;
+    configId: string;
     evaluationMessage?: string;
 };
 
@@ -39,13 +40,19 @@ export default class Chat extends Component<ConnectionConfig, {}> {
     }
 
     render() {
-        const { queueKey, customerKey, evaluationMessage } = this.props;
+        const {
+            queueKey,
+            customerKey,
+            configId,
+            evaluationMessage
+        } = this.props;
         return (
             <ThemeProvider theme={tema}>
                 <Global tabIndex={-1}>
                     <ChatContainer
                         customerKey={customerKey}
                         queueKey={queueKey}
+                        configId={configId}
                         evaluationMessage={evaluationMessage}
                     />
                 </Global>

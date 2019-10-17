@@ -5,6 +5,9 @@ import tema from '../../tema/tema';
 export const Boks = styled(Container)`
     background: ${tema.farger.alertstripe.advarsel.bakgrunn};
     border-color: ${tema.farger.alertstripe.advarsel.border};
+    z-index: 9;
+    flex: 0 0 auto;
+    min-height: 0;
 `;
 
 export const Tekst = styled.div`

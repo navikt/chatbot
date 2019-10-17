@@ -32,6 +32,7 @@ export const Tekstomrade = styled.form`
     padding: 15px;
     align-items: center;
     min-height: 85px;
+    z-index: 10;
 `;
 export const Tekstfelt = styled.textarea`
     width: 100%;

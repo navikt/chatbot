@@ -21,7 +21,7 @@ import Alertstripe from '../Alertstripe';
 import { ConnectionConfig } from '../../index';
 import Evaluering from '../Evaluering';
 import { loadJSON, saveJSON } from '../../services/localStorageService';
-import { Message } from '../../api/Sessions';
+import { Message, SurveySend } from '../../api/Sessions';
 import { MessageWithIndicator, localStorageKeys } from '../ChatContainer';
 import EmailFeedback from '../EmailFeedback';
 import moment from 'moment';
@@ -36,7 +36,7 @@ export interface Bruker {
     aktiv: boolean;
 }
 
-type InteraksjonsvinduProps = {
+interface InteraksjonsvinduProps extends Omit<ConnectionConfig, 'configId'> {
     handterMelding: (melding: MessageWithIndicator, oppdater: boolean) => void;
     skjulIndikator: (melding: MessageWithIndicator) => void;
     vis: boolean;
@@ -56,7 +56,7 @@ type InteraksjonsvinduProps = {
     lukkOgAvslutt: () => void;
     href: string | null;
     feil: boolean;
-};
+}
 
 type InteraksjonsvinduState = {
     melding: string;
@@ -79,7 +79,7 @@ interface Tidigjen {
 }
 
 export default class Interaksjonsvindu extends Component<
-    InteraksjonsvinduProps & ConnectionConfig,
+    InteraksjonsvinduProps,
     InteraksjonsvinduState
 > {
     formRef: HTMLFormElement | null;
@@ -87,7 +87,7 @@ export default class Interaksjonsvindu extends Component<
     tidIgjen: number;
     maxTegn = 110;
 
-    constructor(props: InteraksjonsvinduProps & ConnectionConfig) {
+    constructor(props: InteraksjonsvinduProps) {
         super(props);
 
         this.state = {
@@ -526,7 +526,7 @@ export default class Interaksjonsvindu extends Component<
                         queueKey: this.props.queueKey,
                         surveyComment: evaluering,
                         parentSessionId: this.state.evalueringsNokkel
-                    }
+                    } as SurveySend
                 );
             } catch (e) {
                 this.setState({

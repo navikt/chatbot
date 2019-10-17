@@ -9,6 +9,7 @@ import { loadJSON, saveJSON } from '../../services/localStorageService';
 import {
     ConfigurationResponse,
     Message,
+    SessionCreate,
     SessionCreateResponse
 } from '../../api/Sessions';
 import moment from 'moment';
@@ -73,6 +74,7 @@ export default class ChatContainer extends Component<
     lesIkkeLastethistorieIntervall: number;
     leggTilLenkeHandlerIntervall: number;
     events: Element[] = [];
+    config: ConfigurationResponse;
 
     constructor(props: ConnectionConfig) {
         super(props);
@@ -202,6 +204,7 @@ export default class ChatContainer extends Component<
 
     async start(tving: boolean = false, beholdApen: boolean = false) {
         if (!this.state.config || tving) {
+            await this.settTimerConfig();
             await this.hentConfig();
             await this.setState({
                 ...defaultState,
@@ -212,7 +215,6 @@ export default class ChatContainer extends Component<
         }
 
         if (!this.state.feil && this.state.erApen) {
-            await this.settTimerConfig();
             const node = ReactDOM.findDOMNode(this) as HTMLElement;
             node.focus();
             if (this.state.historie && this.state.historie.length < 1) {
@@ -354,13 +356,16 @@ export default class ChatContainer extends Component<
 
     async hentConfig(): Promise<AxiosResponse<SessionCreateResponse>> {
         const session = await axios.post(`${this.baseUrl}/sessions`, {
-            customerKey: parseInt(this.props.customerKey),
+            customerKey: this.props.customerKey,
             queueKey: this.props.queueKey,
             nickName: 'Bruker',
-            chatId: 'test.name@customer.com',
+            chatId: 'bruker@customer.com',
             languageCode: 'NO',
-            denyArchiving: false
-        });
+            denyArchiving: false,
+            intro: {
+                variables: this.config['variables'] || undefined
+            }
+        } as SessionCreate);
 
         let data: Config = {
             sessionId: `${this.props.customerKey}-${session.data.iqSessionId}`,
@@ -678,11 +683,17 @@ export default class ChatContainer extends Component<
 
     async settTimerConfig() {
         const res = await axios.get(
-            `${this.baseUrl}/configurations/${
-                this.props.customerKey
-            }-c34298fe-3ea4-4d88-9343-c2d4e7bb3e10`
+            `${this.baseUrl}/configurations/${this.props.customerKey}-${
+                this.props.configId
+            }`
         );
         const config = res.data as ConfigurationResponse;
-        this.skriveindikatorTid = parseInt(config.botMessageTimerMs);
+        if (config) {
+            this.config = res.data;
+            const timer = parseInt(config.botMessageTimerMs);
+            if (timer) {
+                this.skriveindikatorTid = timer;
+            }
+        }
     }
 }

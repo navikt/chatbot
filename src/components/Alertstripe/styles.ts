@@ -29,6 +29,9 @@ export const Container = styled.div`
     border-bottom: 1px solid
         ${(props: AlertstripeProps) =>
             tema.farger.alertstripe[props.type.toLowerCase()].border};
+    z-index: 9;
+    flex: 0 0 auto;
+    min-height: 0;
 `;
 
 const ikon = (type: 'info' | 'suksess' | 'advarsel' | 'feil') => {
