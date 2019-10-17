@@ -21,7 +21,6 @@ type EmailFeedbackProps = {
 type EmailFeedbackState = {
     melding: string;
     tilbakemelding: Tilbakemelding;
-    sendt: boolean;
 };
 
 interface Tilbakemelding {
@@ -38,7 +37,6 @@ export default class EmailFeedback extends Component<
 
         this.state = {
             melding: '',
-            sendt: false,
             tilbakemelding: {
                 error: '',
                 suksess: ''
@@ -50,39 +48,33 @@ export default class EmailFeedback extends Component<
     }
 
     render() {
-        if (this.state.sendt) {
-            return null;
-        } else {
-            return (
-                <div>
-                    {this.state.tilbakemelding.suksess ? (
-                        <Suksessmelding>
-                            {this.state.tilbakemelding.suksess}
-                        </Suksessmelding>
-                    ) : (
-                        <Form onSubmit={e => this.sendMail(e)} noValidate>
-                            <Venstre>
-                                <EpostFelt
-                                    type='email'
-                                    placeholder='Din e-post'
-                                    onChange={e => this.handleChange(e)}
-                                    required
-                                    error={!!this.state.tilbakemelding.error}
-                                />
-                                {this.state.tilbakemelding.error && (
-                                    <Feilmelding>
-                                        {this.state.tilbakemelding.error}
-                                    </Feilmelding>
-                                )}
-                            </Venstre>
-                            <Hoyre>
-                                <SendKnapp>Send</SendKnapp>
-                            </Hoyre>
-                        </Form>
-                    )}
-                </div>
-            );
-        }
+        return (
+            <div>
+                <Form onSubmit={e => this.sendMail(e)} noValidate>
+                    <Venstre>
+                        <EpostFelt
+                            type='email'
+                            placeholder='Din e-post'
+                            onChange={e => this.handleChange(e)}
+                            error={!!this.state.tilbakemelding.error}
+                        />
+                        {this.state.tilbakemelding.suksess && (
+                            <Suksessmelding>
+                                {this.state.tilbakemelding.suksess}
+                            </Suksessmelding>
+                        )}
+                        {this.state.tilbakemelding.error && (
+                            <Feilmelding>
+                                {this.state.tilbakemelding.error}
+                            </Feilmelding>
+                        )}
+                    </Venstre>
+                    <Hoyre>
+                        <SendKnapp type='submit'>Send</SendKnapp>
+                    </Hoyre>
+                </Form>
+            </div>
+        );
     }
 
     async sendMail(e?: FormEvent<HTMLFormElement>) {
@@ -148,24 +140,13 @@ export default class EmailFeedback extends Component<
                     } as EmailSend
                 );
 
-                this.setState(
-                    {
-                        melding: '',
-                        tilbakemelding: {
-                            error: '',
-                            suksess: `E-posten ble sendt til ${
-                                this.state.melding
-                            }`
-                        }
-                    },
-                    () => {
-                        setTimeout(() => {
-                            this.setState({
-                                sendt: true
-                            });
-                        }, 5000);
+                this.setState({
+                    melding: '',
+                    tilbakemelding: {
+                        error: '',
+                        suksess: `E-posten ble sendt til ${this.state.melding}`
                     }
-                );
+                });
             } catch (e) {
                 console.error(e);
             }
