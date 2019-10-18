@@ -273,7 +273,7 @@ export default class Interaksjonsvindu extends Component<
                                             ? 'Takk for din tilbakemelding!'
                                             : this.props.evaluationMessage
                                             ? this.props.evaluationMessage
-                                            : 'Hei! Jeg ønsker å lære av din opplevelse. I hvilken grad fikk du svar på det du lurte på?'}
+                                            : 'Jeg ønsker å lære av din opplevelse. I hvilken grad fikk du svar på det du lurte på?'}
                                     </AlertstripeForklarendeTekst>
                                     <Evaluering
                                         evaluer={evaluering =>

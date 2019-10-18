@@ -24,3 +24,7 @@ interface ConnectionConfig {
     evaluationMessage?: string;
 }
 ```
+
+## Typescript
+`index.d.ts` kan finnes i pakkerot. Pakken støtter ikke Typescript "out of the box".
+Denne genereres via `npm run generate:types`, og vil også bli automatisk kjørt før `build`.
