@@ -49,31 +49,29 @@ export default class EmailFeedback extends Component<
 
     render() {
         return (
-            <div>
-                <Form onSubmit={e => this.sendMail(e)} noValidate>
-                    <Venstre>
-                        <EpostFelt
-                            type='email'
-                            placeholder='Din e-post'
-                            onChange={e => this.handleChange(e)}
-                            error={!!this.state.tilbakemelding.error}
-                        />
-                        {this.state.tilbakemelding.suksess && (
-                            <Suksessmelding>
-                                {this.state.tilbakemelding.suksess}
-                            </Suksessmelding>
-                        )}
-                        {this.state.tilbakemelding.error && (
-                            <Feilmelding>
-                                {this.state.tilbakemelding.error}
-                            </Feilmelding>
-                        )}
-                    </Venstre>
-                    <Hoyre>
-                        <SendKnapp type='submit'>Send</SendKnapp>
-                    </Hoyre>
-                </Form>
-            </div>
+            <Form onSubmit={e => this.sendMail(e)} noValidate>
+                <Venstre>
+                    <EpostFelt
+                        type='email'
+                        placeholder='Din e-post'
+                        onChange={e => this.handleChange(e)}
+                        error={!!this.state.tilbakemelding.error}
+                    />
+                    {this.state.tilbakemelding.suksess && (
+                        <Suksessmelding>
+                            {this.state.tilbakemelding.suksess}
+                        </Suksessmelding>
+                    )}
+                    {this.state.tilbakemelding.error && (
+                        <Feilmelding>
+                            {this.state.tilbakemelding.error}
+                        </Feilmelding>
+                    )}
+                </Venstre>
+                <Hoyre>
+                    <SendKnapp type='submit'>Send</SendKnapp>
+                </Hoyre>
+            </Form>
         );
     }
 

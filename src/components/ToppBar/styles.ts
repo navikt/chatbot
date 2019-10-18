@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import tema from '../../tema/tema';
-import { ToppBarProps } from './index';
 
 export const Bar = styled.div`
     border-bottom: 2px solid #000;
@@ -8,11 +7,11 @@ export const Bar = styled.div`
     font-size: ${tema.storrelser.tekst.toppBar};
     margin: 0;
     display: flex;
-    background: ${(props: ToppBarProps) =>
+    background: ${(props: { navn: string }) =>
         props.navn === 'Chatbot Frida'
             ? tema.farger.toppBar.bot
             : tema.farger.toppBar.ekstern};
-    color: ${(props: ToppBarProps) =>
+    color: ${(props: { navn: string }) =>
         props.navn === 'Chatbot Frida' ? undefined : '#fff'};
     transition: all 300ms ease-in-out;
     z-index: 10;
@@ -42,7 +41,7 @@ export const Knapp = styled.button`
 
         line,
         path {
-            stroke: ${(props: ToppBarProps) =>
+            stroke: ${(props: { navn: string }) =>
                 props.navn === 'Chatbot Frida' ? undefined : '#fff'};
             transition: all 300ms ease-in-out;
         }

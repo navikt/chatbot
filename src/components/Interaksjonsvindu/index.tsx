@@ -230,70 +230,63 @@ export default class Interaksjonsvindu extends Component<
                                 Kobler til Frida...
                             </Alertstripe>
                         )}
-                    {this.props.avsluttet && (
-                        <Alertstripe type='info'>
-                            <AlertstripeSeksjon tabIndex={0}>
-                                <AlertstripeHeader>
-                                    Chatten er avsluttet.
-                                </AlertstripeHeader>
-                            </AlertstripeSeksjon>
-                            {this.state.tidIgjen &&
-                                this.state.tidIgjen.tid >= 0 && (
-                                    <AlertstripeSeksjon tabIndex={0}>
-                                        <AlertstripeHeader>
-                                            Trenger du en kopi?
-                                        </AlertstripeHeader>
-                                        <AlertstripeForklarendeTekst>
-                                            Vi sender deg gjerne chat-dialogen
-                                            på e-post.
-                                        </AlertstripeForklarendeTekst>
-                                        {this.state.tidIgjen && (
-                                            <AlertstripeForklarendeTekst>
-                                                Du kan få chat-dialogen tilsendt
-                                                i{' '}
-                                                <UthevetTekst>
-                                                    {
-                                                        this.state.tidIgjen
-                                                            .formatert
-                                                    }{' '}
-                                                </UthevetTekst>
-                                                til.
-                                            </AlertstripeForklarendeTekst>
-                                        )}
-                                        <EmailFeedback
-                                            baseUrl={this.props.baseUrl}
-                                            config={this.props.config}
-                                        />
-                                    </AlertstripeSeksjon>
-                                )}
-                            <AlertstripeSeksjon tabIndex={0}>
-                                <AlertstripeHeader>
-                                    Evaulering
-                                </AlertstripeHeader>
-                                <AlertstripeForklarendeTekst>
-                                    {loadJSON(localStorageKeys.EVAL)
-                                        ? 'Takk for din tilbakemelding!'
-                                        : this.props.evaluationMessage
-                                        ? this.props.evaluationMessage
-                                        : 'Hei! Jeg ønsker å lære av din opplevelse. I hvilken grad fikk du svar på det du lurte på?'}
-                                </AlertstripeForklarendeTekst>
-                                <Evaluering
-                                    evaluer={evaluering =>
-                                        this.evaluer(evaluering)
-                                    }
-                                    baseUrl={this.props.baseUrl}
-                                    queueKey={this.props.queueKey}
-                                    nickName={
-                                        sisteBrukerSomSnakket &&
-                                        sisteBrukerSomSnakketNick ===
-                                            'Chatbot Frida'
-                                            ? sisteBrukerSomSnakketNick
-                                            : 'NAV Chat'
-                                    }
-                                />
-                            </AlertstripeSeksjon>
-                        </Alertstripe>
-                    )}
+                    {this.props.avsluttet &&
+                        this.state.tidIgjen &&
+                        this.state.tidIgjen.tid >= 0 && (
+                            <Alertstripe type='info'>
+                                <AlertstripeSeksjon tabIndex={0}>
+                                    <AlertstripeHeader>
+                                        Chatten er avsluttet.
+                                    </AlertstripeHeader>
+                                </AlertstripeSeksjon>
+                                <AlertstripeSeksjon tabIndex={0}>
+                                    <AlertstripeHeader>
+                                        Trenger du en kopi?
+                                    </AlertstripeHeader>
+                                    <AlertstripeForklarendeTekst>
+                                        Vi sender deg gjerne chat-dialogen på
+                                        e-post.
+                                    </AlertstripeForklarendeTekst>
+                                    <AlertstripeForklarendeTekst>
+                                        Du kan få chat-dialogen tilsendt i{' '}
+                                        <UthevetTekst>
+                                            {this.state.tidIgjen.formatert}{' '}
+                                        </UthevetTekst>
+                                        til.
+                                    </AlertstripeForklarendeTekst>
+                                    <EmailFeedback
+                                        baseUrl={this.props.baseUrl}
+                                        config={this.props.config}
+                                    />
+                                </AlertstripeSeksjon>
+                                <AlertstripeSeksjon tabIndex={0}>
+                                    <AlertstripeHeader>
+                                        Evaulering
+                                    </AlertstripeHeader>
+                                    <AlertstripeForklarendeTekst>
+                                        {loadJSON(localStorageKeys.EVAL)
+                                            ? 'Takk for din tilbakemelding!'
+                                            : this.props.evaluationMessage
+                                            ? this.props.evaluationMessage
+                                            : 'Hei! Jeg ønsker å lære av din opplevelse. I hvilken grad fikk du svar på det du lurte på?'}
+                                    </AlertstripeForklarendeTekst>
+                                    <Evaluering
+                                        evaluer={evaluering =>
+                                            this.evaluer(evaluering)
+                                        }
+                                        baseUrl={this.props.baseUrl}
+                                        queueKey={this.props.queueKey}
+                                        nickName={
+                                            sisteBrukerSomSnakket &&
+                                            sisteBrukerSomSnakketNick ===
+                                                'Chatbot Frida'
+                                                ? sisteBrukerSomSnakketNick
+                                                : 'NAV Chat'
+                                        }
+                                    />
+                                </AlertstripeSeksjon>
+                            </Alertstripe>
+                        )}
                     {this.props.feil && (
                         <Alertstripe type='feil'>
                             En feil har oppstått.

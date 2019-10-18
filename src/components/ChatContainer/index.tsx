@@ -120,7 +120,18 @@ export default class ChatContainer extends Component<
     }
 
     componentDidMount() {
-        if (this.state.erApen) {
+        if (
+            !this.props.configId ||
+            !this.props.queueKey ||
+            !this.props.customerKey
+        ) {
+            console.error(
+                'Mangler påkrevd parameter. Husk å ta med: customerKey, queueKey og configId.'
+            );
+            this.setState({
+                feil: true
+            });
+        } else if (this.state.erApen) {
             this.start();
         }
     }
@@ -319,7 +330,7 @@ export default class ChatContainer extends Component<
                     });
                 }
             } else {
-                this.confirmOmstart();
+                this.lukkOgAvslutt();
             }
         } else {
             if (!this.state.avsluttet) {
