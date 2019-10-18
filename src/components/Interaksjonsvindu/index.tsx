@@ -221,7 +221,15 @@ export default class Interaksjonsvindu extends Component<
                                 Det er ikke flere aktive brukere i kanalen.
                             </Alertstripe>
                         )}
-
+                    {this.props.historie.length > 0 &&
+                        this.props.historie.every(
+                            (historie: MessageWithIndicator) =>
+                                historie.type === 'Intro'
+                        ) && (
+                            <Alertstripe type='info'>
+                                Kobler til Frida...
+                            </Alertstripe>
+                        )}
                     {this.props.avsluttet && (
                         <Alertstripe type='info'>
                             <AlertstripeSeksjon tabIndex={0}>

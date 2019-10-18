@@ -203,63 +203,73 @@ export default class ChatContainer extends Component<
     }
 
     async start(tving: boolean = false, beholdApen: boolean = false) {
-        if (!this.state.config || tving) {
-            await this.settTimerConfig();
-            await this.hentConfig();
-            await this.setState({
-                ...defaultState,
-                erApen: beholdApen,
-                historie: loadJSON(localStorageKeys.HISTORIE) || [],
-                config: loadJSON(localStorageKeys.CONFIG)
-            });
-        }
-
-        if (!this.state.feil && this.state.erApen) {
-            const node = ReactDOM.findDOMNode(this) as HTMLElement;
-            node.focus();
-            if (this.state.historie && this.state.historie.length < 1) {
-                // Henter full historie fra API
-                try {
-                    let historie = await this.hentFullHistorie();
-                    if (historie) {
-                        let data: any[] = historie.data;
-                        if (data.length > 0) {
-                            for (let historie of data) {
-                                this.handterMelding(historie, true);
-                            }
-                        }
-                        this.setState({
-                            erApen: beholdApen
-                        });
-                    }
-                } catch (e) {
-                    console.error(e);
-                    this.setState({
-                        feil: true
-                    });
-                }
-            } else {
-                // Har hentet historie fra localStorage
-                for (let historie of this.state.historie) {
-                    this.handterMelding({ ...historie, showIndicator: false });
-                }
-                this.setState({
-                    erApen: true
+        try {
+            if (!this.state.config || tving) {
+                await this.settTimerConfig();
+                await this.hentConfig();
+                await this.setState({
+                    ...defaultState,
+                    erApen: beholdApen,
+                    historie: loadJSON(localStorageKeys.HISTORIE) || [],
+                    config: loadJSON(localStorageKeys.CONFIG)
                 });
             }
 
-            this.hentHistorieIntervall = setInterval(
-                () => this.hentHistorie(),
-                1000
-            );
-            this.lesIkkeLastethistorieIntervall = setInterval(
-                () => this.lesIkkeLastethistorie(),
-                50
-            );
-            this.leggTilLenkeHandlerIntervall = setInterval(
-                () => this.leggTilLenkeHandler(),
-                100
-            );
+            if (!this.state.feil && this.state.erApen) {
+                const node = ReactDOM.findDOMNode(this) as HTMLElement;
+                node.focus();
+                if (this.state.historie && this.state.historie.length < 1) {
+                    // Henter full historie fra API
+                    try {
+                        let historie = await this.hentFullHistorie();
+                        if (historie) {
+                            let data: any[] = historie.data;
+                            if (data.length > 0) {
+                                for (let historie of data) {
+                                    this.handterMelding(historie, true);
+                                }
+                            }
+                            this.setState({
+                                erApen: beholdApen
+                            });
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        this.setState({
+                            feil: true
+                        });
+                    }
+                } else {
+                    // Har hentet historie fra localStorage
+                    for (let historie of this.state.historie) {
+                        this.handterMelding({
+                            ...historie,
+                            showIndicator: false
+                        });
+                    }
+                    this.setState({
+                        erApen: true
+                    });
+                }
+
+                this.hentHistorieIntervall = setInterval(
+                    () => this.hentHistorie(),
+                    1000
+                );
+                this.lesIkkeLastethistorieIntervall = setInterval(
+                    () => this.lesIkkeLastethistorie(),
+                    50
+                );
+                this.leggTilLenkeHandlerIntervall = setInterval(
+                    () => this.leggTilLenkeHandler(),
+                    100
+                );
+            }
+        } catch (e) {
+            console.error(e);
+            this.setState({
+                feil: true
+            });
         }
     }
 
