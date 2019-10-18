@@ -23,6 +23,11 @@
     "acceptance-tests",
     "webpack",
     "jest",
-    "src/setupTests.ts"
+    "src/setupTests.ts",
+    "src/**/styles.ts",
+    "tests",
+    "umd",
+    "./**/*.js",
+    "demo"
   ]
 }

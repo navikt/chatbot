@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Indikator, IndikatorDot } from './styles';
-import { MessageWithIndicator } from '../ChatContainer';
+import { MessageWithIndicator } from '../ChatContainer/index';
 
 type SkriveindikatorProps = {
     beskjed: MessageWithIndicator;

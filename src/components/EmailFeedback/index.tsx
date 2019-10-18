@@ -1,6 +1,6 @@
 import React, { ChangeEvent, Component, FormEvent } from 'react';
 import axios from 'axios';
-import { Config } from '../Interaksjonsvindu';
+import { Config } from '../Interaksjonsvindu/index';
 import { EmailSend } from '../../api/Sessions';
 import tema from '../../tema/tema';
 import {
@@ -139,7 +139,6 @@ export default class EmailFeedback extends Component<
                 );
 
                 this.setState({
-                    melding: '',
                     tilbakemelding: {
                         error: '',
                         suksess: `E-posten ble sendt til ${this.state.melding}`

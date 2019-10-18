@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { KommunikasjonProps } from '../Kommunikasjon';
+import { KommunikasjonProps } from '../Kommunikasjon/index';
 import { Event } from './styles';
 import Skriveindikator from '../Skriveindikator';
 

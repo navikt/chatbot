@@ -6,7 +6,8 @@ module.exports = {
       externals: {
         react: "React"
       }
-    }
+    },
+    esModules: true
   },
   polyfill: true,
   webpack: {
@@ -23,6 +24,9 @@ module.exports = {
       svg: {
         loader: 'svg-inline-loader?classPrefix'
       }
-    }
+    },
+    copy: [
+      {from: './src/index.d.ts', to:'./@navikt'}
+    ]
   }
 };

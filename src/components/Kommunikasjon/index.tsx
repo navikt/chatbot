@@ -8,14 +8,14 @@ import {
     Snakkeboble,
     Venstre
 } from './styles';
-import { Bruker } from '../Interaksjonsvindu';
+import { Bruker } from '../Interaksjonsvindu/index';
 import rating1 from '../../assets/rating-1.svg';
 import rating2 from '../../assets/rating-2.svg';
 import rating3 from '../../assets/rating-3.svg';
 import rating4 from '../../assets/rating-4.svg';
 import rating5 from '../../assets/rating-5.svg';
 import Skriveindikator from '../Skriveindikator';
-import { MessageWithIndicator } from '../ChatContainer';
+import { MessageWithIndicator } from '../ChatContainer/index';
 
 export type KommunikasjonProps = {
     beskjed: MessageWithIndicator;

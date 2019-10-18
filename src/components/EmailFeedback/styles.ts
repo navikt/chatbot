@@ -40,6 +40,6 @@ export const Feilmelding = styled.p`
 `;
 
 export const Suksessmelding = styled.p`
-    color: ${tema.farger.alertstripe.suksess.bakgrunn};
+    color: #000;
     margin: 0;
 `;

@@ -22,7 +22,7 @@ import { ConnectionConfig } from '../../index';
 import Evaluering from '../Evaluering';
 import { loadJSON, saveJSON } from '../../services/localStorageService';
 import { Message, SurveySend } from '../../api/Sessions';
-import { MessageWithIndicator, localStorageKeys } from '../ChatContainer';
+import { MessageWithIndicator, localStorageKeys } from '../ChatContainer/index';
 import EmailFeedback from '../EmailFeedback';
 import moment from 'moment';
 import Bekreftelsesboks from '../Bekreftelsesboks';
@@ -135,10 +135,15 @@ export default class Interaksjonsvindu extends Component<
                 );
             }
         }, 1000);
+        this.scrollTilBunn();
     }
 
     componentWillUnmount(): void {
         clearInterval(this.tidIgjen);
+    }
+
+    componentWillReceiveProps(nextProps: InteraksjonsvinduProps) {
+        this.scrollTilBunn();
     }
 
     render() {
@@ -261,7 +266,7 @@ export default class Interaksjonsvindu extends Component<
                                 </AlertstripeSeksjon>
                                 <AlertstripeSeksjon tabIndex={0}>
                                     <AlertstripeHeader>
-                                        Evaulering
+                                        Tilbakemelding
                                     </AlertstripeHeader>
                                     <AlertstripeForklarendeTekst>
                                         {loadJSON(localStorageKeys.EVAL)

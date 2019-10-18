@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import ToppBar from '../ToppBar';
-import Interaksjonsvindu, { Bruker, Config } from '../Interaksjonsvindu';
+import Interaksjonsvindu, { Bruker, Config } from '../Interaksjonsvindu/index';
 import { Container, FridaKnapp } from './styles';
 import { ConnectionConfig } from '../../index';
 import axios, { AxiosResponse } from 'axios';
@@ -68,7 +68,7 @@ export default class ChatContainer extends Component<
     ConnectionConfig,
     ChatContainerState
 > {
-    baseUrl = 'https://devapi.puzzel.com/chat/v1';
+    baseUrl = 'https://api.puzzel.com/chat/v1';
     skriveindikatorTid = 1000;
     hentHistorieIntervall: number;
     lesIkkeLastethistorieIntervall: number;
@@ -271,10 +271,10 @@ export default class ChatContainer extends Component<
                     () => this.lesIkkeLastethistorie(),
                     50
                 );
-                this.leggTilLenkeHandlerIntervall = setInterval(
-                    () => this.leggTilLenkeHandler(),
-                    100
-                );
+                // this.leggTilLenkeHandlerIntervall = setInterval(
+                //     () => this.leggTilLenkeHandler(),
+                //     100
+                // );
             }
         } catch (e) {
             console.error(e);
