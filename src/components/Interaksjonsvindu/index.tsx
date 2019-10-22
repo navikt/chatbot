@@ -288,6 +288,9 @@ export default class Interaksjonsvindu extends Component<
                                                 ? sisteBrukerSomSnakketNick
                                                 : 'NAV Chat'
                                         }
+                                        opprettEvaluering={() =>
+                                            this.opprettEvaluering()
+                                        }
                                     />
                                 </AlertstripeSeksjon>
                             </Alertstripe>
@@ -297,7 +300,12 @@ export default class Interaksjonsvindu extends Component<
                             En feil har oppstått.
                         </Alertstripe>
                     )}
-                    <Chatlog role='region' aria-live='polite'>
+                    <Chatlog
+                        role='feed'
+                        aria-live='polite'
+                        aria-atomic='false'
+                        aria-relevant='additions'
+                    >
                         {historieListe}
                     </Chatlog>
                     <Tekstomrade
@@ -321,6 +329,8 @@ export default class Interaksjonsvindu extends Component<
                                 {this.state.sendt ? 'Sendt' : 'Send'}
                             </Knapp>
                             <Teller
+                                tabIndex={-1}
+                                aria-hidden={true}
                                 error={this.state.melding.length > this.maxTegn}
                             >
                                 {this.state.melding.length} / {this.maxTegn}
@@ -511,7 +521,6 @@ export default class Interaksjonsvindu extends Component<
             this.setState({
                 evalueringsNokkel: evaluering.data
             });
-            this.scrollTilBunn();
         }
     }
 

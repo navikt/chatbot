@@ -46,9 +46,6 @@ export default class Flervalg extends Component<FlervalgProps, FlervalgState> {
                     valgt={_h.valgt}
                     aktiv={this.props.harBlittBesvart}
                     tabIndex={-1}
-                    aria-label={`Valg ${index + 1}: ${_h.tekst}. ${
-                        _h.valgt ? 'Du har valgt dette valget.' : ''
-                    }`}
                 >
                     <button
                         onClick={() => {
@@ -67,7 +64,7 @@ export default class Flervalg extends Component<FlervalgProps, FlervalgState> {
             )
         );
         return (
-            <Container kollaps={this.state.kollaps} tabIndex={0}>
+            <Container kollaps={this.state.kollaps}>
                 {!this.state.kollaps && (
                     <MetaInfo
                         nickName={this.props.beskjed.nickName}
@@ -75,13 +72,7 @@ export default class Flervalg extends Component<FlervalgProps, FlervalgState> {
                         side='VENSTRE'
                     />
                 )}
-                <ValgContainer
-                    aria-label={`${this.props.beskjed.nickName} har sendt deg ${
-                        options.length
-                    } valgmuligheter.`}
-                >
-                    {options}
-                </ValgContainer>
+                <ValgContainer>{options}</ValgContainer>
             </Container>
         );
     }

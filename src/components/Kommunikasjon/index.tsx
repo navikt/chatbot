@@ -140,19 +140,6 @@ export default class Kommunikasjon extends Component<
                                 this.props.beskjed.userId
                             ) === 'Human') && (
                             <Snakkeboble
-                                aria-label={`${
-                                    this.state.side === 'VENSTRE'
-                                        ? nickName
-                                        : 'Du'
-                                } ${
-                                    type === 'Evaluation'
-                                        ? 'ga evaluering'
-                                        : 'skrev'
-                                }: ${
-                                    content.optionChoice
-                                        ? content.optionChoice
-                                        : this.stripHtml(content)
-                                } ${type === 'Evaluation' ? 'av 5' : ''}`}
                                 dangerouslySetInnerHTML={{
                                     __html: htmlToRender as string
                                 }}

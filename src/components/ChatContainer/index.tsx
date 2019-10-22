@@ -68,7 +68,7 @@ export default class ChatContainer extends Component<
     ConnectionConfig,
     ChatContainerState
 > {
-    baseUrl = 'https://api.puzzel.com/chat/v1';
+    baseUrl = 'https://devapi.puzzel.com/chat/v1';
     skriveindikatorTid = 1000;
     hentHistorieIntervall: number;
     lesIkkeLastethistorieIntervall: number;
@@ -155,6 +155,7 @@ export default class ChatContainer extends Component<
                         : undefined
                 }
                 lang={this.state.erApen ? 'no' : undefined}
+                role={this.state.erApen ? 'dialog' : undefined}
             >
                 {!this.state.erApen && (
                     <FridaKnapp

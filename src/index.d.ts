@@ -449,6 +449,7 @@ declare module 'src/components/Interaksjonsvindu/index' {
 	    constructor(props: InteraksjonsvinduProps);
 	    componentDidMount(): Promise<void>;
 	    componentWillUnmount(): void;
+	    componentWillReceiveProps(nextProps: InteraksjonsvinduProps): void;
 	    render(): JSX.Element | null;
 	    sendMelding(e?: FormEvent<HTMLFormElement>): Promise<void>;
 	    lastHistorie(historie: MessageWithIndicator, forrigeHistorieBrukerId: number | null): JSX.Element | undefined;
