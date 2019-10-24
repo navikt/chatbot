@@ -68,7 +68,7 @@ export default class ChatContainer extends Component<
     ConnectionConfig,
     ChatContainerState
 > {
-    baseUrl = 'https://devapi.puzzel.com/chat/v1';
+    baseUrl = 'https://api.puzzel.com/chat/v1';
     skriveindikatorTid = 1000;
     hentHistorieIntervall: number;
     lesIkkeLastethistorieIntervall: number;

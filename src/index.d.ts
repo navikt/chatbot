@@ -151,7 +151,6 @@ declare module 'src/components/Eventviser/index' {
 	    constructor(props: KommunikasjonProps);
 	    render(): JSX.Element;
 	    private visEventTekst;
-	    private hentAriaTekst;
 	}
 
 }
@@ -337,6 +336,7 @@ declare module 'src/services/localStorageService' {
 declare module 'src/components/Evaluering/index' {
 	import { Component } from 'react'; type EvalueringProps = {
 	    evaluer: (evaluering: number) => void;
+	    opprettEvaluering: () => void;
 	    baseUrl: string;
 	    queueKey: string;
 	    nickName: string;
