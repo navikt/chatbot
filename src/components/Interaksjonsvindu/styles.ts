@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import tema from '../../tema/tema';
 
 export const Interaksjon = styled.div`
@@ -66,25 +66,6 @@ export const Teller = styled.div`
     margin-top: 5px;
     color: ${(props: { error: boolean }) =>
         props.error ? 'red' : tema.farger.tekst.klokketekst};
-`;
-
-const visAnimasjon = keyframes`
-    from { 
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-`;
-
-export const Tabbable = styled.div`
-    animation: ${visAnimasjon} 300ms;
-    &:focus,
-    &:active {
-        // outline: ${tema.farger.interaksjon} solid 2px;
-    }
 `;
 
 export const AlertstripeSeksjon = styled.div`

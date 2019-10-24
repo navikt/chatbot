@@ -6,7 +6,6 @@ import {
     Chatlog,
     Interaksjon,
     SendKnappOgTeller,
-    Tabbable,
     Tekstfelt,
     Tekstomrade,
     Teller,
@@ -301,7 +300,7 @@ export default class Interaksjonsvindu extends Component<
                         </Alertstripe>
                     )}
                     <Chatlog
-                        role='feed'
+                        role='log'
                         aria-live='polite'
                         aria-atomic='false'
                         aria-relevant='additions'
@@ -398,7 +397,7 @@ export default class Interaksjonsvindu extends Component<
         switch (historie.type) {
             case 'Message':
                 return (
-                    <Tabbable key={`el-${historie.id}`}>
+                    <div key={`el-${historie.id}`}>
                         <Kommunikasjon
                             key={historie.id}
                             beskjed={historie}
@@ -418,11 +417,11 @@ export default class Interaksjonsvindu extends Component<
                             ref={e => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
-                    </Tabbable>
+                    </div>
                 );
             case 'Event':
                 return (
-                    <Tabbable key={`el-${historie.id}`}>
+                    <div key={`el-${historie.id}`}>
                         <Eventviser
                             beskjed={historie}
                             skriveindikatorTid={this.props.skriveindikatorTid}
@@ -436,11 +435,11 @@ export default class Interaksjonsvindu extends Component<
                             ref={e => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
-                    </Tabbable>
+                    </div>
                 );
             case 'Option':
                 return (
-                    <Tabbable key={`el-${historie.id}`}>
+                    <div key={`el-${historie.id}`}>
                         <Flervalg
                             beskjed={historie}
                             harBlittBesvart={
@@ -460,7 +459,7 @@ export default class Interaksjonsvindu extends Component<
                             ref={e => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
-                    </Tabbable>
+                    </div>
                 );
             default:
                 return;
