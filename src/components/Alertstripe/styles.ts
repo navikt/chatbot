@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import tema from '../../tema/tema';
 import { AlertstripeProps } from './index';
 
@@ -7,23 +7,11 @@ import advarsel from '../../assets/advarsel.svg';
 import feil from '../../assets/feil.svg';
 import suksess from '../../assets/suksess.svg';
 
-const animIn = keyframes`
-    from{
-        transform: translateY(-60px);
-        margin-bottom: -55px;
-    }
-    to{
-      transform: translateY(0);
-      margin-bottom: 0;
-  }
-`;
-
 export const Container = styled.div`
     padding: 15px;
     display: flex;
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
     align-items: center;
-    animation: ${animIn} 150ms ease-in-out forwards;
     background: ${(props: AlertstripeProps) =>
         tema.farger.alertstripe[props.type.toLowerCase()].bakgrunn};
     border-bottom: 1px solid
