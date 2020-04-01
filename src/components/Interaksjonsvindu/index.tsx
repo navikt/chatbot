@@ -530,7 +530,7 @@ export default class Interaksjonsvindu extends Component<
                         surveyMinScore: 1,
                         offerSurvey: false,
                         queueKey: this.props.queueKey,
-                        surveyComment: evaluering,
+                        surveyResult: evaluering,
                         parentSessionId: this.state.evalueringsNokkel
                     } as SurveySend
                 );
