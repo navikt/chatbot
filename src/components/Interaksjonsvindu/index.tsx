@@ -6,7 +6,6 @@ import {
     Chatlog,
     Interaksjon,
     SendKnappOgTeller,
-    Tabbable,
     Tekstfelt,
     Tekstomrade,
     Teller,
@@ -288,6 +287,9 @@ export default class Interaksjonsvindu extends Component<
                                                 ? sisteBrukerSomSnakketNick
                                                 : 'NAV Chat'
                                         }
+                                        opprettEvaluering={() =>
+                                            this.opprettEvaluering()
+                                        }
                                     />
                                 </AlertstripeSeksjon>
                             </Alertstripe>
@@ -297,7 +299,12 @@ export default class Interaksjonsvindu extends Component<
                             En feil har oppstått.
                         </Alertstripe>
                     )}
-                    <Chatlog role='region' aria-live='polite'>
+                    <Chatlog
+                        role='log'
+                        aria-live='polite'
+                        aria-atomic='false'
+                        aria-relevant='additions'
+                    >
                         {historieListe}
                     </Chatlog>
                     <Tekstomrade
@@ -321,6 +328,8 @@ export default class Interaksjonsvindu extends Component<
                                 {this.state.sendt ? 'Sendt' : 'Send'}
                             </Knapp>
                             <Teller
+                                tabIndex={-1}
+                                aria-hidden={true}
                                 error={this.state.melding.length > this.maxTegn}
                             >
                                 {this.state.melding.length} / {this.maxTegn}
@@ -388,7 +397,7 @@ export default class Interaksjonsvindu extends Component<
         switch (historie.type) {
             case 'Message':
                 return (
-                    <Tabbable key={`el-${historie.id}`}>
+                    <div key={`el-${historie.id}`}>
                         <Kommunikasjon
                             key={historie.id}
                             beskjed={historie}
@@ -408,11 +417,11 @@ export default class Interaksjonsvindu extends Component<
                             ref={e => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
-                    </Tabbable>
+                    </div>
                 );
             case 'Event':
                 return (
-                    <Tabbable key={`el-${historie.id}`}>
+                    <div key={`el-${historie.id}`}>
                         <Eventviser
                             beskjed={historie}
                             skriveindikatorTid={this.props.skriveindikatorTid}
@@ -426,11 +435,11 @@ export default class Interaksjonsvindu extends Component<
                             ref={e => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
-                    </Tabbable>
+                    </div>
                 );
             case 'Option':
                 return (
-                    <Tabbable key={`el-${historie.id}`}>
+                    <div key={`el-${historie.id}`}>
                         <Flervalg
                             beskjed={historie}
                             harBlittBesvart={
@@ -450,7 +459,7 @@ export default class Interaksjonsvindu extends Component<
                             ref={e => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
-                    </Tabbable>
+                    </div>
                 );
             default:
                 return;
@@ -511,7 +520,6 @@ export default class Interaksjonsvindu extends Component<
             this.setState({
                 evalueringsNokkel: evaluering.data
             });
-            this.scrollTilBunn();
         }
     }
 

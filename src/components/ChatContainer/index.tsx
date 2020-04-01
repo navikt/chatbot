@@ -155,6 +155,7 @@ export default class ChatContainer extends Component<
                         : undefined
                 }
                 lang={this.state.erApen ? 'no' : undefined}
+                role={this.state.erApen ? 'dialog' : undefined}
             >
                 {!this.state.erApen && (
                     <FridaKnapp

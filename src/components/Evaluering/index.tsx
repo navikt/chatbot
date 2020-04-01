@@ -10,6 +10,7 @@ import { localStorageKeys } from '../ChatContainer';
 
 type EvalueringProps = {
     evaluer: (evaluering: number) => void;
+    opprettEvaluering: () => void;
     baseUrl: string;
     queueKey: string;
     nickName: string;
@@ -42,6 +43,7 @@ export default class Evaluering extends Component<
                 });
             }
         }, 100);
+        this.props.opprettEvaluering();
     }
 
     componentWillUnmount(): void {

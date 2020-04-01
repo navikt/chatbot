@@ -151,7 +151,6 @@ declare module 'src/components/Eventviser/index' {
 	    constructor(props: KommunikasjonProps);
 	    render(): JSX.Element;
 	    private visEventTekst;
-	    private hentAriaTekst;
 	}
 
 }
@@ -337,6 +336,7 @@ declare module 'src/services/localStorageService' {
 declare module 'src/components/Evaluering/index' {
 	import { Component } from 'react'; type EvalueringProps = {
 	    evaluer: (evaluering: number) => void;
+	    opprettEvaluering: () => void;
 	    baseUrl: string;
 	    queueKey: string;
 	    nickName: string;
@@ -449,6 +449,7 @@ declare module 'src/components/Interaksjonsvindu/index' {
 	    constructor(props: InteraksjonsvinduProps);
 	    componentDidMount(): Promise<void>;
 	    componentWillUnmount(): void;
+	    componentWillReceiveProps(nextProps: InteraksjonsvinduProps): void;
 	    render(): JSX.Element | null;
 	    sendMelding(e?: FormEvent<HTMLFormElement>): Promise<void>;
 	    lastHistorie(historie: MessageWithIndicator, forrigeHistorieBrukerId: number | null): JSX.Element | undefined;

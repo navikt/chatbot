@@ -24,7 +24,7 @@ export default class Bekreftelsesboks extends Component<
     render() {
         return (
             <Boks type='advarsel' tabIndex={0}>
-                <Ikon type='advarsel' />
+                <Ikon type='advarsel' tabIndex={-1} aria-hidden={true} />
                 <Tekst>
                     {this.props.tekst}
                     {this.props.undertekst && (

@@ -9,21 +9,14 @@ const Outer = styled.div`
     margin: 0;
 `;
 
-const NAVBackdrop = styled.iframe`
-    height: 100vh;
-    width: 100vw;
-    border: none;
-`;
-
 class Demo extends Component {
     render() {
         return (
             <Outer>
-                <NAVBackdrop src='https://familie.nav.no/' title='NAV Famile' />
                 <Chat
-                    customerKey='41155'
+                    customerKey='12345'
                     queueKey='Q_CHAT_BOT'
-                    configId='599f9e7c-7f6b-4569-81a1-27202c419953'
+                    configId='c34298fe-3ea4-4d88-9343-c2d4e7bb3e10'
                 />
             </Outer>
         );

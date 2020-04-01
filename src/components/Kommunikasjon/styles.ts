@@ -59,5 +59,6 @@ export const Snakkeboble = styled.div`
     a:visited,
     :link {
         color: ${tema.farger.interaksjon};
+        text-decoration: underline;
     }
 `;
