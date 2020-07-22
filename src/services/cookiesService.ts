@@ -1,8 +1,10 @@
 import Cookies from 'js-cookie';
 
+const getDomain = () => document.location.hostname !== 'localhost' ? '.nav.no' : undefined;
+
 const saveJSON = (key: string, data: any | any[]): void => {
     Cookies.set(key, data,
-      { domain: document.location.hostname !== 'localhost' ? '.nav.no' : undefined });
+      { domain: getDomain() });
 };
 
 const loadJSON = (key: string): any | any[] | null => {
@@ -10,7 +12,7 @@ const loadJSON = (key: string): any | any[] | null => {
 };
 
 const deleteJSON = (key: string): void => {
-    Cookies.remove(key);
+    Cookies.remove(key, { domain: getDomain() });
 };
 
 export { saveJSON, loadJSON, deleteJSON };

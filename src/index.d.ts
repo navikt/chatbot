@@ -328,7 +328,7 @@ declare module 'src/components/Alertstripe/index' {
 	}
 
 }
-declare module 'src/services/localStorageService' {
+declare module 'src/services/cookiesService' {
 	 const saveJSON: (key: string, data: any) => void; const loadJSON: (key: string) => any; const deleteJSON: (key: string) => void;
 	export { saveJSON, loadJSON, deleteJSON };
 
@@ -395,7 +395,7 @@ declare module 'src/components/Bekreftelsesboks/index' {
 declare module 'src/components/Interaksjonsvindu/index' {
 	import React, { ChangeEvent, Component, FormEvent } from 'react';
 	import { ConnectionConfig } from 'src/index';
-	import { MessageWithIndicator } from 'src/components/ChatContainer/index';
+	import { MessageWithIndicator } from 'src/components/ChatContainer';
 	export interface Bruker {
 	    userId: number;
 	    avatarUrl: string;
@@ -498,13 +498,13 @@ declare module 'src/components/ChatContainer/index' {
 	}
 	export interface MessageWithIndicator extends Message, ShowIndicator {
 	}
-	export enum localStorageKeys {
-	    CONFIG = "chatbot-frida_config",
-	    HISTORIE = "chatbot-frida_historie",
-	    APEN = "chatbot-frida_apen",
-	    EVAL = "chatbot-frida_eval",
-	    MAILTIMEOUT = "chatbot-frida_mail-timeout"
-	}
+	export const cookieKeys: {
+	    CONFIG: string;
+	    HISTORIE: string;
+	    APEN: string;
+	    EVAL: string;
+	    MAILTIMEOUT: string;
+	};
 	export default class ChatContainer extends Component<ConnectionConfig, ChatContainerState> {
 	    baseUrl: string;
 	    skriveindikatorTid: number;
