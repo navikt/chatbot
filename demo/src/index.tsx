@@ -14,9 +14,9 @@ class Demo extends Component {
         return (
             <Outer>
                 <Chat
-                    customerKey='12345'
+                    customerKey='41155'
                     queueKey='Q_CHAT_BOT'
-                    configId='c34298fe-3ea4-4d88-9343-c2d4e7bb3e10'
+                    configId='599f9e7c-7f6b-4569-81a1-27202c419953'
                 />
             </Outer>
         );

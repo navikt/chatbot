@@ -19,9 +19,9 @@ import Knapp from '../Knapp';
 import Alertstripe from '../Alertstripe';
 import { ConnectionConfig } from '../../index';
 import Evaluering from '../Evaluering';
-import { loadJSON, saveJSON } from '../../services/localStorageService';
+import { loadJSON, saveJSON } from '../../services/cookiesService';
 import { Message, SurveySend } from '../../api/Sessions';
-import { MessageWithIndicator, localStorageKeys } from '../ChatContainer/index';
+import { MessageWithIndicator, cookieKeys } from '../ChatContainer';
 import EmailFeedback from '../EmailFeedback';
 import moment from 'moment';
 import Bekreftelsesboks from '../Bekreftelsesboks';
@@ -114,11 +114,11 @@ export default class Interaksjonsvindu extends Component<
                     {
                         tidIgjen: {
                             formatert: moment().to(
-                                loadJSON(localStorageKeys.MAILTIMEOUT),
+                                loadJSON(cookieKeys.MAILTIMEOUT),
                                 true
                             ),
                             tid: moment(
-                                loadJSON(localStorageKeys.MAILTIMEOUT)
+                                loadJSON(cookieKeys.MAILTIMEOUT)
                             ).diff(moment())
                         }
                     },
@@ -127,7 +127,7 @@ export default class Interaksjonsvindu extends Component<
                             this.state.tidIgjen &&
                             this.state.tidIgjen.tid <= 0
                         ) {
-                            saveJSON(localStorageKeys.APEN, false);
+                            saveJSON(cookieKeys.APEN, false);
                             this.props.lukkOgAvslutt();
                         }
                     }
@@ -268,7 +268,7 @@ export default class Interaksjonsvindu extends Component<
                                         Tilbakemelding
                                     </AlertstripeHeader>
                                     <AlertstripeForklarendeTekst>
-                                        {loadJSON(localStorageKeys.EVAL)
+                                        {loadJSON(cookieKeys.EVAL)
                                             ? 'Takk for din tilbakemelding!'
                                             : this.props.evaluationMessage
                                             ? this.props.evaluationMessage
@@ -502,7 +502,7 @@ export default class Interaksjonsvindu extends Component<
     }
 
     async opprettEvaluering() {
-        if (!loadJSON(localStorageKeys.EVAL)) {
+        if (!loadJSON(cookieKeys.EVAL)) {
             const evaluering = await axios.post(
                 `${this.props.baseUrl}/sessions/${
                     this.props.config.sessionId
@@ -524,7 +524,7 @@ export default class Interaksjonsvindu extends Component<
     }
 
     async evaluer(evaluering: number) {
-        if (!loadJSON(localStorageKeys.EVAL)) {
+        if (!loadJSON(cookieKeys.EVAL)) {
             try {
                 await axios.post(
                     `${this.props.baseUrl}/sessions/${
@@ -547,7 +547,7 @@ export default class Interaksjonsvindu extends Component<
                     feil: true
                 });
             }
-            saveJSON(localStorageKeys.EVAL, evaluering);
+            saveJSON(cookieKeys.EVAL, evaluering);
             const max = Number.MAX_SAFE_INTEGER - 1000;
             const min = Number.MAX_SAFE_INTEGER - 100000;
             this.props.handterMelding(

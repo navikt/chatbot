@@ -1,13 +1,16 @@
+import Cookies from 'js-cookie';
+
 const saveJSON = (key: string, data: any | any[]): void => {
-    sessionStorage.setItem(key, JSON.stringify(data));
+    Cookies.set(key, data,
+      { domain: document.location.hostname !== 'localhost' ? '.nav.no' : undefined });
 };
 
 const loadJSON = (key: string): any | any[] | null => {
-    return JSON.parse(sessionStorage.getItem(key) as string);
+    return Cookies.getJSON(key) || null;
 };
 
 const deleteJSON = (key: string): void => {
-    sessionStorage.removeItem(key);
+    Cookies.remove(key);
 };
 
 export { saveJSON, loadJSON, deleteJSON };

@@ -5,7 +5,7 @@ import Interaksjonsvindu, { Bruker, Config } from '../Interaksjonsvindu/index';
 import { Container, FridaKnapp } from './styles';
 import { ConnectionConfig } from '../../index';
 import axios, { AxiosResponse } from 'axios';
-import { loadJSON, saveJSON } from '../../services/localStorageService';
+import { deleteJSON, loadJSON, saveJSON } from '../../services/cookiesService';
 import {
     ConfigurationResponse,
     Message,
@@ -56,13 +56,17 @@ export interface ShowIndicator {
 
 export interface MessageWithIndicator extends Message, ShowIndicator {}
 
-export enum localStorageKeys {
-    CONFIG = 'chatbot-frida_config',
-    HISTORIE = 'chatbot-frida_historie',
-    APEN = 'chatbot-frida_apen',
-    EVAL = 'chatbot-frida_eval',
-    MAILTIMEOUT = 'chatbot-frida_mail-timeout'
+export const cookieKeys = {
+    CONFIG: 'chatbot-frida_config',
+    HISTORIE: 'chatbot-frida_historie',
+    APEN: 'chatbot-frida_apen',
+    EVAL: 'chatbot-frida_eval',
+    MAILTIMEOUT: 'chatbot-frida_mail-timeout'
 }
+
+const clearCookies = () => {
+    Object.values(cookieKeys).forEach(deleteJSON);
+};
 
 export default class ChatContainer extends Component<
     ConnectionConfig,
@@ -80,15 +84,15 @@ export default class ChatContainer extends Component<
         super(props);
         this.state = {
             ...defaultState,
-            erApen: loadJSON(localStorageKeys.APEN) || false,
-            historie: loadJSON(localStorageKeys.HISTORIE) || [],
-            config: loadJSON(localStorageKeys.CONFIG),
-            sisteMeldingId: loadJSON(localStorageKeys.HISTORIE)
-                ? loadJSON(localStorageKeys.HISTORIE)
+            erApen: loadJSON(cookieKeys.APEN) || false,
+            historie: loadJSON(cookieKeys.HISTORIE) || [],
+            config: loadJSON(cookieKeys.CONFIG),
+            sisteMeldingId: loadJSON(cookieKeys.HISTORIE)
+                ? loadJSON(cookieKeys.HISTORIE)
                       .slice()
                       .reverse()
                       .find((_historie: any) => _historie.role === 1)
-                    ? loadJSON(localStorageKeys.HISTORIE)
+                    ? loadJSON(cookieKeys.HISTORIE)
                           .slice()
                           .reverse()
                           .find((_historie: any) => _historie.role === 1).id
@@ -222,8 +226,8 @@ export default class ChatContainer extends Component<
                 await this.setState({
                     ...defaultState,
                     erApen: beholdApen,
-                    historie: loadJSON(localStorageKeys.HISTORIE) || [],
-                    config: loadJSON(localStorageKeys.CONFIG)
+                    historie: loadJSON(cookieKeys.HISTORIE) || [],
+                    config: loadJSON(cookieKeys.CONFIG)
                 });
             }
 
@@ -252,7 +256,7 @@ export default class ChatContainer extends Component<
                         });
                     }
                 } else {
-                    // Har hentet historie fra localStorage
+                    // Har hentet historie fra cookies
                     for (let historie of this.state.historie) {
                         this.handterMelding({
                             ...historie,
@@ -286,7 +290,7 @@ export default class ChatContainer extends Component<
     }
 
     async apne() {
-        saveJSON(localStorageKeys.APEN, true);
+        saveJSON(cookieKeys.APEN, true);
         await this.setState({
             erApen: true
         });
@@ -295,7 +299,7 @@ export default class ChatContainer extends Component<
 
     async lukk() {
         await this.setState({ erApen: false });
-        saveJSON(localStorageKeys.APEN, false);
+        saveJSON(cookieKeys.APEN, false);
     }
 
     omstart() {
@@ -309,10 +313,9 @@ export default class ChatContainer extends Component<
         clearInterval(this.hentHistorieIntervall);
         clearInterval(this.lesIkkeLastethistorieIntervall);
         clearInterval(this.leggTilLenkeHandlerIntervall);
-        const apen = loadJSON(localStorageKeys.APEN) == true;
-        sessionStorage.clear();
-        localStorage.clear();
-        saveJSON(localStorageKeys.APEN, apen);
+        const apen = loadJSON(cookieKeys.APEN) == true;
+        clearCookies();
+        saveJSON(cookieKeys.APEN, apen);
         this.start(true, apen);
     }
 
@@ -350,9 +353,9 @@ export default class ChatContainer extends Component<
                 this.state.config!.requestId
             }`
         );
-        if (!loadJSON(localStorageKeys.MAILTIMEOUT)) {
+        if (!loadJSON(cookieKeys.MAILTIMEOUT)) {
             saveJSON(
-                localStorageKeys.MAILTIMEOUT,
+                cookieKeys.MAILTIMEOUT,
                 moment()
                     .add(4.5, 'm')
                     .valueOf()
@@ -368,8 +371,7 @@ export default class ChatContainer extends Component<
     }
 
     lukkOgAvslutt() {
-        localStorage.clear();
-        sessionStorage.clear();
+        clearCookies();
         this.setState({
             ...defaultState,
             erApen: false
@@ -398,7 +400,7 @@ export default class ChatContainer extends Component<
                 .valueOf()
         };
 
-        saveJSON(localStorageKeys.CONFIG, data);
+        saveJSON(cookieKeys.CONFIG, data);
         this.setState({
             config: data
         });
@@ -578,7 +580,7 @@ export default class ChatContainer extends Component<
             });
         }
 
-        saveJSON(localStorageKeys.HISTORIE, this.state.historie);
+        saveJSON(cookieKeys.HISTORIE, this.state.historie);
     }
 
     lesIkkeLastethistorie() {
@@ -657,7 +659,7 @@ export default class ChatContainer extends Component<
                 }
             },
             () => {
-                saveJSON(localStorageKeys.HISTORIE, this.state.historie);
+                saveJSON(cookieKeys.HISTORIE, this.state.historie);
             }
         );
     }
