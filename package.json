@@ -17,6 +17,7 @@
         "umd"
     ],
     "scripts": {
+        "publish:prewin": "npm run build && copy umd\\@navikt nav-chatbot\\umd\\@navikt /y && npm version prerelease --prefix nav-chatbot && npm publish nav-chatbot --access public",
         "build": "npm run generate:types && nwb build-react-component --no-demo && import-path --path umd/@navikt/nav-chatbot.min.js",
         "clean": "nwb clean-module && nwb clean-demo",
         "prepublishOnly": "npm run build",

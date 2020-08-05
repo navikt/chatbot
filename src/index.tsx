@@ -30,6 +30,7 @@ export type ConnectionConfig = {
     queueKey: string;
     customerKey: string;
     configId: string;
+    isOpen?: boolean;
     evaluationMessage?: string;
 };
 
@@ -44,7 +45,8 @@ export default class Chat extends Component<ConnectionConfig, {}> {
             queueKey,
             customerKey,
             configId,
-            evaluationMessage
+            isOpen,
+            evaluationMessage,
         } = this.props;
         return (
             <ThemeProvider theme={tema}>
@@ -54,6 +56,7 @@ export default class Chat extends Component<ConnectionConfig, {}> {
                         queueKey={queueKey}
                         configId={configId}
                         evaluationMessage={evaluationMessage}
+                        isOpen={isOpen}
                     />
                 </Global>
             </ThemeProvider>

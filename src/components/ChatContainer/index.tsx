@@ -114,7 +114,7 @@ export default class ChatContainer extends Component<
 
         this.state = {
             ...defaultState,
-            erApen: getCookie(chatStateKeys.APEN) || false,
+            erApen: getCookie(chatStateKeys.APEN) || props.isOpen || false,
             historie: historie,
             config: getCookie(chatStateKeys.CONFIG),
             sisteMeldingId: sisteMelding ? sisteMelding.id : 0,

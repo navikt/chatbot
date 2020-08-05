@@ -36,9 +36,6 @@ module.exports = {
                 loader: 'svg-inline-loader?classPrefix',
             },
         },
-        copy: [
-            { from: './src/index.d.ts', to: './@navikt' },
-            { from: './package.json', to: './@navikt' },
-        ],
+        copy: [{ from: './src/index.d.ts', to: './@navikt' }],
     },
 };
