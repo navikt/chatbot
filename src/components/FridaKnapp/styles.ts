@@ -24,6 +24,7 @@ export const FridaTekst = styled.span`
     height: ${tekstHeightPx};
     box-shadow: inset 0 0 0 2px ${navGra20};
     border-radius: ${tekstHeightPx} 0 0 ${tekstHeightPx};
+    background-color: white;
 `;
 
 export const FridaIkon = styled.span`
