@@ -50,7 +50,7 @@ export const FridaKnapp = styled.button`
     align-items: center;
     height: ${tekstHeightPx};
     cursor: pointer;
-    background-color: white;
+    background-color: transparent;
     border: none;
     padding: 0;
 
