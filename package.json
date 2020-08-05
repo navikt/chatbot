@@ -48,6 +48,7 @@
         "import-path": "^1.0.14",
         "moment-locales-webpack-plugin": "^1.2.0",
         "nwb": "^0.23.0",
+        "prettier": "^2.0.5",
         "react": "^16.8.6",
         "react-app-polyfill": "^1.0.6",
         "react-dom": "^16.8.6",

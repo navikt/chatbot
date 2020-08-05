@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import ToppBar from '../ToppBar';
 import Interaksjonsvindu, { Bruker, Config } from '../Interaksjonsvindu/index';
-import { Container, FridaKnapp } from './styles';
+import { Container } from './styles';
 import { ConnectionConfig } from '../../index';
 import axios, { AxiosResponse } from 'axios';
 import { deleteCookie, getCookie, setCookie } from '../../services/cookies';
@@ -10,13 +10,14 @@ import {
     ConfigurationResponse,
     Message,
     SessionCreate,
-    SessionCreateResponse
+    SessionCreateResponse,
 } from '../../api/Sessions';
 import moment from 'moment';
 import md5 from 'md5';
 import { getStorageItem } from '../../services/sessionStorage';
 import { setStorageItem } from '../../services/sessionStorage';
 import { removeStorageItem } from '../../services/sessionStorage';
+import { FridaKnappContainer } from '../FridaKnapp';
 
 export type ChatContainerState = {
     erApen: boolean;
@@ -51,7 +52,7 @@ const defaultState: ChatContainerState = {
     hentHistorie: true,
     visBekreftelse: undefined,
     lastHref: '',
-    feil: false
+    feil: false,
 };
 
 export interface ShowIndicator {
@@ -65,8 +66,8 @@ export const chatStateKeys = {
     HISTORIE: 'chatbot-frida_historie',
     APEN: 'chatbot-frida_apen',
     EVAL: 'chatbot-frida_eval',
-    MAILTIMEOUT: 'chatbot-frida_mail-timeout'
-}
+    MAILTIMEOUT: 'chatbot-frida_mail-timeout',
+};
 
 const clearState = () => {
     Object.values(chatStateKeys).forEach(deleteCookie);
@@ -107,16 +108,16 @@ export default class ChatContainer extends Component<
         super(props);
         const historie = loadHistoryCache() || [];
         const sisteMelding = historie
-          .slice()
-          .reverse()
-          .find((_historie: any) => _historie.role === 1);
+            .slice()
+            .reverse()
+            .find((_historie: any) => _historie.role === 1);
 
         this.state = {
             ...defaultState,
             erApen: getCookie(chatStateKeys.APEN) || false,
             historie: historie,
             config: getCookie(chatStateKeys.CONFIG),
-            sisteMeldingId: sisteMelding ? sisteMelding.id : 0
+            sisteMeldingId: sisteMelding ? sisteMelding.id : 0,
         };
 
         this.start = this.start.bind(this);
@@ -152,7 +153,7 @@ export default class ChatContainer extends Component<
                 'Mangler påkrevd parameter. Husk å ta med: customerKey, queueKey og configId.'
             );
             this.setState({
-                feil: true
+                feil: true,
             });
         } else if (this.state.erApen) {
             this.start(false, true);
@@ -170,7 +171,6 @@ export default class ChatContainer extends Component<
         return (
             <Container
                 erApen={this.state.erApen}
-                queueKey={this.props.queueKey}
                 tabIndex={this.state.erApen ? 0 : -1}
                 aria-label={
                     this.state.erApen
@@ -181,15 +181,10 @@ export default class ChatContainer extends Component<
                 role={this.state.erApen ? 'dialog' : undefined}
             >
                 {!this.state.erApen && (
-                    <FridaKnapp
+                    <FridaKnappContainer
                         onClick={this.apne}
-                        tabIndex={this.state.erApen ? -1 : 0}
-                        aria-label={
-                            this.state.erApen
-                                ? undefined
-                                : `Samtalevindu: ${this.state.navn}`
-                        }
-                        lang={this.state.erApen ? undefined : 'no'}
+                        navn={this.state.navn || ''}
+                        queueKey={this.props.queueKey}
                     />
                 )}
                 {this.state.erApen && (
@@ -265,13 +260,13 @@ export default class ChatContainer extends Component<
                                 }
                             }
                             this.setState({
-                                erApen: beholdApen
+                                erApen: beholdApen,
                             });
                         }
                     } catch (e) {
                         console.error(e);
                         this.setState({
-                            feil: true
+                            feil: true,
                         });
                     }
                 } else {
@@ -279,11 +274,11 @@ export default class ChatContainer extends Component<
                     for (const historie of this.state.historie) {
                         this.handterMelding({
                             ...historie,
-                            showIndicator: false
+                            showIndicator: false,
                         });
                     }
                     this.setState({
-                        erApen: true
+                        erApen: true,
                     });
                 }
 
@@ -303,7 +298,7 @@ export default class ChatContainer extends Component<
         } catch (e) {
             console.error(e);
             this.setState({
-                feil: true
+                feil: true,
             });
         }
     }
@@ -311,7 +306,7 @@ export default class ChatContainer extends Component<
     async apne() {
         setCookie(chatStateKeys.APEN, true);
         await this.setState({
-            erApen: true
+            erApen: true,
         });
         this.start(false, true);
     }
@@ -323,7 +318,7 @@ export default class ChatContainer extends Component<
 
     omstart() {
         this.setState({
-            visBekreftelse: 'OMSTART'
+            visBekreftelse: 'OMSTART',
         });
     }
 
@@ -349,7 +344,7 @@ export default class ChatContainer extends Component<
             if (!this.state.avsluttet) {
                 if (this.state.config) {
                     await this.setState({
-                        visBekreftelse: 'AVSLUTT'
+                        visBekreftelse: 'AVSLUTT',
                     });
                 }
             } else {
@@ -375,9 +370,7 @@ export default class ChatContainer extends Component<
         if (!getCookie(chatStateKeys.MAILTIMEOUT)) {
             setCookie(
                 chatStateKeys.MAILTIMEOUT,
-                moment()
-                    .add(4.5, 'm')
-                    .valueOf()
+                moment().add(4.5, 'm').valueOf()
             );
         }
         this.confirmCancel();
@@ -385,7 +378,7 @@ export default class ChatContainer extends Component<
 
     confirmCancel() {
         this.setState({
-            visBekreftelse: undefined
+            visBekreftelse: undefined,
         });
     }
 
@@ -393,7 +386,7 @@ export default class ChatContainer extends Component<
         clearState();
         this.setState({
             ...defaultState,
-            erApen: false
+            erApen: false,
         });
     }
 
@@ -406,22 +399,20 @@ export default class ChatContainer extends Component<
             languageCode: 'NO',
             denyArchiving: false,
             intro: {
-                variables: this.config['variables'] || undefined
-            }
+                variables: this.config['variables'] || undefined,
+            },
         } as SessionCreate);
 
         const data: Config = {
             sessionId: `${this.props.customerKey}-${session.data.iqSessionId}`,
             sessionIdPure: session.data.iqSessionId,
             requestId: session.data.requestId,
-            alive: moment(new Date())
-                .add(2, 'hours')
-                .valueOf()
+            alive: moment(new Date()).add(2, 'hours').valueOf(),
         };
 
         setCookie(chatStateKeys.CONFIG, data);
         this.setState({
-            config: data
+            config: data,
         });
         return session;
     }
@@ -429,9 +420,7 @@ export default class ChatContainer extends Component<
     hentFullHistorie() {
         if (this.state.config) {
             return axios.get(
-                `${this.baseUrl}/sessions/${
-                    this.state.config.sessionId
-                }/messages/0`
+                `${this.baseUrl}/sessions/${this.state.config.sessionId}/messages/0`
             );
         } else {
             return undefined;
@@ -446,9 +435,7 @@ export default class ChatContainer extends Component<
         ) {
             try {
                 const res = await axios.get(
-                    `${this.baseUrl}/sessions/${
-                        this.state.config.sessionId
-                    }/messages/${this.state.sisteMeldingId}`
+                    `${this.baseUrl}/sessions/${this.state.config.sessionId}/messages/${this.state.sisteMeldingId}`
                 );
                 const data: Message[] = res.data;
 
@@ -457,13 +444,13 @@ export default class ChatContainer extends Component<
                         const showIndicator = historie.content === 'TYPE_MSG';
                         const historieMedIndikator: MessageWithIndicator = {
                             ...historie,
-                            showIndicator: showIndicator
+                            showIndicator: showIndicator,
                         };
                         this.setState({
                             ikkeLastethistorie: [
                                 ...this.state.ikkeLastethistorie,
-                                historieMedIndikator
-                            ]
+                                historieMedIndikator,
+                            ],
                         });
                     }
                     let fantId = false;
@@ -472,7 +459,7 @@ export default class ChatContainer extends Component<
                         if (data[data.length - sisteId]) {
                             fantId = true;
                             this.setState({
-                                sisteMeldingId: data[data.length - sisteId].id
+                                sisteMeldingId: data[data.length - sisteId].id,
                             });
                         } else {
                             sisteId++;
@@ -482,7 +469,7 @@ export default class ChatContainer extends Component<
                     for (const historie of data) {
                         const historieMedIndikator: MessageWithIndicator = {
                             ...historie,
-                            showIndicator: false
+                            showIndicator: false,
                         };
                         this.handterMelding(historieMedIndikator, true);
                     }
@@ -494,7 +481,7 @@ export default class ChatContainer extends Component<
                         avsluttet:
                             e.response && e.response.status === 404
                                 ? true
-                                : state.avsluttet
+                                : state.avsluttet,
                     };
                 });
             }
@@ -515,16 +502,16 @@ export default class ChatContainer extends Component<
                         nickName: melding.nickName,
                         role: melding.role,
                         userType: melding.content.userType,
-                        aktiv: true
+                        aktiv: true,
                     });
                     return {
-                        brukere
+                        brukere,
                     };
                 });
             }
             if (melding.content.userType === 'Human') {
                 this.setState({
-                    iKo: false
+                    iKo: false,
                 });
             }
         } else if (melding.type === 'Option') {
@@ -533,7 +520,7 @@ export default class ChatContainer extends Component<
                 if (typeof m === 'string') {
                     melding.content[i] = {
                         tekst: m,
-                        valgt: false
+                        valgt: false,
                     };
                 }
             }
@@ -551,14 +538,14 @@ export default class ChatContainer extends Component<
             if (melding.content === 'USER_DISCONNECTED') {
                 this.setState(
                     (state: ChatContainerState) => {
-                        const brukere = state.brukere.map(bruker => {
+                        const brukere = state.brukere.map((bruker) => {
                             if (bruker.userId === melding.userId) {
                                 bruker.aktiv = false;
                             }
                             return bruker;
                         });
                         return {
-                            brukere
+                            brukere,
                         };
                     },
                     () => {
@@ -575,11 +562,11 @@ export default class ChatContainer extends Component<
                 );
             } else if (melding.content.includes('REQUEST_PUTINQUEUE')) {
                 this.setState({
-                    iKo: true
+                    iKo: true,
                 });
             } else if (melding.content === 'REQUEST_DISCONNECTED') {
                 this.setState({
-                    avsluttet: true
+                    avsluttet: true,
                 });
             }
         }
@@ -595,7 +582,7 @@ export default class ChatContainer extends Component<
             )
         ) {
             this.setState({
-                historie: [...this.state.historie, melding]
+                historie: [...this.state.historie, melding],
             });
         }
 
@@ -618,12 +605,12 @@ export default class ChatContainer extends Component<
                         this.setState(
                             (state: ChatContainerState) => {
                                 const brukereSomSkriver = {
-                                    ...state.brukereSomSkriver
+                                    ...state.brukereSomSkriver,
                                 };
                                 brukereSomSkriver[historie.userId] = now;
                                 return {
                                     brukereSomSkriver,
-                                    ikkeLastethistorie: resten
+                                    ikkeLastethistorie: resten,
                                 };
                             },
                             () => {
@@ -637,18 +624,18 @@ export default class ChatContainer extends Component<
                 } else {
                     this.setState((state: ChatContainerState) => {
                         const brukereSomSkriver = {
-                            ...state.brukereSomSkriver
+                            ...state.brukereSomSkriver,
                         };
                         brukereSomSkriver[historie.userId] = now;
                         return {
-                            brukereSomSkriver
+                            brukereSomSkriver,
                         };
                     });
                 }
             } else {
                 this.setState(
                     {
-                        ikkeLastethistorie: resten
+                        ikkeLastethistorie: resten,
                     },
                     () => {
                         this.handterMelding(historie, true);
@@ -699,7 +686,7 @@ export default class ChatContainer extends Component<
                 const index = historier.indexOf(indikator);
                 state.historie[index] = indikator;
                 return {
-                    historie: historier
+                    historie: historier,
                 };
             });
         });
@@ -714,7 +701,7 @@ export default class ChatContainer extends Component<
                     if (lenke.getAttribute('target') === '_blank') {
                         this.setState({
                             visBekreftelse: 'NY_FANE',
-                            lastHref: lenke.getAttribute('href')
+                            lastHref: lenke.getAttribute('href'),
                         });
                     } else if (lenke.getAttribute('href')) {
                         window.location.href = lenke.getAttribute('href')!;
@@ -727,9 +714,7 @@ export default class ChatContainer extends Component<
 
     async settTimerConfig() {
         const res = await axios.get(
-            `${this.baseUrl}/configurations/${this.props.customerKey}-${
-                this.props.configId
-            }`
+            `${this.baseUrl}/configurations/${this.props.customerKey}-${this.props.configId}`
         );
         const config = res.data as ConfigurationResponse;
         if (config) {
