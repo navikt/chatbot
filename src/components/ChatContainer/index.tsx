@@ -156,7 +156,7 @@ export default class ChatContainer extends Component<
                 feil: true,
             });
         } else if (this.state.erApen) {
-            this.start(false, true);
+            this.start(this.props.isOpen, true);
         }
     }
 
@@ -243,6 +243,10 @@ export default class ChatContainer extends Component<
                     historie: loadHistoryCache() || [],
                     config: getCookie(chatStateKeys.CONFIG),
                 });
+            }
+
+            if (beholdApen) {
+                setCookie(chatStateKeys.APEN, true);
             }
 
             if (!this.state.feil && this.state.erApen) {
