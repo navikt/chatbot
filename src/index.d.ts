@@ -475,6 +475,16 @@ declare module 'src/services/sessionStorage' {
 	export const removeStorageItem: (key: string) => void;
 
 }
+declare module 'src/components/FridaKnapp/index' {
+	 type Props = {
+	    onClick: () => void;
+	    navn: string;
+	    queueKey: string;
+	};
+	export const FridaKnappContainer: (props: Props) => JSX.Element;
+	export {};
+
+}
 declare module 'src/components/ChatContainer/index' {
 	import { Component } from 'react';
 	import { Bruker, Config } from 'src/components/Interaksjonsvindu/index';

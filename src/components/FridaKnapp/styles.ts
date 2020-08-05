@@ -15,14 +15,21 @@ type Props = {
 };
 
 export const FridaTekst = styled.span`
-    padding: 0 ${tekstPadding};
+    display: flex;
+    align-items: center;
+    padding-left: ${tekstPadding};
+    padding-right: calc(${tekstPadding} + ${ikonSizePx} * 0.5);
     color: ${navDypBla};
     white-space: nowrap;
+    height: ${tekstHeightPx};
+    box-shadow: inset 0 0 0 2px ${navGra20};
+    border-radius: ${tekstHeightPx} 0 0 ${tekstHeightPx};
 `;
 
 export const FridaIkon = styled.span`
-    position: absolute;
-    right: calc(-${ikonSizePx} * 0.5);
+    position: relative;
+    right: calc(${ikonSizePx} * 0.5);
+    margin-right: calc(-${ikonSizePx} * 0.5);
     width: ${ikonSizePx};
     height: ${ikonSizePx};
     border-radius: ${ikonSizePx};
@@ -39,24 +46,18 @@ export const FridaIkon = styled.span`
 `;
 
 export const FridaKnapp = styled.button`
-    position: relative;
     display: flex;
     align-items: center;
-    width: fit-content;
     height: ${tekstHeightPx};
     cursor: pointer;
     background-color: white;
     border: none;
     padding: 0;
-    padding-right: calc(${ikonSizePx} * 0.5);
-    box-shadow: inset 0 0 0 2px ${navGra20};
-    border-radius: ${tekstHeightPx} 0 0 ${tekstHeightPx};
 
     &:hover {
-        background-color: ${navDypBla};
-
         ${FridaTekst} {
             color: white;
+            background-color: ${navDypBla};
         }
 
         ${FridaIkon} {
@@ -65,7 +66,11 @@ export const FridaKnapp = styled.button`
     }
 
     &:focus {
-        box-shadow: inset 0 0 0 3px ${navDypBla} !important;
+        box-shadow: none !important;
+
+        ${FridaTekst} {
+            box-shadow: inset 0 0 0 3px ${navDypBla} !important;
+        }
 
         ${FridaIkon} {
             box-shadow: 0 0 0 3px ${navDypBla};
