@@ -328,9 +328,9 @@ declare module 'src/components/Alertstripe/index' {
 	}
 
 }
-declare module 'src/services/cookiesService' {
-	 const saveJSON: (key: string, data: any) => void; const loadJSON: (key: string) => any; const deleteJSON: (key: string) => void;
-	export { saveJSON, loadJSON, deleteJSON };
+declare module 'src/services/cookies' {
+	 const setCookie: (key: string, data: any | any[]) => void; const getCookie: (key: string) => any | any[] | null; const deleteCookie: (key: string) => void;
+	export { setCookie, getCookie, deleteCookie };
 
 }
 declare module 'src/components/Evaluering/index' {
@@ -469,6 +469,12 @@ declare module 'src/tema/mediaqueries' {
 	export const liten = "@media (max-width: 767px), (max-height: 568px)";
 
 }
+declare module 'src/services/sessionStorage' {
+	export const setStorageItem: (key: string, value: string) => void;
+	export const getStorageItem: (key: string) => string | null;
+	export const removeStorageItem: (key: string) => void;
+
+}
 declare module 'src/components/ChatContainer/index' {
 	import { Component } from 'react';
 	import { Bruker, Config } from 'src/components/Interaksjonsvindu/index';
@@ -498,7 +504,7 @@ declare module 'src/components/ChatContainer/index' {
 	}
 	export interface MessageWithIndicator extends Message, ShowIndicator {
 	}
-	export const cookieKeys: {
+	export const chatStateKeys: {
 	    CONFIG: string;
 	    HISTORIE: string;
 	    APEN: string;

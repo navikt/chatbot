@@ -19,9 +19,9 @@ import Knapp from '../Knapp';
 import Alertstripe from '../Alertstripe';
 import { ConnectionConfig } from '../../index';
 import Evaluering from '../Evaluering';
-import { loadJSON, saveJSON } from '../../services/cookiesService';
+import { getCookie, setCookie } from '../../services/cookies';
 import { Message, SurveySend } from '../../api/Sessions';
-import { MessageWithIndicator, cookieKeys } from '../ChatContainer';
+import { MessageWithIndicator, chatStateKeys } from '../ChatContainer';
 import EmailFeedback from '../EmailFeedback';
 import moment from 'moment';
 import Bekreftelsesboks from '../Bekreftelsesboks';
@@ -114,20 +114,20 @@ export default class Interaksjonsvindu extends Component<
                     {
                         tidIgjen: {
                             formatert: moment().to(
-                                loadJSON(cookieKeys.MAILTIMEOUT),
+                                getCookie(chatStateKeys.MAILTIMEOUT),
                                 true
                             ),
                             tid: moment(
-                                loadJSON(cookieKeys.MAILTIMEOUT)
-                            ).diff(moment())
-                        }
+                                getCookie(chatStateKeys.MAILTIMEOUT)
+                            ).diff(moment()),
+                        },
                     },
                     () => {
                         if (
                             this.state.tidIgjen &&
                             this.state.tidIgjen.tid <= 0
                         ) {
-                            saveJSON(cookieKeys.APEN, false);
+                            setCookie(chatStateKeys.APEN, false);
                             this.props.lukkOgAvslutt();
                         }
                     }
@@ -159,7 +159,7 @@ export default class Interaksjonsvindu extends Component<
             if (sisteBrukerSomSnakket) {
                 sisteBrukerSomSnakketNick = sisteBrukerSomSnakket.nickName;
             }
-            let historieListe = historie.map(
+            const historieListe = historie.map(
                 (historieItem: MessageWithIndicator, index: number) => {
                     const sistehistorie: Message =
                         this.props.historie[index - 1] &&
@@ -268,7 +268,7 @@ export default class Interaksjonsvindu extends Component<
                                         Tilbakemelding
                                     </AlertstripeHeader>
                                     <AlertstripeForklarendeTekst>
-                                        {loadJSON(cookieKeys.EVAL)
+                                        {getCookie(chatStateKeys.EVAL)
                                             ? 'Takk for din tilbakemelding!'
                                             : this.props.evaluationMessage
                                             ? this.props.evaluationMessage
@@ -502,7 +502,7 @@ export default class Interaksjonsvindu extends Component<
     }
 
     async opprettEvaluering() {
-        if (!loadJSON(cookieKeys.EVAL)) {
+        if (!getCookie(chatStateKeys.EVAL)) {
             const evaluering = await axios.post(
                 `${this.props.baseUrl}/sessions/${
                     this.props.config.sessionId
@@ -524,7 +524,7 @@ export default class Interaksjonsvindu extends Component<
     }
 
     async evaluer(evaluering: number) {
-        if (!loadJSON(cookieKeys.EVAL)) {
+        if (!getCookie(chatStateKeys.EVAL)) {
             try {
                 await axios.post(
                     `${this.props.baseUrl}/sessions/${
@@ -547,7 +547,7 @@ export default class Interaksjonsvindu extends Component<
                     feil: true
                 });
             }
-            saveJSON(cookieKeys.EVAL, evaluering);
+            setCookie(chatStateKeys.EVAL, evaluering);
             const max = Number.MAX_SAFE_INTEGER - 1000;
             const min = Number.MAX_SAFE_INTEGER - 100000;
             this.props.handterMelding(

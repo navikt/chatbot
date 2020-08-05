@@ -27,6 +27,7 @@ module.exports = {
       externals: {
         'react-app-polyfill/ie11': 'commonjs2 react-app-polyfill/ie11',
         'react-app-polyfill/stable': 'commonjs2 react-app-polyfill/stable',
+        'object-hash': 'commonjs2 object-hash'
       }
     },
     rules: {

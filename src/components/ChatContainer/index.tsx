@@ -5,7 +5,7 @@ import Interaksjonsvindu, { Bruker, Config } from '../Interaksjonsvindu/index';
 import { Container, FridaKnapp } from './styles';
 import { ConnectionConfig } from '../../index';
 import axios, { AxiosResponse } from 'axios';
-import { deleteJSON, loadJSON, saveJSON } from '../../services/cookiesService';
+import { deleteCookie, getCookie, setCookie } from '../../services/cookies';
 import {
     ConfigurationResponse,
     Message,
@@ -13,6 +13,10 @@ import {
     SessionCreateResponse
 } from '../../api/Sessions';
 import moment from 'moment';
+import md5 from 'md5';
+import { getStorageItem } from '../../services/sessionStorage';
+import { setStorageItem } from '../../services/sessionStorage';
+import { removeStorageItem } from '../../services/sessionStorage';
 
 export type ChatContainerState = {
     erApen: boolean;
@@ -56,7 +60,7 @@ export interface ShowIndicator {
 
 export interface MessageWithIndicator extends Message, ShowIndicator {}
 
-export const cookieKeys = {
+export const chatStateKeys = {
     CONFIG: 'chatbot-frida_config',
     HISTORIE: 'chatbot-frida_historie',
     APEN: 'chatbot-frida_apen',
@@ -64,8 +68,27 @@ export const cookieKeys = {
     MAILTIMEOUT: 'chatbot-frida_mail-timeout'
 }
 
-const clearCookies = () => {
-    Object.values(cookieKeys).forEach(deleteJSON);
+const clearState = () => {
+    Object.values(chatStateKeys).forEach(deleteCookie);
+    removeStorageItem(chatStateKeys.HISTORIE);
+};
+
+const setHistoryCache = (historie: MessageWithIndicator[]) => {
+    const jsonString = JSON.stringify(historie);
+    setStorageItem(chatStateKeys.HISTORIE, jsonString);
+    setCookie(chatStateKeys.HISTORIE, md5(jsonString));
+};
+
+const loadHistoryCache = () => {
+    const historie = getStorageItem(chatStateKeys.HISTORIE);
+    if (!historie) {
+        return null;
+    }
+    const historieHash = md5(historie);
+    if (historieHash !== getCookie(chatStateKeys.HISTORIE)) {
+        return null;
+    }
+    return JSON.parse(historie);
 };
 
 export default class ChatContainer extends Component<
@@ -82,22 +105,18 @@ export default class ChatContainer extends Component<
 
     constructor(props: ConnectionConfig) {
         super(props);
+        const historie = loadHistoryCache() || [];
+        const sisteMelding = historie
+          .slice()
+          .reverse()
+          .find((_historie: any) => _historie.role === 1);
+
         this.state = {
             ...defaultState,
-            erApen: loadJSON(cookieKeys.APEN) || false,
-            historie: loadJSON(cookieKeys.HISTORIE) || [],
-            config: loadJSON(cookieKeys.CONFIG),
-            sisteMeldingId: loadJSON(cookieKeys.HISTORIE)
-                ? loadJSON(cookieKeys.HISTORIE)
-                      .slice()
-                      .reverse()
-                      .find((_historie: any) => _historie.role === 1)
-                    ? loadJSON(cookieKeys.HISTORIE)
-                          .slice()
-                          .reverse()
-                          .find((_historie: any) => _historie.role === 1).id
-                    : 0
-                : 0
+            erApen: getCookie(chatStateKeys.APEN) || false,
+            historie: historie,
+            config: getCookie(chatStateKeys.CONFIG),
+            sisteMeldingId: sisteMelding ? sisteMelding.id : 0
         };
 
         this.start = this.start.bind(this);
@@ -136,7 +155,7 @@ export default class ChatContainer extends Component<
                 feil: true
             });
         } else if (this.state.erApen) {
-            this.start();
+            this.start(false, true);
         }
     }
 
@@ -226,8 +245,8 @@ export default class ChatContainer extends Component<
                 await this.setState({
                     ...defaultState,
                     erApen: beholdApen,
-                    historie: loadJSON(cookieKeys.HISTORIE) || [],
-                    config: loadJSON(cookieKeys.CONFIG)
+                    historie: loadHistoryCache() || [],
+                    config: getCookie(chatStateKeys.CONFIG),
                 });
             }
 
@@ -237,11 +256,11 @@ export default class ChatContainer extends Component<
                 if (this.state.historie && this.state.historie.length < 1) {
                     // Henter full historie fra API
                     try {
-                        let historie = await this.hentFullHistorie();
+                        const historie = await this.hentFullHistorie();
                         if (historie) {
-                            let data: any[] = historie.data;
+                            const data: any[] = historie.data;
                             if (data.length > 0) {
-                                for (let historie of data) {
+                                for (const historie of data) {
                                     this.handterMelding(historie, true);
                                 }
                             }
@@ -256,8 +275,8 @@ export default class ChatContainer extends Component<
                         });
                     }
                 } else {
-                    // Har hentet historie fra cookies
-                    for (let historie of this.state.historie) {
+                    // Har hentet historie fra cache
+                    for (const historie of this.state.historie) {
                         this.handterMelding({
                             ...historie,
                             showIndicator: false
@@ -290,7 +309,7 @@ export default class ChatContainer extends Component<
     }
 
     async apne() {
-        saveJSON(cookieKeys.APEN, true);
+        setCookie(chatStateKeys.APEN, true);
         await this.setState({
             erApen: true
         });
@@ -299,7 +318,7 @@ export default class ChatContainer extends Component<
 
     async lukk() {
         await this.setState({ erApen: false });
-        saveJSON(cookieKeys.APEN, false);
+        setCookie(chatStateKeys.APEN, false);
     }
 
     omstart() {
@@ -313,9 +332,9 @@ export default class ChatContainer extends Component<
         clearInterval(this.hentHistorieIntervall);
         clearInterval(this.lesIkkeLastethistorieIntervall);
         clearInterval(this.leggTilLenkeHandlerIntervall);
-        const apen = loadJSON(cookieKeys.APEN) == true;
-        clearCookies();
-        saveJSON(cookieKeys.APEN, apen);
+        const apen = getCookie(chatStateKeys.APEN) === true;
+        clearState();
+        setCookie(chatStateKeys.APEN, apen);
         this.start(true, apen);
     }
 
@@ -353,9 +372,9 @@ export default class ChatContainer extends Component<
                 this.state.config!.requestId
             }`
         );
-        if (!loadJSON(cookieKeys.MAILTIMEOUT)) {
-            saveJSON(
-                cookieKeys.MAILTIMEOUT,
+        if (!getCookie(chatStateKeys.MAILTIMEOUT)) {
+            setCookie(
+                chatStateKeys.MAILTIMEOUT,
                 moment()
                     .add(4.5, 'm')
                     .valueOf()
@@ -371,7 +390,7 @@ export default class ChatContainer extends Component<
     }
 
     lukkOgAvslutt() {
-        clearCookies();
+        clearState();
         this.setState({
             ...defaultState,
             erApen: false
@@ -391,7 +410,7 @@ export default class ChatContainer extends Component<
             }
         } as SessionCreate);
 
-        let data: Config = {
+        const data: Config = {
             sessionId: `${this.props.customerKey}-${session.data.iqSessionId}`,
             sessionIdPure: session.data.iqSessionId,
             requestId: session.data.requestId,
@@ -400,7 +419,7 @@ export default class ChatContainer extends Component<
                 .valueOf()
         };
 
-        saveJSON(cookieKeys.CONFIG, data);
+        setCookie(chatStateKeys.CONFIG, data);
         this.setState({
             config: data
         });
@@ -434,9 +453,9 @@ export default class ChatContainer extends Component<
                 const data: Message[] = res.data;
 
                 if (data && data.length > 0) {
-                    for (let historie of data) {
-                        let showIndicator = historie.content === 'TYPE_MSG';
-                        let historieMedIndikator: MessageWithIndicator = {
+                    for (const historie of data) {
+                        const showIndicator = historie.content === 'TYPE_MSG';
+                        const historieMedIndikator: MessageWithIndicator = {
                             ...historie,
                             showIndicator: showIndicator
                         };
@@ -460,8 +479,8 @@ export default class ChatContainer extends Component<
                         }
                     }
                 } else {
-                    for (let historie of data) {
-                        let historieMedIndikator: MessageWithIndicator = {
+                    for (const historie of data) {
+                        const historieMedIndikator: MessageWithIndicator = {
                             ...historie,
                             showIndicator: false
                         };
@@ -510,7 +529,7 @@ export default class ChatContainer extends Component<
             }
         } else if (melding.type === 'Option') {
             for (let i = 0; i < melding.content.length; i++) {
-                let m = melding.content[i];
+                const m = melding.content[i];
                 if (typeof m === 'string') {
                     melding.content[i] = {
                         tekst: m,
@@ -580,7 +599,7 @@ export default class ChatContainer extends Component<
             });
         }
 
-        saveJSON(cookieKeys.HISTORIE, this.state.historie);
+        setHistoryCache(this.state.historie);
     }
 
     lesIkkeLastethistorie() {
@@ -643,7 +662,7 @@ export default class ChatContainer extends Component<
         this.setState(
             (state: ChatContainerState) => {
                 const historier = [...state.historie];
-                let historie = historier.find(
+                const historie = historier.find(
                     (h: MessageWithIndicator) => h.id === melding.id
                 );
 
@@ -652,14 +671,15 @@ export default class ChatContainer extends Component<
                     state.historie[index] = historie;
                     historie.showIndicator = false;
                     return {
-                        historie: historier
+                        ...state,
+                        historie: historier,
                     };
                 } else {
                     return state;
                 }
             },
             () => {
-                saveJSON(cookieKeys.HISTORIE, this.state.historie);
+                setHistoryCache(this.state.historie);
             }
         );
     }
@@ -714,7 +734,7 @@ export default class ChatContainer extends Component<
         const config = res.data as ConfigurationResponse;
         if (config) {
             this.config = res.data;
-            const timer = parseInt(config.botMessageTimerMs);
+            const timer = parseInt(config.botMessageTimerMs, 10);
             if (timer) {
                 this.skriveindikatorTid = timer;
             }
