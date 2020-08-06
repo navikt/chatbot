@@ -13,6 +13,7 @@ export const FridaKnappContainer = (props: Props) => {
             onClick={props.onClick}
             aria-label={`Samtalevindu: ${props.navn}`}
             lang={'no'}
+            id={'chatbot-frida-knapp'}
         >
             <FridaTekst>{'Chatbot Frida'}</FridaTekst>
             <FridaIkon queueKey={props.queueKey} />
