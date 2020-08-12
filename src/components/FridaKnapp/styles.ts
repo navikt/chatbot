@@ -3,7 +3,7 @@ import fridaIkon from '../../assets/frida.svg';
 import defaultIkon from '../../assets/default.svg';
 
 const ikonSize = 68;
-const ikonSizePx = `${ikonSize}px`;
+export const ikonSizePx = `${ikonSize}px`;
 const tekstHeight = Math.floor(ikonSize * 0.67);
 const tekstHeightPx = `${tekstHeight}px`;
 const tekstPadding = `${tekstHeight * 0.4}px`;

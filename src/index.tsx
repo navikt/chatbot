@@ -7,8 +7,6 @@ import ChatContainer from './components/ChatContainer';
 
 import tema from './tema/tema';
 
-const VERSION = require('../package.json').version;
-
 const Global = styled.div`
     box-sizing: border-box;
     font-family: ${tema.tekstFamilie};
@@ -18,6 +16,10 @@ const Global = styled.div`
     *:before,
     *:after {
         box-sizing: inherit;
+    }
+
+    &:focus {
+        outline: none;
     }
 
     *:focus {
@@ -35,11 +37,6 @@ export type ConnectionConfig = {
 };
 
 export default class Chat extends Component<ConnectionConfig, {}> {
-    constructor(props: ConnectionConfig) {
-        super(props);
-        console.info(`Chatbot Frida v${VERSION}`);
-    }
-
     render() {
         const {
             queueKey,
