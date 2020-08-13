@@ -41,8 +41,8 @@ export const Container = styled.div`
             right: ${rightOffset};
 
             @media (max-height: calc(${tema.hoyde} + ${bottomOffset})) {
-                height: 100%;
-                bottom: 0;
+                top: 0;
+                bottom: auto;
             }
 
             ${liten} {
