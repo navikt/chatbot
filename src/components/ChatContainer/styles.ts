@@ -7,6 +7,9 @@ interface Props {
     erApen: boolean;
 }
 
+const bottomOffset = '50px';
+const rightOffset = '50px';
+
 export const Container = styled.div`
     width: fit-content;
     height: ${ikonSizePx};
@@ -34,8 +37,13 @@ export const Container = styled.div`
             border: 1px solid #b5b5b5;
             box-shadow: 6px 6px 6px 0 rgba(0, 0, 0, 0.16);
             position: fixed;
-            bottom: 50px;
-            right: 50px;
+            bottom: ${bottomOffset};
+            right: ${rightOffset};
+
+            @media (max-height: calc(${tema.hoyde} + ${bottomOffset})) {
+                height: 100%;
+                bottom: 0;
+            }
 
             ${liten} {
                 width: 100%;
