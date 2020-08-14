@@ -95,11 +95,9 @@ const loadHistoryCache = () => {
 // TODO: sett til 30 min for prod
 const sessionTimeoutMins = 3;
 
-const updateSessionExpires = (config: Config | undefined) => {
-    if (config) {
-        config.lastActive = moment().valueOf();
-        setCookie(chatStateKeys.CONFIG, config);
-    }
+const updateSessionExpires = (config: Config) => {
+    config.lastActive = moment().valueOf();
+    setCookie(chatStateKeys.CONFIG, config);
 };
 
 const hasActiveSession = (config: Config | undefined) =>
@@ -259,7 +257,7 @@ export default class ChatContainer extends Component<
                 await this.setState({
                     ...defaultState,
                     erApen: beholdApen,
-                    historie: loadHistoryCache() || [],
+                    historie: [],
                     config: getCookie(chatStateKeys.CONFIG),
                 });
             }
@@ -596,6 +594,7 @@ export default class ChatContainer extends Component<
 
         // Oppdater timeout hvis bruker skrev melding
         if (
+            this.state.config &&
             melding.role === 0 &&
             moment(melding.sent).isAfter(this.state.config?.lastActive)
         ) {
