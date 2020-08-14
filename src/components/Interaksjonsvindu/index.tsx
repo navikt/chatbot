@@ -12,7 +12,7 @@ import {
     AlertstripeHeader,
     AlertstripeForklarendeTekst,
     AlertstripeSeksjon,
-    UthevetTekst
+    UthevetTekst,
 } from './styles';
 import Flervalg from '../Flervalg';
 import Knapp from '../Knapp';
@@ -93,7 +93,7 @@ export default class Interaksjonsvindu extends Component<
             evalueringsNokkel: '',
             feil: this.props.feil,
             sendt: false,
-            melding: ''
+            melding: '',
         };
 
         this.sendMelding = this.sendMelding.bind(this);
@@ -134,7 +134,7 @@ export default class Interaksjonsvindu extends Component<
                 );
             }
         }, 1000);
-        this.scrollTilBunn();
+        this.scrollTilBunn(false);
     }
 
     componentWillUnmount(): void {
@@ -153,7 +153,7 @@ export default class Interaksjonsvindu extends Component<
             const sisteBrukerSomSnakket = historie
                 .slice()
                 .reverse()
-                .find(_historie => _historie.role === 1);
+                .find((_historie) => _historie.role === 1);
             let sisteBrukerSomSnakketNick;
 
             if (sisteBrukerSomSnakket) {
@@ -275,7 +275,7 @@ export default class Interaksjonsvindu extends Component<
                                             : 'Jeg ønsker å lære av din opplevelse. I hvilken grad fikk du svar på det du lurte på?'}
                                     </AlertstripeForklarendeTekst>
                                     <Evaluering
-                                        evaluer={evaluering =>
+                                        evaluer={(evaluering) =>
                                             this.evaluer(evaluering)
                                         }
                                         baseUrl={this.props.baseUrl}
@@ -308,12 +308,12 @@ export default class Interaksjonsvindu extends Component<
                         {historieListe}
                     </Chatlog>
                     <Tekstomrade
-                        ref={el => (this.formRef = el)}
-                        onSubmit={e => this.sendMelding(e)}
+                        ref={(el) => (this.formRef = el)}
+                        onSubmit={(e) => this.sendMelding(e)}
                     >
                         <Tekstfelt
-                            onKeyDown={e => this.handleKeyDown(e)}
-                            onChange={e => this.handleChange(e)}
+                            onKeyDown={(e) => this.handleKeyDown(e)}
+                            onChange={(e) => this.handleChange(e)}
                             placeholder={'Skriv spørsmålet ditt'}
                             disabled={this.props.avsluttet}
                         />
@@ -352,13 +352,11 @@ export default class Interaksjonsvindu extends Component<
         ) {
             try {
                 await axios.post(
-                    `${this.props.baseUrl}/sessions/${
-                        this.props.config.sessionId
-                    }/messages`,
+                    `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/messages`,
                     {
                         nickName: 'Bruker',
                         content: this.state.melding.trim(),
-                        type: 'Message'
+                        type: 'Message',
                     }
                 );
                 this.props.hentHistorie();
@@ -366,7 +364,7 @@ export default class Interaksjonsvindu extends Component<
             } catch (e) {
                 console.error(e.response);
                 this.setState({
-                    feil: true
+                    feil: true,
                 });
             }
 
@@ -375,13 +373,13 @@ export default class Interaksjonsvindu extends Component<
                 this.setState(
                     {
                         sendt: true,
-                        melding: ''
+                        melding: '',
                     },
                     () => {
                         this.scrollTilBunn();
                         setTimeout(() => {
                             this.setState({
-                                sendt: false
+                                sendt: false,
                             });
                         }, 3000);
                     }
@@ -414,7 +412,7 @@ export default class Interaksjonsvindu extends Component<
                         />
                         <div
                             key={`scroll-el-${historie.id}`}
-                            ref={e => (this.scrollEl = e)}
+                            ref={(e) => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
                     </div>
@@ -432,7 +430,7 @@ export default class Interaksjonsvindu extends Component<
                         />
                         <div
                             key={`scroll-el-${historie.id}`}
-                            ref={e => (this.scrollEl = e)}
+                            ref={(e) => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
                     </div>
@@ -456,7 +454,7 @@ export default class Interaksjonsvindu extends Component<
                         />
                         <div
                             key={`scroll-el-${historie.id}`}
-                            ref={e => (this.scrollEl = e)}
+                            ref={(e) => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
                     </div>
@@ -477,25 +475,25 @@ export default class Interaksjonsvindu extends Component<
         }
     }
 
-    scrollTilBunn() {
+    scrollTilBunn(smooth = true) {
         if (this.scrollEl) {
-            this.scrollEl.scrollIntoView({ behavior: 'smooth' });
+            this.scrollEl.scrollIntoView({
+                behavior: smooth ? 'smooth' : undefined,
+            });
         }
     }
 
     async velg(messageId: number, valg: string) {
         await axios.post(
-            `${this.props.baseUrl}/sessions/${
-                this.props.config.sessionId
-            }/messages`,
+            `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/messages`,
             {
                 nickName: 'Bruker',
                 type: 'OptionResult',
                 content: {
                     messageId: messageId,
                     optionChoice: valg,
-                    cancelled: false
-                }
+                    cancelled: false,
+                },
             }
         );
         this.scrollTilBunn();
@@ -504,9 +502,7 @@ export default class Interaksjonsvindu extends Component<
     async opprettEvaluering() {
         if (!getCookie(chatStateKeys.EVAL)) {
             const evaluering = await axios.post(
-                `${this.props.baseUrl}/sessions/${
-                    this.props.config.sessionId
-                }/survey`,
+                `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/survey`,
                 {
                     nickName: 'Bruker',
                     surveyQuestion:
@@ -514,11 +510,11 @@ export default class Interaksjonsvindu extends Component<
                     surveyMaxScore: 5,
                     surveyMinScore: 1,
                     offerSurvey: true,
-                    queueKey: this.props.queueKey
+                    queueKey: this.props.queueKey,
                 }
             );
             this.setState({
-                evalueringsNokkel: evaluering.data
+                evalueringsNokkel: evaluering.data,
             });
         }
     }
@@ -527,9 +523,7 @@ export default class Interaksjonsvindu extends Component<
         if (!getCookie(chatStateKeys.EVAL)) {
             try {
                 await axios.post(
-                    `${this.props.baseUrl}/sessions/${
-                        this.props.config.sessionId
-                    }/survey`,
+                    `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/survey`,
                     {
                         nickName: 'Bruker',
                         surveyQuestion:
@@ -539,12 +533,12 @@ export default class Interaksjonsvindu extends Component<
                         offerSurvey: false,
                         queueKey: this.props.queueKey,
                         surveyResult: evaluering,
-                        parentSessionId: this.state.evalueringsNokkel
+                        parentSessionId: this.state.evalueringsNokkel,
                     } as SurveySend
                 );
             } catch (e) {
                 this.setState({
-                    feil: true
+                    feil: true,
                 });
             }
             setCookie(chatStateKeys.EVAL, evaluering);
@@ -559,7 +553,7 @@ export default class Interaksjonsvindu extends Component<
                     userId: 0,
                     type: 'Evaluation',
                     content: evaluering,
-                    showIndicator: false
+                    showIndicator: false,
                 },
                 true
             );
