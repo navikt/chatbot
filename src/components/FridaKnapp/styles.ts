@@ -29,8 +29,9 @@ export const FridaTekst = styled.span`
 
 export const FridaIkon = styled.span`
     position: relative;
+    top: calc((${ikonSizePx} - ${tekstHeightPx}) * -0.5);
     right: calc(${ikonSizePx} * 0.5);
-    margin-right: calc(-${ikonSizePx} * 0.5);
+    margin-right: calc(${ikonSizePx} * -0.5);
     width: ${ikonSizePx};
     height: ${ikonSizePx};
     border-radius: ${ikonSizePx};
@@ -48,7 +49,6 @@ export const FridaIkon = styled.span`
 
 export const FridaKnapp = styled.button`
     display: flex;
-    align-items: center;
     height: ${tekstHeightPx};
     cursor: pointer;
     background-color: transparent;
