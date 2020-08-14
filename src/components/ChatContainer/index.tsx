@@ -92,6 +92,7 @@ const loadHistoryCache = () => {
     return JSON.parse(historie);
 };
 
+// TODO: sett til 30 min for prod
 const sessionTimeoutMins = 3;
 
 const updateSessionExpires = (config: Config | undefined) => {
@@ -100,6 +101,12 @@ const updateSessionExpires = (config: Config | undefined) => {
         setCookie(chatStateKeys.CONFIG, config);
     }
 };
+
+const hasActiveSession = (config: Config | undefined) =>
+    config &&
+    moment().isBefore(
+        moment(config.lastActive).add(sessionTimeoutMins, 'minutes')
+    );
 
 export default class ChatContainer extends Component<
     ConnectionConfig,
@@ -121,13 +128,16 @@ export default class ChatContainer extends Component<
             .reverse()
             .find((_historie: any) => _historie.role === 1);
 
-        this.state = {
-            ...defaultState,
-            erApen: getCookie(chatStateKeys.APEN) || props.isOpen || false,
-            historie: historie,
-            config: getCookie(chatStateKeys.CONFIG),
-            sisteMeldingId: sisteMelding ? sisteMelding.id : 0,
-        };
+        this.state = hasActiveSession(getCookie(chatStateKeys.CONFIG))
+            ? {
+                  ...defaultState,
+                  erApen:
+                      getCookie(chatStateKeys.APEN) || props.isOpen || false,
+                  historie: historie,
+                  config: getCookie(chatStateKeys.CONFIG),
+                  sisteMeldingId: sisteMelding ? sisteMelding.id : 0,
+              }
+            : defaultState;
 
         this.start = this.start.bind(this);
         this.apne = this.apne.bind(this);
@@ -243,23 +253,13 @@ export default class ChatContainer extends Component<
 
     async start(tving: boolean = false, beholdApen: boolean = false) {
         try {
-            const shouldFetchConfig =
-                !this.state.config ||
-                moment().isAfter(
-                    moment(this.state.config.lastActive).add(
-                        sessionTimeoutMins,
-                        'minutes'
-                    )
-                ) ||
-                tving;
-
-            if (shouldFetchConfig) {
+            if (!hasActiveSession(this.state.config) || tving) {
                 await this.settTimerConfig();
                 await this.hentConfig();
                 await this.setState({
                     ...defaultState,
                     erApen: beholdApen,
-                    historie: [],
+                    historie: loadHistoryCache() || [],
                     config: getCookie(chatStateKeys.CONFIG),
                 });
             }
