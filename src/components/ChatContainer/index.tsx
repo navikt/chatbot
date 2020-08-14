@@ -92,6 +92,15 @@ const loadHistoryCache = () => {
     return JSON.parse(historie);
 };
 
+const sessionTimeoutMins = 3;
+
+const updateSessionExpires = (config: Config | undefined) => {
+    if (config) {
+        config.lastActive = moment().valueOf();
+        setCookie(chatStateKeys.CONFIG, config);
+    }
+};
+
 export default class ChatContainer extends Component<
     ConnectionConfig,
     ChatContainerState
@@ -234,13 +243,23 @@ export default class ChatContainer extends Component<
 
     async start(tving: boolean = false, beholdApen: boolean = false) {
         try {
-            if (!this.state.config || tving) {
+            const shouldFetchConfig =
+                !this.state.config ||
+                moment().isAfter(
+                    moment(this.state.config.lastActive).add(
+                        sessionTimeoutMins,
+                        'minutes'
+                    )
+                ) ||
+                tving;
+
+            if (shouldFetchConfig) {
                 await this.settTimerConfig();
                 await this.hentConfig();
                 await this.setState({
                     ...defaultState,
                     erApen: beholdApen,
-                    historie: loadHistoryCache() || [],
+                    historie: [],
                     config: getCookie(chatStateKeys.CONFIG),
                 });
             }
@@ -411,7 +430,7 @@ export default class ChatContainer extends Component<
             sessionId: `${this.props.customerKey}-${session.data.iqSessionId}`,
             sessionIdPure: session.data.iqSessionId,
             requestId: session.data.requestId,
-            alive: moment(new Date()).add(2, 'hours').valueOf(),
+            lastActive: moment().valueOf(),
         };
 
         setCookie(chatStateKeys.CONFIG, data);
@@ -574,6 +593,15 @@ export default class ChatContainer extends Component<
                 });
             }
         }
+
+        // Oppdater timeout hvis bruker skrev melding
+        if (
+            melding.role === 0 &&
+            moment(melding.sent).isAfter(this.state.config?.lastActive)
+        ) {
+            updateSessionExpires(this.state.config);
+        }
+
         this.skjulAlleIndikatorForBruker(melding.userId);
         this.leggTilIHistorie(melding, oppdater);
     }

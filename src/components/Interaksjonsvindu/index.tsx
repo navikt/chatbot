@@ -69,7 +69,7 @@ export interface Config {
     sessionId: string;
     sessionIdPure: string;
     requestId: number;
-    alive: number;
+    lastActive: number;
 }
 
 interface Tidigjen {
