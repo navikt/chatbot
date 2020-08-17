@@ -5,6 +5,7 @@ type Props = {
     onClick: () => void;
     navn: string;
     queueKey: string;
+    label?: string;
 };
 
 export const FridaKnappContainer = (props: Props) => {
@@ -15,7 +16,7 @@ export const FridaKnappContainer = (props: Props) => {
             lang={'no'}
             id={'chatbot-frida-knapp'}
         >
-            <FridaTekst>{'Chatbot Frida'}</FridaTekst>
+            <FridaTekst>{props.label || 'Chatbot Frida'}</FridaTekst>
             <FridaIkon queueKey={props.queueKey} />
         </FridaKnapp>
     );

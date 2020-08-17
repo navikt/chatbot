@@ -129,8 +129,7 @@ export default class ChatContainer extends Component<
         this.state = hasActiveSession(getCookie(chatStateKeys.CONFIG))
             ? {
                   ...defaultState,
-                  erApen:
-                      getCookie(chatStateKeys.APEN) || props.isOpen || false,
+                  erApen: getCookie(chatStateKeys.APEN) || false,
                   historie: historie,
                   config: getCookie(chatStateKeys.CONFIG),
                   sisteMeldingId: sisteMelding ? sisteMelding.id : 0,
@@ -173,7 +172,7 @@ export default class ChatContainer extends Component<
                 feil: true,
             });
         } else if (this.state.erApen) {
-            this.start(this.props.isOpen, true);
+            this.start(false, true);
         }
     }
 
@@ -202,6 +201,7 @@ export default class ChatContainer extends Component<
                         onClick={this.apne}
                         navn={this.state.navn || ''}
                         queueKey={this.props.queueKey}
+                        label={this.props.label}
                     />
                 )}
                 {this.state.erApen && (

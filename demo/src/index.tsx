@@ -17,6 +17,7 @@ class Demo extends Component {
                     customerKey='41155'
                     queueKey='Q_CHAT_BOT'
                     configId='599f9e7c-7f6b-4569-81a1-27202c419953'
+                    label={'Chat med NAV'}
                 />
             </Outer>
         );
