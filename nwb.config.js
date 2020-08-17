@@ -1,5 +1,3 @@
-const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
-
 module.exports = {
     type: 'react-component',
     npm: {
@@ -21,14 +19,13 @@ module.exports = {
             module: {
                 rules: [{ test: /\.ts|\.tsx$/, loader: 'ts-loader' }],
             },
-            plugins: [
-                new MomentLocalesPlugin({ localesToKeep: ['nb', 'nn', 'en'] }),
-            ],
             externals: {
                 'react-app-polyfill/ie11': 'commonjs2 react-app-polyfill/ie11',
                 'react-app-polyfill/stable':
                     'commonjs2 react-app-polyfill/stable',
                 'object-hash': 'commonjs2 object-hash',
+                moment: 'commonjs2 moment',
+                'styled-compoments': 'commonjs2 styled-compoments',
             },
         },
         rules: {
