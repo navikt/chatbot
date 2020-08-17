@@ -25,7 +25,6 @@ module.exports = {
                     'commonjs2 react-app-polyfill/stable',
                 'object-hash': 'commonjs2 object-hash',
                 moment: 'commonjs2 moment',
-                'styled-compoments': 'commonjs2 styled-compoments',
             },
         },
         rules: {
