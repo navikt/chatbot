@@ -5,11 +5,14 @@ module.exports = {
             global: 'NAVChatBot',
             externals: {
                 react: 'React',
+                moment: 'moment',
+                'react-app-polyfill/ie11': 'react-app-polyfill/ie11',
+                'react-app-polyfill/stable': 'react-app-polyfill/stable',
             },
         },
-        esModules: true,
+        cjs: false,
+        esModules: false,
     },
-    polyfill: true,
     webpack: {
         extra: {
             entry: './src/index',
@@ -19,19 +22,12 @@ module.exports = {
             module: {
                 rules: [{ test: /\.ts|\.tsx$/, loader: 'ts-loader' }],
             },
-            externals: {
-                'react-app-polyfill/ie11': 'commonjs2 react-app-polyfill/ie11',
-                'react-app-polyfill/stable':
-                    'commonjs2 react-app-polyfill/stable',
-                'object-hash': 'commonjs2 object-hash',
-                moment: 'commonjs2 moment',
-            },
         },
         rules: {
             svg: {
                 loader: 'svg-inline-loader?classPrefix',
             },
         },
-        copy: [{ from: './src/index.d.ts', to: './@navikt' }],
+        copy: [{ from: './src/index.d.ts', to: './' }],
     },
 };

@@ -1,28 +1,26 @@
 # Chatbot Frida
+
+## Bruk
+**Nytt fra v.1.3.0**<br>
+Chatbot Frida er nå implementert i [Nav-dekoratøren](https://github.com/navikt/nav-dekoratoren).
+Chatbot'en kan aktiveres i appene via et parameter til dekoratøren. Se dekoratørens readme for hvordan dette gjøres.
+Komponenten fra NPM-pakka skal ikke benyttes i apper som også benytter Nav-dekoratøren, da dette vil komme i konflikt med dekoratørens Chatbot.
+
 ## Installasjon
+Apper uten Nav-dekoratøren kan ta i bruk Chatbot med NPM-pakka. 
 ```sh
 npm i @navikt/nav-chatbot
 ```
-
-## Bruk
 ```javascript
 import NAVChatBot from '@navikt/nav-chatbot';
 
 <NAVChatBot
-    customerKey='xxxx'
-    queueKey='XXXX'
-    configId='xxxx-xxxx-xxxx-xxxx-xxxx'
-    evaluationMessage=''
+    customerKey='xxxx'                      // Nødvendig config-felt
+    queueKey='XXXX'                         // Nødvendig config-felt
+    configId='xxxx-xxxx-xxxx-xxxx-xxxx'     // Nødvendig config-felt
+    label=''                                // Setter tekst på Frida-ikonet (optional)
+    evaluationMessage=''                    // Setter tekst på tilbakemeldings-forespørsel (optional)
 />
-```
-> NAVChatBot har følgende props:
-```typescript
-interface ConnectionConfig {
-    queueKey: string;
-    customerKey: string;
-    configId: string;
-    evaluationMessage?: string;
-}
 ```
 
 ## Typescript
