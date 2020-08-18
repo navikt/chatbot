@@ -5,7 +5,7 @@ import Interaksjonsvindu, { Bruker, Config } from '../Interaksjonsvindu/index';
 import { Container } from './styles';
 import { ConnectionConfig } from '../../index';
 import axios, { AxiosResponse } from 'axios';
-import { deleteCookie, getCookie, setCookie } from '../../services/cookies';
+import { getCookie, setCookie } from '../../utils/cookies';
 import {
     ConfigurationResponse,
     Message,
@@ -13,11 +13,15 @@ import {
     SessionCreateResponse,
 } from '../../api/Sessions';
 import moment from 'moment';
-import md5 from 'md5';
-import { getStorageItem } from '../../services/sessionStorage';
-import { setStorageItem } from '../../services/sessionStorage';
-import { removeStorageItem } from '../../services/sessionStorage';
 import { FridaKnappContainer } from '../FridaKnapp';
+import {
+    chatStateKeys,
+    clearState,
+    hasActiveSession,
+    loadHistoryCache,
+    setHistoryCache,
+    updateLastActiveTime,
+} from '../../utils/stateUtils';
 
 export type ChatContainerState = {
     erApen: boolean;
@@ -61,51 +65,6 @@ export interface ShowIndicator {
 
 export interface MessageWithIndicator extends Message, ShowIndicator {}
 
-export const chatStateKeys = {
-    CONFIG: 'chatbot-frida_config',
-    HISTORIE: 'chatbot-frida_historie',
-    APEN: 'chatbot-frida_apen',
-    EVAL: 'chatbot-frida_eval',
-    MAILTIMEOUT: 'chatbot-frida_mail-timeout',
-};
-
-const clearState = () => {
-    Object.values(chatStateKeys).forEach(deleteCookie);
-    removeStorageItem(chatStateKeys.HISTORIE);
-};
-
-const setHistoryCache = (historie: MessageWithIndicator[]) => {
-    const jsonString = JSON.stringify(historie);
-    setStorageItem(chatStateKeys.HISTORIE, jsonString);
-    setCookie(chatStateKeys.HISTORIE, md5(jsonString));
-};
-
-const loadHistoryCache = () => {
-    const historie = getStorageItem(chatStateKeys.HISTORIE);
-    if (!historie) {
-        return null;
-    }
-    const historieHash = md5(historie);
-    if (historieHash !== getCookie(chatStateKeys.HISTORIE)) {
-        return null;
-    }
-    return JSON.parse(historie);
-};
-
-// TODO: sett til 30 min for prod
-const sessionTimeoutMins = 3;
-
-const updateSessionExpires = (config: Config) => {
-    config.lastActive = moment().valueOf();
-    setCookie(chatStateKeys.CONFIG, config);
-};
-
-const hasActiveSession = (config: Config | undefined) =>
-    config &&
-    moment().isBefore(
-        moment(config.lastActive).add(sessionTimeoutMins, 'minutes')
-    );
-
 export default class ChatContainer extends Component<
     ConnectionConfig,
     ChatContainerState
@@ -125,13 +84,14 @@ export default class ChatContainer extends Component<
             .slice()
             .reverse()
             .find((_historie: any) => _historie.role === 1);
+        const config = getCookie(chatStateKeys.CONFIG);
 
-        this.state = hasActiveSession(getCookie(chatStateKeys.CONFIG))
+        this.state = hasActiveSession(config)
             ? {
                   ...defaultState,
                   erApen: getCookie(chatStateKeys.APEN) || false,
                   historie: historie,
-                  config: getCookie(chatStateKeys.CONFIG),
+                  config: config,
                   sisteMeldingId: sisteMelding ? sisteMelding.id : 0,
               }
             : defaultState;
@@ -592,13 +552,13 @@ export default class ChatContainer extends Component<
             }
         }
 
-        // Oppdater timeout hvis bruker skrev melding
+        // Refresh timeout hvis bruker skrev melding
         if (
             this.state.config &&
             melding.role === 0 &&
             moment(melding.sent).isAfter(this.state.config?.lastActive)
         ) {
-            updateSessionExpires(this.state.config);
+            updateLastActiveTime(this.state.config);
         }
 
         this.skjulAlleIndikatorForBruker(melding.userId);

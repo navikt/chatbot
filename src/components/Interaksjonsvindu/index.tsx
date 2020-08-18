@@ -19,12 +19,13 @@ import Knapp from '../Knapp';
 import Alertstripe from '../Alertstripe';
 import { ConnectionConfig } from '../../index';
 import Evaluering from '../Evaluering';
-import { getCookie, setCookie } from '../../services/cookies';
+import { getCookie, setCookie } from '../../utils/cookies';
 import { Message, SurveySend } from '../../api/Sessions';
-import { MessageWithIndicator, chatStateKeys } from '../ChatContainer';
+import { MessageWithIndicator } from '../ChatContainer';
 import EmailFeedback from '../EmailFeedback';
 import moment from 'moment';
 import Bekreftelsesboks from '../Bekreftelsesboks';
+import { chatStateKeys } from '../../utils/stateUtils';
 
 export interface Bruker {
     userId: number;

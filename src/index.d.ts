@@ -333,6 +333,29 @@ declare module 'src/services/cookies' {
 	export { setCookie, getCookie, deleteCookie };
 
 }
+declare module 'src/services/sessionStorage' {
+	export const setStorageItem: (key: string, value: string) => void;
+	export const getStorageItem: (key: string) => string | null;
+	export const removeStorageItem: (key: string) => void;
+
+}
+declare module 'src/services/stateUtils' {
+	import { Config } from 'src/components/Interaksjonsvindu';
+	import { MessageWithIndicator } from 'src/components/ChatContainer';
+	export const chatStateKeys: {
+	    CONFIG: string;
+	    HISTORIE: string;
+	    APEN: string;
+	    EVAL: string;
+	    MAILTIMEOUT: string;
+	};
+	export const clearState: () => void;
+	export const setHistoryCache: (historie: MessageWithIndicator[]) => void;
+	export const loadHistoryCache: () => any;
+	export const updateLastActiveTime: (config: Config) => void;
+	export const hasActiveSession: (config: Config | undefined) => boolean | undefined;
+
+}
 declare module 'src/components/Evaluering/index' {
 	import { Component } from 'react'; type EvalueringProps = {
 	    evaluer: (evaluering: number) => void;
@@ -469,12 +492,6 @@ declare module 'src/tema/mediaqueries' {
 	export const liten: string;
 
 }
-declare module 'src/services/sessionStorage' {
-	export const setStorageItem: (key: string, value: string) => void;
-	export const getStorageItem: (key: string) => string | null;
-	export const removeStorageItem: (key: string) => void;
-
-}
 declare module 'src/components/FridaKnapp/index' {
 	 type Props = {
 	    onClick: () => void;
@@ -515,13 +532,6 @@ declare module 'src/components/ChatContainer/index' {
 	}
 	export interface MessageWithIndicator extends Message, ShowIndicator {
 	}
-	export const chatStateKeys: {
-	    CONFIG: string;
-	    HISTORIE: string;
-	    APEN: string;
-	    EVAL: string;
-	    MAILTIMEOUT: string;
-	};
 	export default class ChatContainer extends Component<ConnectionConfig, ChatContainerState> {
 	    baseUrl: string;
 	    skriveindikatorTid: number;

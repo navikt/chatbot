@@ -5,8 +5,8 @@ import rating2 from '../../assets/rating-2.svg';
 import rating3 from '../../assets/rating-3.svg';
 import rating4 from '../../assets/rating-4.svg';
 import rating5 from '../../assets/rating-5.svg';
-import { getCookie } from '../../services/cookies';
-import { chatStateKeys } from '../ChatContainer';
+import { getCookie } from '../../utils/cookies';
+import { chatStateKeys } from '../../utils/stateUtils';
 
 type EvalueringProps = {
     evaluer: (evaluering: number) => void;
@@ -30,7 +30,7 @@ export default class Evaluering extends Component<
         super(props);
         this.state = {
             valgt: !!getCookie(chatStateKeys.EVAL),
-            valgtSvar: getCookie(chatStateKeys.EVAL)
+            valgtSvar: getCookie(chatStateKeys.EVAL),
         };
     }
 
@@ -39,7 +39,7 @@ export default class Evaluering extends Component<
             if (!this.state.valgt && !this.state.valgtSvar) {
                 this.setState({
                     valgt: !!getCookie(chatStateKeys.EVAL),
-                    valgtSvar: getCookie(chatStateKeys.EVAL)
+                    valgtSvar: getCookie(chatStateKeys.EVAL),
                 });
             }
         }, 100);
