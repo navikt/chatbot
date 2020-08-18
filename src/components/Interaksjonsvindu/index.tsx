@@ -12,19 +12,20 @@ import {
     AlertstripeHeader,
     AlertstripeForklarendeTekst,
     AlertstripeSeksjon,
-    UthevetTekst
+    UthevetTekst,
 } from './styles';
 import Flervalg from '../Flervalg';
 import Knapp from '../Knapp';
 import Alertstripe from '../Alertstripe';
 import { ConnectionConfig } from '../../index';
 import Evaluering from '../Evaluering';
-import { loadJSON, saveJSON } from '../../services/localStorageService';
+import { getCookie, setCookie } from '../../utils/cookies';
 import { Message, SurveySend } from '../../api/Sessions';
-import { MessageWithIndicator, localStorageKeys } from '../ChatContainer/index';
+import { MessageWithIndicator } from '../ChatContainer';
 import EmailFeedback from '../EmailFeedback';
 import moment from 'moment';
 import Bekreftelsesboks from '../Bekreftelsesboks';
+import { chatStateKeys } from '../../utils/stateUtils';
 
 export interface Bruker {
     userId: number;
@@ -69,7 +70,7 @@ export interface Config {
     sessionId: string;
     sessionIdPure: string;
     requestId: number;
-    alive: number;
+    lastActive: number;
 }
 
 interface Tidigjen {
@@ -93,7 +94,7 @@ export default class Interaksjonsvindu extends Component<
             evalueringsNokkel: '',
             feil: this.props.feil,
             sendt: false,
-            melding: ''
+            melding: '',
         };
 
         this.sendMelding = this.sendMelding.bind(this);
@@ -114,27 +115,27 @@ export default class Interaksjonsvindu extends Component<
                     {
                         tidIgjen: {
                             formatert: moment().to(
-                                loadJSON(localStorageKeys.MAILTIMEOUT),
+                                getCookie(chatStateKeys.MAILTIMEOUT),
                                 true
                             ),
                             tid: moment(
-                                loadJSON(localStorageKeys.MAILTIMEOUT)
-                            ).diff(moment())
-                        }
+                                getCookie(chatStateKeys.MAILTIMEOUT)
+                            ).diff(moment()),
+                        },
                     },
                     () => {
                         if (
                             this.state.tidIgjen &&
                             this.state.tidIgjen.tid <= 0
                         ) {
-                            saveJSON(localStorageKeys.APEN, false);
+                            setCookie(chatStateKeys.APEN, false);
                             this.props.lukkOgAvslutt();
                         }
                     }
                 );
             }
         }, 1000);
-        this.scrollTilBunn();
+        this.scrollTilBunn(false);
     }
 
     componentWillUnmount(): void {
@@ -153,13 +154,13 @@ export default class Interaksjonsvindu extends Component<
             const sisteBrukerSomSnakket = historie
                 .slice()
                 .reverse()
-                .find(_historie => _historie.role === 1);
+                .find((_historie) => _historie.role === 1);
             let sisteBrukerSomSnakketNick;
 
             if (sisteBrukerSomSnakket) {
                 sisteBrukerSomSnakketNick = sisteBrukerSomSnakket.nickName;
             }
-            let historieListe = historie.map(
+            const historieListe = historie.map(
                 (historieItem: MessageWithIndicator, index: number) => {
                     const sistehistorie: Message =
                         this.props.historie[index - 1] &&
@@ -268,14 +269,14 @@ export default class Interaksjonsvindu extends Component<
                                         Tilbakemelding
                                     </AlertstripeHeader>
                                     <AlertstripeForklarendeTekst>
-                                        {loadJSON(localStorageKeys.EVAL)
+                                        {getCookie(chatStateKeys.EVAL)
                                             ? 'Takk for din tilbakemelding!'
                                             : this.props.evaluationMessage
                                             ? this.props.evaluationMessage
                                             : 'Jeg ønsker å lære av din opplevelse. I hvilken grad fikk du svar på det du lurte på?'}
                                     </AlertstripeForklarendeTekst>
                                     <Evaluering
-                                        evaluer={evaluering =>
+                                        evaluer={(evaluering) =>
                                             this.evaluer(evaluering)
                                         }
                                         baseUrl={this.props.baseUrl}
@@ -308,12 +309,12 @@ export default class Interaksjonsvindu extends Component<
                         {historieListe}
                     </Chatlog>
                     <Tekstomrade
-                        ref={el => (this.formRef = el)}
-                        onSubmit={e => this.sendMelding(e)}
+                        ref={(el) => (this.formRef = el)}
+                        onSubmit={(e) => this.sendMelding(e)}
                     >
                         <Tekstfelt
-                            onKeyDown={e => this.handleKeyDown(e)}
-                            onChange={e => this.handleChange(e)}
+                            onKeyDown={(e) => this.handleKeyDown(e)}
+                            onChange={(e) => this.handleChange(e)}
                             placeholder={'Skriv spørsmålet ditt'}
                             disabled={this.props.avsluttet}
                         />
@@ -352,13 +353,11 @@ export default class Interaksjonsvindu extends Component<
         ) {
             try {
                 await axios.post(
-                    `${this.props.baseUrl}/sessions/${
-                        this.props.config.sessionId
-                    }/messages`,
+                    `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/messages`,
                     {
                         nickName: 'Bruker',
                         content: this.state.melding.trim(),
-                        type: 'Message'
+                        type: 'Message',
                     }
                 );
                 this.props.hentHistorie();
@@ -366,7 +365,7 @@ export default class Interaksjonsvindu extends Component<
             } catch (e) {
                 console.error(e.response);
                 this.setState({
-                    feil: true
+                    feil: true,
                 });
             }
 
@@ -375,13 +374,13 @@ export default class Interaksjonsvindu extends Component<
                 this.setState(
                     {
                         sendt: true,
-                        melding: ''
+                        melding: '',
                     },
                     () => {
                         this.scrollTilBunn();
                         setTimeout(() => {
                             this.setState({
-                                sendt: false
+                                sendt: false,
                             });
                         }, 3000);
                     }
@@ -414,7 +413,7 @@ export default class Interaksjonsvindu extends Component<
                         />
                         <div
                             key={`scroll-el-${historie.id}`}
-                            ref={e => (this.scrollEl = e)}
+                            ref={(e) => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
                     </div>
@@ -432,7 +431,7 @@ export default class Interaksjonsvindu extends Component<
                         />
                         <div
                             key={`scroll-el-${historie.id}`}
-                            ref={e => (this.scrollEl = e)}
+                            ref={(e) => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
                     </div>
@@ -456,7 +455,7 @@ export default class Interaksjonsvindu extends Component<
                         />
                         <div
                             key={`scroll-el-${historie.id}`}
-                            ref={e => (this.scrollEl = e)}
+                            ref={(e) => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
                     </div>
@@ -477,36 +476,34 @@ export default class Interaksjonsvindu extends Component<
         }
     }
 
-    scrollTilBunn() {
+    scrollTilBunn(smooth = true) {
         if (this.scrollEl) {
-            this.scrollEl.scrollIntoView({ behavior: 'smooth' });
+            this.scrollEl.scrollIntoView({
+                behavior: smooth ? 'smooth' : undefined,
+            });
         }
     }
 
     async velg(messageId: number, valg: string) {
         await axios.post(
-            `${this.props.baseUrl}/sessions/${
-                this.props.config.sessionId
-            }/messages`,
+            `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/messages`,
             {
                 nickName: 'Bruker',
                 type: 'OptionResult',
                 content: {
                     messageId: messageId,
                     optionChoice: valg,
-                    cancelled: false
-                }
+                    cancelled: false,
+                },
             }
         );
         this.scrollTilBunn();
     }
 
     async opprettEvaluering() {
-        if (!loadJSON(localStorageKeys.EVAL)) {
+        if (!getCookie(chatStateKeys.EVAL)) {
             const evaluering = await axios.post(
-                `${this.props.baseUrl}/sessions/${
-                    this.props.config.sessionId
-                }/survey`,
+                `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/survey`,
                 {
                     nickName: 'Bruker',
                     surveyQuestion:
@@ -514,22 +511,20 @@ export default class Interaksjonsvindu extends Component<
                     surveyMaxScore: 5,
                     surveyMinScore: 1,
                     offerSurvey: true,
-                    queueKey: this.props.queueKey
+                    queueKey: this.props.queueKey,
                 }
             );
             this.setState({
-                evalueringsNokkel: evaluering.data
+                evalueringsNokkel: evaluering.data,
             });
         }
     }
 
     async evaluer(evaluering: number) {
-        if (!loadJSON(localStorageKeys.EVAL)) {
+        if (!getCookie(chatStateKeys.EVAL)) {
             try {
                 await axios.post(
-                    `${this.props.baseUrl}/sessions/${
-                        this.props.config.sessionId
-                    }/survey`,
+                    `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/survey`,
                     {
                         nickName: 'Bruker',
                         surveyQuestion:
@@ -539,15 +534,15 @@ export default class Interaksjonsvindu extends Component<
                         offerSurvey: false,
                         queueKey: this.props.queueKey,
                         surveyResult: evaluering,
-                        parentSessionId: this.state.evalueringsNokkel
+                        parentSessionId: this.state.evalueringsNokkel,
                     } as SurveySend
                 );
             } catch (e) {
                 this.setState({
-                    feil: true
+                    feil: true,
                 });
             }
-            saveJSON(localStorageKeys.EVAL, evaluering);
+            setCookie(chatStateKeys.EVAL, evaluering);
             const max = Number.MAX_SAFE_INTEGER - 1000;
             const min = Number.MAX_SAFE_INTEGER - 100000;
             this.props.handterMelding(
@@ -559,7 +554,7 @@ export default class Interaksjonsvindu extends Component<
                     userId: 0,
                     type: 'Evaluation',
                     content: evaluering,
-                    showIndicator: false
+                    showIndicator: false,
                 },
                 true
             );

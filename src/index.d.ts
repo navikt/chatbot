@@ -328,9 +328,32 @@ declare module 'src/components/Alertstripe/index' {
 	}
 
 }
-declare module 'src/services/localStorageService' {
-	 const saveJSON: (key: string, data: any) => void; const loadJSON: (key: string) => any; const deleteJSON: (key: string) => void;
-	export { saveJSON, loadJSON, deleteJSON };
+declare module 'src/services/cookies' {
+	 const setCookie: (key: string, data: any | any[]) => void; const getCookie: (key: string) => any | any[] | null; const deleteCookie: (key: string) => void;
+	export { setCookie, getCookie, deleteCookie };
+
+}
+declare module 'src/services/sessionStorage' {
+	export const setStorageItem: (key: string, value: string) => void;
+	export const getStorageItem: (key: string) => string | null;
+	export const removeStorageItem: (key: string) => void;
+
+}
+declare module 'src/services/stateUtils' {
+	import { Config } from 'src/components/Interaksjonsvindu';
+	import { MessageWithIndicator } from 'src/components/ChatContainer';
+	export const chatStateKeys: {
+	    CONFIG: string;
+	    HISTORIE: string;
+	    APEN: string;
+	    EVAL: string;
+	    MAILTIMEOUT: string;
+	};
+	export const clearState: () => void;
+	export const setHistoryCache: (historie: MessageWithIndicator[]) => void;
+	export const loadHistoryCache: () => any;
+	export const updateLastActiveTime: (config: Config) => void;
+	export const hasActiveSession: (config: Config | undefined) => boolean | undefined;
 
 }
 declare module 'src/components/Evaluering/index' {
@@ -395,7 +418,7 @@ declare module 'src/components/Bekreftelsesboks/index' {
 declare module 'src/components/Interaksjonsvindu/index' {
 	import React, { ChangeEvent, Component, FormEvent } from 'react';
 	import { ConnectionConfig } from 'src/index';
-	import { MessageWithIndicator } from 'src/components/ChatContainer/index';
+	import { MessageWithIndicator } from 'src/components/ChatContainer';
 	export interface Bruker {
 	    userId: number;
 	    avatarUrl: string;
@@ -435,7 +458,7 @@ declare module 'src/components/Interaksjonsvindu/index' {
 	    sessionId: string;
 	    sessionIdPure: string;
 	    requestId: number;
-	    alive: number;
+	    lastActive: number;
 	}
 	interface Tidigjen {
 	    formatert: string;
@@ -455,7 +478,7 @@ declare module 'src/components/Interaksjonsvindu/index' {
 	    lastHistorie(historie: MessageWithIndicator, forrigeHistorieBrukerId: number | null): JSX.Element | undefined;
 	    handleChange(e: ChangeEvent<HTMLTextAreaElement>): void;
 	    handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>): void;
-	    scrollTilBunn(): void;
+	    scrollTilBunn(smooth?: boolean): void;
 	    velg(messageId: number, valg: string): Promise<void>;
 	    opprettEvaluering(): Promise<void>;
 	    evaluer(evaluering: number): Promise<void>;
@@ -466,7 +489,18 @@ declare module 'src/components/Interaksjonsvindu/index' {
 
 }
 declare module 'src/tema/mediaqueries' {
-	export const liten = "@media (max-width: 767px), (max-height: 568px)";
+	export const liten: string;
+
+}
+declare module 'src/components/FridaKnapp/index' {
+	 type Props = {
+	    onClick: () => void;
+	    navn: string;
+	    queueKey: string;
+	    label?: string;
+	};
+	export const FridaKnappContainer: (props: Props) => JSX.Element;
+	export {};
 
 }
 declare module 'src/components/ChatContainer/index' {
@@ -497,13 +531,6 @@ declare module 'src/components/ChatContainer/index' {
 	    showIndicator: boolean;
 	}
 	export interface MessageWithIndicator extends Message, ShowIndicator {
-	}
-	export enum localStorageKeys {
-	    CONFIG = "chatbot-frida_config",
-	    HISTORIE = "chatbot-frida_historie",
-	    APEN = "chatbot-frida_apen",
-	    EVAL = "chatbot-frida_eval",
-	    MAILTIMEOUT = "chatbot-frida_mail-timeout"
 	}
 	export default class ChatContainer extends Component<ConnectionConfig, ChatContainerState> {
 	    baseUrl: string;
@@ -548,10 +575,10 @@ declare module 'src/index' {
 	    queueKey: string;
 	    customerKey: string;
 	    configId: string;
+	    label?: string;
 	    evaluationMessage?: string;
 	};
 	export default class Chat extends Component<ConnectionConfig, {}> {
-	    constructor(props: ConnectionConfig);
 	    render(): JSX.Element;
 	}
 

@@ -2,17 +2,26 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import ToppBar from '../ToppBar';
 import Interaksjonsvindu, { Bruker, Config } from '../Interaksjonsvindu/index';
-import { Container, FridaKnapp } from './styles';
+import { Container } from './styles';
 import { ConnectionConfig } from '../../index';
 import axios, { AxiosResponse } from 'axios';
-import { loadJSON, saveJSON } from '../../services/localStorageService';
+import { getCookie, setCookie } from '../../utils/cookies';
 import {
     ConfigurationResponse,
     Message,
     SessionCreate,
-    SessionCreateResponse
+    SessionCreateResponse,
 } from '../../api/Sessions';
 import moment from 'moment';
+import { FridaKnappContainer } from '../FridaKnapp';
+import {
+    chatStateKeys,
+    clearState,
+    hasActiveSession,
+    loadHistoryCache,
+    setHistoryCache,
+    updateLastActiveTime,
+} from '../../utils/stateUtils';
 
 export type ChatContainerState = {
     erApen: boolean;
@@ -47,7 +56,7 @@ const defaultState: ChatContainerState = {
     hentHistorie: true,
     visBekreftelse: undefined,
     lastHref: '',
-    feil: false
+    feil: false,
 };
 
 export interface ShowIndicator {
@@ -55,14 +64,6 @@ export interface ShowIndicator {
 }
 
 export interface MessageWithIndicator extends Message, ShowIndicator {}
-
-export enum localStorageKeys {
-    CONFIG = 'chatbot-frida_config',
-    HISTORIE = 'chatbot-frida_historie',
-    APEN = 'chatbot-frida_apen',
-    EVAL = 'chatbot-frida_eval',
-    MAILTIMEOUT = 'chatbot-frida_mail-timeout'
-}
 
 export default class ChatContainer extends Component<
     ConnectionConfig,
@@ -78,23 +79,22 @@ export default class ChatContainer extends Component<
 
     constructor(props: ConnectionConfig) {
         super(props);
-        this.state = {
-            ...defaultState,
-            erApen: loadJSON(localStorageKeys.APEN) || false,
-            historie: loadJSON(localStorageKeys.HISTORIE) || [],
-            config: loadJSON(localStorageKeys.CONFIG),
-            sisteMeldingId: loadJSON(localStorageKeys.HISTORIE)
-                ? loadJSON(localStorageKeys.HISTORIE)
-                      .slice()
-                      .reverse()
-                      .find((_historie: any) => _historie.role === 1)
-                    ? loadJSON(localStorageKeys.HISTORIE)
-                          .slice()
-                          .reverse()
-                          .find((_historie: any) => _historie.role === 1).id
-                    : 0
-                : 0
-        };
+        const historie = loadHistoryCache() || [];
+        const sisteMelding = historie
+            .slice()
+            .reverse()
+            .find((_historie: any) => _historie.role === 1);
+        const config = getCookie(chatStateKeys.CONFIG);
+
+        this.state = hasActiveSession(config)
+            ? {
+                  ...defaultState,
+                  erApen: getCookie(chatStateKeys.APEN) || false,
+                  historie: historie,
+                  config: config,
+                  sisteMeldingId: sisteMelding ? sisteMelding.id : 0,
+              }
+            : defaultState;
 
         this.start = this.start.bind(this);
         this.apne = this.apne.bind(this);
@@ -129,10 +129,10 @@ export default class ChatContainer extends Component<
                 'Mangler påkrevd parameter. Husk å ta med: customerKey, queueKey og configId.'
             );
             this.setState({
-                feil: true
+                feil: true,
             });
         } else if (this.state.erApen) {
-            this.start();
+            this.start(false, true);
         }
     }
 
@@ -147,7 +147,6 @@ export default class ChatContainer extends Component<
         return (
             <Container
                 erApen={this.state.erApen}
-                queueKey={this.props.queueKey}
                 tabIndex={this.state.erApen ? 0 : -1}
                 aria-label={
                     this.state.erApen
@@ -158,15 +157,11 @@ export default class ChatContainer extends Component<
                 role={this.state.erApen ? 'dialog' : undefined}
             >
                 {!this.state.erApen && (
-                    <FridaKnapp
+                    <FridaKnappContainer
                         onClick={this.apne}
-                        tabIndex={this.state.erApen ? -1 : 0}
-                        aria-label={
-                            this.state.erApen
-                                ? undefined
-                                : `Samtalevindu: ${this.state.navn}`
-                        }
-                        lang={this.state.erApen ? undefined : 'no'}
+                        navn={this.state.navn || ''}
+                        queueKey={this.props.queueKey}
+                        label={this.props.label}
                     />
                 )}
                 {this.state.erApen && (
@@ -216,15 +211,19 @@ export default class ChatContainer extends Component<
 
     async start(tving: boolean = false, beholdApen: boolean = false) {
         try {
-            if (!this.state.config || tving) {
+            if (!hasActiveSession(this.state.config) || tving) {
                 await this.settTimerConfig();
                 await this.hentConfig();
                 await this.setState({
                     ...defaultState,
                     erApen: beholdApen,
-                    historie: loadJSON(localStorageKeys.HISTORIE) || [],
-                    config: loadJSON(localStorageKeys.CONFIG)
+                    historie: [],
+                    config: getCookie(chatStateKeys.CONFIG),
                 });
+            }
+
+            if (beholdApen) {
+                setCookie(chatStateKeys.APEN, true);
             }
 
             if (!this.state.feil && this.state.erApen) {
@@ -233,34 +232,34 @@ export default class ChatContainer extends Component<
                 if (this.state.historie && this.state.historie.length < 1) {
                     // Henter full historie fra API
                     try {
-                        let historie = await this.hentFullHistorie();
+                        const historie = await this.hentFullHistorie();
                         if (historie) {
-                            let data: any[] = historie.data;
+                            const data: any[] = historie.data;
                             if (data.length > 0) {
-                                for (let historie of data) {
+                                for (const historie of data) {
                                     this.handterMelding(historie, true);
                                 }
                             }
                             this.setState({
-                                erApen: beholdApen
+                                erApen: beholdApen,
                             });
                         }
                     } catch (e) {
                         console.error(e);
                         this.setState({
-                            feil: true
+                            feil: true,
                         });
                     }
                 } else {
-                    // Har hentet historie fra localStorage
-                    for (let historie of this.state.historie) {
+                    // Har hentet historie fra cache
+                    for (const historie of this.state.historie) {
                         this.handterMelding({
                             ...historie,
-                            showIndicator: false
+                            showIndicator: false,
                         });
                     }
                     this.setState({
-                        erApen: true
+                        erApen: true,
                     });
                 }
 
@@ -280,27 +279,27 @@ export default class ChatContainer extends Component<
         } catch (e) {
             console.error(e);
             this.setState({
-                feil: true
+                feil: true,
             });
         }
     }
 
     async apne() {
-        saveJSON(localStorageKeys.APEN, true);
+        setCookie(chatStateKeys.APEN, true);
         await this.setState({
-            erApen: true
+            erApen: true,
         });
         this.start(false, true);
     }
 
     async lukk() {
         await this.setState({ erApen: false });
-        saveJSON(localStorageKeys.APEN, false);
+        setCookie(chatStateKeys.APEN, false);
     }
 
     omstart() {
         this.setState({
-            visBekreftelse: 'OMSTART'
+            visBekreftelse: 'OMSTART',
         });
     }
 
@@ -309,10 +308,9 @@ export default class ChatContainer extends Component<
         clearInterval(this.hentHistorieIntervall);
         clearInterval(this.lesIkkeLastethistorieIntervall);
         clearInterval(this.leggTilLenkeHandlerIntervall);
-        const apen = loadJSON(localStorageKeys.APEN) == true;
-        sessionStorage.clear();
-        localStorage.clear();
-        saveJSON(localStorageKeys.APEN, apen);
+        const apen = getCookie(chatStateKeys.APEN) === true;
+        clearState();
+        setCookie(chatStateKeys.APEN, apen);
         this.start(true, apen);
     }
 
@@ -327,7 +325,7 @@ export default class ChatContainer extends Component<
             if (!this.state.avsluttet) {
                 if (this.state.config) {
                     await this.setState({
-                        visBekreftelse: 'AVSLUTT'
+                        visBekreftelse: 'AVSLUTT',
                     });
                 }
             } else {
@@ -350,12 +348,10 @@ export default class ChatContainer extends Component<
                 this.state.config!.requestId
             }`
         );
-        if (!loadJSON(localStorageKeys.MAILTIMEOUT)) {
-            saveJSON(
-                localStorageKeys.MAILTIMEOUT,
-                moment()
-                    .add(4.5, 'm')
-                    .valueOf()
+        if (!getCookie(chatStateKeys.MAILTIMEOUT)) {
+            setCookie(
+                chatStateKeys.MAILTIMEOUT,
+                moment().add(4.5, 'm').valueOf()
             );
         }
         this.confirmCancel();
@@ -363,16 +359,15 @@ export default class ChatContainer extends Component<
 
     confirmCancel() {
         this.setState({
-            visBekreftelse: undefined
+            visBekreftelse: undefined,
         });
     }
 
     lukkOgAvslutt() {
-        localStorage.clear();
-        sessionStorage.clear();
+        clearState();
         this.setState({
             ...defaultState,
-            erApen: false
+            erApen: false,
         });
     }
 
@@ -385,22 +380,20 @@ export default class ChatContainer extends Component<
             languageCode: 'NO',
             denyArchiving: false,
             intro: {
-                variables: this.config['variables'] || undefined
-            }
+                variables: this.config['variables'] || undefined,
+            },
         } as SessionCreate);
 
-        let data: Config = {
+        const data: Config = {
             sessionId: `${this.props.customerKey}-${session.data.iqSessionId}`,
             sessionIdPure: session.data.iqSessionId,
             requestId: session.data.requestId,
-            alive: moment(new Date())
-                .add(2, 'hours')
-                .valueOf()
+            lastActive: moment().valueOf(),
         };
 
-        saveJSON(localStorageKeys.CONFIG, data);
+        setCookie(chatStateKeys.CONFIG, data);
         this.setState({
-            config: data
+            config: data,
         });
         return session;
     }
@@ -408,9 +401,7 @@ export default class ChatContainer extends Component<
     hentFullHistorie() {
         if (this.state.config) {
             return axios.get(
-                `${this.baseUrl}/sessions/${
-                    this.state.config.sessionId
-                }/messages/0`
+                `${this.baseUrl}/sessions/${this.state.config.sessionId}/messages/0`
             );
         } else {
             return undefined;
@@ -425,24 +416,22 @@ export default class ChatContainer extends Component<
         ) {
             try {
                 const res = await axios.get(
-                    `${this.baseUrl}/sessions/${
-                        this.state.config.sessionId
-                    }/messages/${this.state.sisteMeldingId}`
+                    `${this.baseUrl}/sessions/${this.state.config.sessionId}/messages/${this.state.sisteMeldingId}`
                 );
                 const data: Message[] = res.data;
 
                 if (data && data.length > 0) {
-                    for (let historie of data) {
-                        let showIndicator = historie.content === 'TYPE_MSG';
-                        let historieMedIndikator: MessageWithIndicator = {
+                    for (const historie of data) {
+                        const showIndicator = historie.content === 'TYPE_MSG';
+                        const historieMedIndikator: MessageWithIndicator = {
                             ...historie,
-                            showIndicator: showIndicator
+                            showIndicator: showIndicator,
                         };
                         this.setState({
                             ikkeLastethistorie: [
                                 ...this.state.ikkeLastethistorie,
-                                historieMedIndikator
-                            ]
+                                historieMedIndikator,
+                            ],
                         });
                     }
                     let fantId = false;
@@ -451,17 +440,17 @@ export default class ChatContainer extends Component<
                         if (data[data.length - sisteId]) {
                             fantId = true;
                             this.setState({
-                                sisteMeldingId: data[data.length - sisteId].id
+                                sisteMeldingId: data[data.length - sisteId].id,
                             });
                         } else {
                             sisteId++;
                         }
                     }
                 } else {
-                    for (let historie of data) {
-                        let historieMedIndikator: MessageWithIndicator = {
+                    for (const historie of data) {
+                        const historieMedIndikator: MessageWithIndicator = {
                             ...historie,
-                            showIndicator: false
+                            showIndicator: false,
                         };
                         this.handterMelding(historieMedIndikator, true);
                     }
@@ -473,7 +462,7 @@ export default class ChatContainer extends Component<
                         avsluttet:
                             e.response && e.response.status === 404
                                 ? true
-                                : state.avsluttet
+                                : state.avsluttet,
                     };
                 });
             }
@@ -494,25 +483,25 @@ export default class ChatContainer extends Component<
                         nickName: melding.nickName,
                         role: melding.role,
                         userType: melding.content.userType,
-                        aktiv: true
+                        aktiv: true,
                     });
                     return {
-                        brukere
+                        brukere,
                     };
                 });
             }
             if (melding.content.userType === 'Human') {
                 this.setState({
-                    iKo: false
+                    iKo: false,
                 });
             }
         } else if (melding.type === 'Option') {
             for (let i = 0; i < melding.content.length; i++) {
-                let m = melding.content[i];
+                const m = melding.content[i];
                 if (typeof m === 'string') {
                     melding.content[i] = {
                         tekst: m,
-                        valgt: false
+                        valgt: false,
                     };
                 }
             }
@@ -530,14 +519,14 @@ export default class ChatContainer extends Component<
             if (melding.content === 'USER_DISCONNECTED') {
                 this.setState(
                     (state: ChatContainerState) => {
-                        const brukere = state.brukere.map(bruker => {
+                        const brukere = state.brukere.map((bruker) => {
                             if (bruker.userId === melding.userId) {
                                 bruker.aktiv = false;
                             }
                             return bruker;
                         });
                         return {
-                            brukere
+                            brukere,
                         };
                     },
                     () => {
@@ -554,14 +543,24 @@ export default class ChatContainer extends Component<
                 );
             } else if (melding.content.includes('REQUEST_PUTINQUEUE')) {
                 this.setState({
-                    iKo: true
+                    iKo: true,
                 });
             } else if (melding.content === 'REQUEST_DISCONNECTED') {
                 this.setState({
-                    avsluttet: true
+                    avsluttet: true,
                 });
             }
         }
+
+        // Refresh timeout hvis bruker skrev melding
+        if (
+            this.state.config &&
+            melding.role === 0 &&
+            moment(melding.sent).isAfter(this.state.config?.lastActive)
+        ) {
+            updateLastActiveTime(this.state.config);
+        }
+
         this.skjulAlleIndikatorForBruker(melding.userId);
         this.leggTilIHistorie(melding, oppdater);
     }
@@ -574,11 +573,11 @@ export default class ChatContainer extends Component<
             )
         ) {
             this.setState({
-                historie: [...this.state.historie, melding]
+                historie: [...this.state.historie, melding],
             });
         }
 
-        saveJSON(localStorageKeys.HISTORIE, this.state.historie);
+        setHistoryCache(this.state.historie);
     }
 
     lesIkkeLastethistorie() {
@@ -597,12 +596,12 @@ export default class ChatContainer extends Component<
                         this.setState(
                             (state: ChatContainerState) => {
                                 const brukereSomSkriver = {
-                                    ...state.brukereSomSkriver
+                                    ...state.brukereSomSkriver,
                                 };
                                 brukereSomSkriver[historie.userId] = now;
                                 return {
                                     brukereSomSkriver,
-                                    ikkeLastethistorie: resten
+                                    ikkeLastethistorie: resten,
                                 };
                             },
                             () => {
@@ -616,18 +615,18 @@ export default class ChatContainer extends Component<
                 } else {
                     this.setState((state: ChatContainerState) => {
                         const brukereSomSkriver = {
-                            ...state.brukereSomSkriver
+                            ...state.brukereSomSkriver,
                         };
                         brukereSomSkriver[historie.userId] = now;
                         return {
-                            brukereSomSkriver
+                            brukereSomSkriver,
                         };
                     });
                 }
             } else {
                 this.setState(
                     {
-                        ikkeLastethistorie: resten
+                        ikkeLastethistorie: resten,
                     },
                     () => {
                         this.handterMelding(historie, true);
@@ -641,7 +640,7 @@ export default class ChatContainer extends Component<
         this.setState(
             (state: ChatContainerState) => {
                 const historier = [...state.historie];
-                let historie = historier.find(
+                const historie = historier.find(
                     (h: MessageWithIndicator) => h.id === melding.id
                 );
 
@@ -650,14 +649,15 @@ export default class ChatContainer extends Component<
                     state.historie[index] = historie;
                     historie.showIndicator = false;
                     return {
-                        historie: historier
+                        ...state,
+                        historie: historier,
                     };
                 } else {
                     return state;
                 }
             },
             () => {
-                saveJSON(localStorageKeys.HISTORIE, this.state.historie);
+                setHistoryCache(this.state.historie);
             }
         );
     }
@@ -677,7 +677,7 @@ export default class ChatContainer extends Component<
                 const index = historier.indexOf(indikator);
                 state.historie[index] = indikator;
                 return {
-                    historie: historier
+                    historie: historier,
                 };
             });
         });
@@ -692,7 +692,7 @@ export default class ChatContainer extends Component<
                     if (lenke.getAttribute('target') === '_blank') {
                         this.setState({
                             visBekreftelse: 'NY_FANE',
-                            lastHref: lenke.getAttribute('href')
+                            lastHref: lenke.getAttribute('href'),
                         });
                     } else if (lenke.getAttribute('href')) {
                         window.location.href = lenke.getAttribute('href')!;
@@ -705,14 +705,12 @@ export default class ChatContainer extends Component<
 
     async settTimerConfig() {
         const res = await axios.get(
-            `${this.baseUrl}/configurations/${this.props.customerKey}-${
-                this.props.configId
-            }`
+            `${this.baseUrl}/configurations/${this.props.customerKey}-${this.props.configId}`
         );
         const config = res.data as ConfigurationResponse;
         if (config) {
             this.config = res.data;
-            const timer = parseInt(config.botMessageTimerMs);
+            const timer = parseInt(config.botMessageTimerMs, 10);
             if (timer) {
                 this.skriveindikatorTid = timer;
             }
