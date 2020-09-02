@@ -54,6 +54,7 @@ export const FridaKnapp = styled.button`
     background-color: transparent;
     border: none;
     padding: 0;
+    filter: drop-shadow(6px 4px 6px #444);
 
     &:hover {
         ${FridaTekst} {
