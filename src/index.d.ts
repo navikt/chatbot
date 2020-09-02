@@ -328,18 +328,18 @@ declare module 'src/components/Alertstripe/index' {
 	}
 
 }
-declare module 'src/services/cookies' {
+declare module 'src/utils/cookies' {
 	 const setCookie: (key: string, data: any | any[]) => void; const getCookie: (key: string) => any | any[] | null; const deleteCookie: (key: string) => void;
 	export { setCookie, getCookie, deleteCookie };
 
 }
-declare module 'src/services/sessionStorage' {
+declare module 'src/utils/sessionStorage' {
 	export const setStorageItem: (key: string, value: string) => void;
 	export const getStorageItem: (key: string) => string | null;
 	export const removeStorageItem: (key: string) => void;
 
 }
-declare module 'src/services/stateUtils' {
+declare module 'src/utils/stateUtils' {
 	import { Config } from 'src/components/Interaksjonsvindu';
 	import { MessageWithIndicator } from 'src/components/ChatContainer';
 	export const chatStateKeys: {
