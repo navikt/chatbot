@@ -1,12 +1,12 @@
 import styled from 'styled-components';
+import { liten } from '../../tema/mediaqueries';
 import fridaIkon from '../../assets/frida.svg';
 import defaultIkon from '../../assets/default.svg';
 
-const ikonSize = 68;
-export const ikonSizePx = `${ikonSize}px`;
-const tekstHeight = Math.floor(ikonSize * 0.67);
-const tekstHeightPx = `${tekstHeight}px`;
-const tekstPadding = `${tekstHeight * 0.4}px`;
+export const ikonSizePx = '64px';
+const tekstHeightPx = '42px';
+export const ikonSizeMobilPx = '48px';
+const tekstHeightMobilPx = '32px';
 const navGra20 = '#c6c2bf';
 const navDypBla = '#005B82';
 
@@ -17,25 +17,37 @@ type Props = {
 export const FridaTekst = styled.span`
     display: flex;
     align-items: center;
-    padding-left: ${tekstPadding};
-    padding-right: calc(${tekstPadding} + ${ikonSizePx} * 0.5);
+    padding: 0 calc(${ikonSizePx} / 2 + 8px) 0 calc(${tekstHeightPx} / 2);
     color: ${navDypBla};
     white-space: nowrap;
     height: ${tekstHeightPx};
     box-shadow: inset 0 0 0 2px ${navGra20};
     border-radius: ${tekstHeightPx} 0 0 ${tekstHeightPx};
     background-color: white;
+
+    ${liten} {
+        padding: 0 calc(${ikonSizeMobilPx} / 2 + 8px) 0
+            calc(${tekstHeightMobilPx} / 2);
+        align-self: flex-end;
+        height: ${tekstHeightMobilPx};
+    }
 `;
 
 export const FridaIkon = styled.span`
     position: relative;
-    top: calc((${ikonSizePx} - ${tekstHeightPx}) * -0.5);
+    align-self: center;
     right: calc(${ikonSizePx} * 0.5);
-    margin-right: calc(${ikonSizePx} * -0.5);
     width: ${ikonSizePx};
     height: ${ikonSizePx};
     border-radius: ${ikonSizePx};
     transition: transform 100ms ease-out;
+
+    ${liten} {
+        right: calc(${ikonSizeMobilPx} * 0.5);
+        width: ${ikonSizeMobilPx};
+        height: ${ikonSizeMobilPx};
+        border-radius: ${ikonSizeMobilPx};
+    }
 
     background: ${(props: Props) =>
         props.queueKey === 'Q_CHAT_BOT'
@@ -54,7 +66,7 @@ export const FridaKnapp = styled.button`
     background-color: transparent;
     border: none;
     padding: 0;
-    filter: drop-shadow(6px 4px 6px #444);
+    filter: drop-shadow(5px 3px 4px #666);
 
     &:hover {
         ${FridaTekst} {
