@@ -37,6 +37,7 @@ export const FridaIkon = styled.span`
     position: relative;
     align-self: center;
     right: calc(${ikonSizePx} * 0.5);
+    margin-right: calc(${ikonSizePx} * -0.5);
     width: ${ikonSizePx};
     height: ${ikonSizePx};
     border-radius: ${ikonSizePx};
@@ -44,6 +45,7 @@ export const FridaIkon = styled.span`
 
     ${liten} {
         right: calc(${ikonSizeMobilPx} * 0.5);
+        margin-right: calc(${ikonSizeMobilPx} * -0.5);
         width: ${ikonSizeMobilPx};
         height: ${ikonSizeMobilPx};
         border-radius: ${ikonSizeMobilPx};
