@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import tema from '../../tema/tema';
+import AlertStripe from 'nav-frontend-alertstriper';
 
 export const Interaksjon = styled.div`
     display: flex;
@@ -19,11 +20,14 @@ export const Interaksjon = styled.div`
         transition: top 150ms ease-in-out;
     }
 `;
+
 export const Chatlog = styled.div`
     height: 100%;
     overflow-y: scroll;
     padding: 15px;
+    min-height: 50%;
 `;
+
 export const Tekstomrade = styled.form`
     margin-top: auto;
     display: flex;
@@ -34,6 +38,7 @@ export const Tekstomrade = styled.form`
     min-height: 85px;
     z-index: 10;
 `;
+
 export const Tekstfelt = styled.textarea`
     width: 100%;
     height: 100%;
@@ -68,28 +73,31 @@ export const Teller = styled.div`
         props.error ? 'red' : tema.farger.tekst.klokketekst};
 `;
 
-export const AlertstripeSeksjon = styled.div`
-    & + & {
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px dashed ${tema.farger.alertstripe.info.border};
-    }
+export const Alertstripe = styled(AlertStripe)`
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom-width: 2px;
+    border-radius: 0;
 `;
 
-export const AlertstripeHeader = styled.h2`
-    margin: 0;
-    font-size: ${tema.storrelser.tekst.toppBar};
+export const Avsluttet = styled.div`
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border-bottom: 2px solid black;
 `;
 
-export const AlertstripeForklarendeTekst = styled.p`
-    margin: 0;
-    color: ${tema.farger.tekstfelt};
-
-    &:last-of-type {
-        margin-bottom: 10px;
-    }
+export const AvsluttetHeader = styled(AlertStripe)`
+    border-bottom: 1px solid black;
+    border-radius: 0;
+    padding-bottom: 1rem;
 `;
 
-export const UthevetTekst = styled.span`
-    font-weight: bold;
+export const KoblerTil = styled(AlertStripe)`
+    position: absolute;
+    border-radius: 0;
+    padding: 1.5rem;
+    background-color: white;
+    width: 100%;
 `;

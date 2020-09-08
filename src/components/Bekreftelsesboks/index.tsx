@@ -1,51 +1,51 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import { Boks, JaKnapp, NeiKnapp, Tekst, Undertekst } from './styles';
+import React from 'react';
+import {
+    Boks,
+    InnerContainer,
+    JaKnapp,
+    NeiKnapp,
+    Tekst,
+    Undertekst,
+} from './styles';
 import avsluttIkon from '../../assets/avslutt.svg';
 import checkIkon from '../../assets/check.svg';
-import { Ikon } from '../Alertstripe/styles';
 
-type BekreftelsesboksProps = {
+type Props = {
     tekst?: string;
     undertekst?: string | null;
     ja?: () => void;
     nei?: () => void;
 };
 
-export default class Bekreftelsesboks extends Component<
-    BekreftelsesboksProps,
-    {}
-> {
-    componentDidMount() {
-        const node = ReactDOM.findDOMNode(this) as HTMLElement;
-        node.focus();
-    }
-
-    render() {
-        return (
-            <Boks type='advarsel' tabIndex={0}>
-                <Ikon type='advarsel' tabIndex={-1} aria-hidden={true} />
+export const Bekreftelsesboks = (props: Props) => {
+    return (
+        <Boks type={'advarsel'}>
+            <InnerContainer>
                 <Tekst>
-                    {this.props.tekst}
-                    {this.props.undertekst && (
-                        <Undertekst>{this.props.undertekst}</Undertekst>
+                    {props.tekst}
+                    {props.undertekst && (
+                        <Undertekst>{props.undertekst}</Undertekst>
                     )}
                 </Tekst>
-                {this.props.ja && (
+                {props.ja && (
                     <JaKnapp
                         dangerouslySetInnerHTML={{ __html: checkIkon }}
-                        onClick={() => this.props.ja!()}
+                        onClick={() => props.ja!()}
                         aria-label={'Ja'}
                     />
                 )}
-                {this.props.nei && (
+                {props.nei && (
                     <NeiKnapp
-                        dangerouslySetInnerHTML={{ __html: avsluttIkon }}
-                        onClick={() => this.props.nei!()}
+                        dangerouslySetInnerHTML={{
+                            __html: avsluttIkon,
+                        }}
+                        onClick={() => props.nei!()}
                         aria-label={'Nei'}
                     />
                 )}
-            </Boks>
-        );
-    }
-}
+            </InnerContainer>
+        </Boks>
+    );
+};
+
+export default Bekreftelsesboks;

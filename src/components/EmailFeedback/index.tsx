@@ -1,156 +1,123 @@
-import React, { ChangeEvent, Component, FormEvent } from 'react';
+import React, { ChangeEvent, FormEvent, useState } from 'react';
 import axios from 'axios';
-import { Config } from '../Interaksjonsvindu/index';
+import { Config, Tidigjen } from '../Interaksjonsvindu';
 import { EmailSend } from '../../api/Sessions';
 import tema from '../../tema/tema';
 import {
-    EpostFelt,
+    Container,
     Feilmelding,
     Form,
-    Hoyre,
-    SendKnapp,
     Suksessmelding,
-    Venstre
+    UthevetTekst,
 } from './styles';
+import { Knapp } from 'nav-frontend-knapper';
+import { Input } from 'nav-frontend-skjema';
+import { Normaltekst, Undertittel } from 'nav-frontend-typografi';
 
-type EmailFeedbackProps = {
+const validateEmail = (email: string) =>
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i.test(
+        email
+    );
+
+const sendEmail = (url: string, email: string) =>
+    axios.post(url, {
+        toEmailAddress: email,
+        emailSubject: 'Chatlog fra NAV',
+        fromEmailDisplayName: 'NAV Kontaktsenter',
+        preText: 'Hei,[br] her er referatet fra din chatsamtale med oss:',
+        postText:
+            'Takk for din henvendelse.[br][br]Hilsen,[br] NAV Kontaktsenter',
+        timeZoneId: 'W. Europe Standard Time',
+        logo: {
+            url: 'https://www.nav.no/_public/beta.nav.no/images/logo.png',
+            link: 'https://www.nav.no',
+            alt: 'NAV Kontaktsenter',
+        },
+        layout: {
+            topBackgroundColor: '#FFFFFF',
+            topLineColor: '#555555',
+            bottomLineColor: '#c30000',
+            textStyle:
+                'font-size:' +
+                tema.storrelser.tekst.generell +
+                ';font-family:' +
+                tema.tekstFamilie,
+        },
+    } as EmailSend);
+
+type Props = {
     baseUrl: string;
     config: Config;
+    tidIgjen: Tidigjen;
 };
 
-type EmailFeedbackState = {
-    melding: string;
-    tilbakemelding: Tilbakemelding;
-};
+export const EmailFeedback = ({ baseUrl, config, tidIgjen }: Props) => {
+    const [emailInput, setEmailInput] = useState<string>('');
+    const [emailSentTo, setEmailSentTo] = useState('');
+    const [error, setError] = useState<string>('');
 
-interface Tilbakemelding {
-    error: string;
-    suksess: string;
-}
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setError('');
+        setEmailInput(e.target.value);
+    };
 
-export default class EmailFeedback extends Component<
-    EmailFeedbackProps,
-    EmailFeedbackState
-> {
-    constructor(props: any) {
-        super(props);
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
-        this.state = {
-            melding: '',
-            tilbakemelding: {
-                error: '',
-                suksess: ''
-            }
-        };
-
-        this.sendMail = this.sendMail.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    render() {
-        return (
-            <Form onSubmit={e => this.sendMail(e)} noValidate>
-                <Venstre>
-                    <EpostFelt
-                        type='email'
-                        placeholder='Din e-post'
-                        onChange={e => this.handleChange(e)}
-                        error={!!this.state.tilbakemelding.error}
-                    />
-                    {this.state.tilbakemelding.suksess && (
-                        <Suksessmelding>
-                            {this.state.tilbakemelding.suksess}
-                        </Suksessmelding>
-                    )}
-                    {this.state.tilbakemelding.error && (
-                        <Feilmelding>
-                            {this.state.tilbakemelding.error}
-                        </Feilmelding>
-                    )}
-                </Venstre>
-                <Hoyre>
-                    <SendKnapp type='submit'>Send</SendKnapp>
-                </Hoyre>
-            </Form>
-        );
-    }
-
-    async sendMail(e?: FormEvent<HTMLFormElement>) {
-        if (e) {
-            e.preventDefault();
+        if (!emailInput) {
+            setError('Skriv inn din e-post adresse');
+            return;
         }
-        await this.setState({
-            tilbakemelding: {
-                error: '',
-                suksess: ''
-            }
-        });
-        if (!this.state.melding) {
-            await this.setState({
-                tilbakemelding: {
-                    ...this.state.tilbakemelding,
-                    error: 'Skriv inn e-post'
-                }
-            });
+
+        if (!validateEmail(emailInput)) {
+            setError('E-post adressen er ikke gyldig');
+            return;
         }
-        const validEmailRegex = RegExp(
-            /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i
-        );
-        if (!validEmailRegex.test(this.state.melding)) {
-            await this.setState({
-                tilbakemelding: {
-                    ...this.state.tilbakemelding,
-                    error: 'Din e-post er ugyldig.'
-                }
-            });
-        }
-        if (!this.state.tilbakemelding.error) {
-            try {
-                await axios.post(
-                    `${this.props.baseUrl}/sessions/${
-                        this.props.config.sessionId
-                    }/email`,
-                    {
-                        toEmailAddress: this.state.melding,
-                        emailSubject: 'Chatlog fra NAV',
-                        fromEmailDisplayName: 'NAV Kontaktsenter',
-                        preText:
-                            'Hei,[br] her er referatet fra din chatsamtale med oss:',
-                        postText:
-                            'Takk for din henvendelse.[br][br]Hilsen,[br] NAV Kontaktsenter',
-                        timeZoneId: 'W. Europe Standard Time',
-                        logo: {
-                            url:
-                                'https://www.nav.no/_public/beta.nav.no/images/logo.png',
-                            link: 'https://www.nav.no',
-                            alt: 'NAV Kontaktsenter'
-                        },
-                        layout: {
-                            topBackgroundColor: '#FFFFFF',
-                            topLineColor: '#555555',
-                            bottomLineColor: '#c30000',
-                            textStyle:
-                                'font-size:' +
-                                tema.storrelser.tekst.generell +
-                                ';font-family:' +
-                                tema.tekstFamilie
-                        }
-                    } as EmailSend
+
+        sendEmail(`${baseUrl}/sessions/${config.sessionId}/email`, emailInput)
+            .then(() => {
+                setError('');
+                setEmailSentTo(emailInput);
+            })
+            .catch((err) => {
+                setError(
+                    'Sending feilet - dobbeltsjekk e-post adressen og prøv igjen'
                 );
+                console.error(
+                    `Error sending chatlog to email ${emailInput} - ${err}`
+                );
+            });
+    };
 
-                this.setState({
-                    tilbakemelding: {
-                        error: '',
-                        suksess: `E-posten ble sendt til ${this.state.melding}`
-                    }
-                });
-            } catch (e) {
-                console.error(e);
-            }
-        }
-    }
+    return (
+        <Container>
+            <Undertittel>{'Trenger du en kopi?'}</Undertittel>
+            <Normaltekst>
+                {'Vi sender deg gjerne chat-dialogen på e-post. Du kan få' +
+                    ' chat-dialogen tilsendt i '}
+                <UthevetTekst>{tidIgjen.formatert}</UthevetTekst>
+                {' til.'}
+            </Normaltekst>
+            <Form onSubmit={handleSubmit} noValidate>
+                <Input
+                    type={'email'}
+                    aria-label={'Din e-post'}
+                    placeholder={'Din e-post'}
+                    onChange={handleChange}
+                    feil={!!error}
+                />
+                <Knapp htmlType={'submit'} kompakt={true}>
+                    {'Send'}
+                </Knapp>
+            </Form>
+            {error && <Feilmelding>{error}</Feilmelding>}
+            {emailSentTo && (
+                <Suksessmelding>
+                    {`E-post ble sendt til ${emailSentTo}`}
+                </Suksessmelding>
+            )}
+        </Container>
+    );
+};
 
-    handleChange(e: ChangeEvent<HTMLInputElement>) {
-        this.setState({ melding: e.target.value });
-    }
-}
+export default EmailFeedback;

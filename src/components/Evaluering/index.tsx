@@ -1,92 +1,196 @@
-import React, { Component } from 'react';
-import { Container, Eval, Outer } from './styles';
-import rating1 from '../../assets/rating-1.svg';
-import rating2 from '../../assets/rating-2.svg';
-import rating3 from '../../assets/rating-3.svg';
-import rating4 from '../../assets/rating-4.svg';
-import rating5 from '../../assets/rating-5.svg';
-import { getCookie } from '../../utils/cookies';
+import { getCookie, setCookie } from '../../utils/cookies';
 import { chatStateKeys } from '../../utils/stateUtils';
+import {
+    Checkbox,
+    CheckboxGruppe,
+    Radio,
+    RadioGruppe,
+    SkjemaGruppe,
+} from 'nav-frontend-skjema';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Hovedknapp } from 'nav-frontend-knapper';
+import { SurveyData, SurveyQuestion, defaultSurvey } from './surveyFields';
+import { MessageWithIndicator } from '../ChatContainer';
+import { Normaltekst } from 'nav-frontend-typografi';
+import { Container, Header, SurveyForm } from './styles';
+import { AnalyticsCallback } from '../../index';
 
-type EvalueringProps = {
-    evaluer: (evaluering: number) => void;
-    opprettEvaluering: () => void;
+type Props = {
     baseUrl: string;
+    sessionId: string;
     queueKey: string;
-    nickName: string;
+    nickName?: string;
+    handterMelding: (melding: MessageWithIndicator, oppdater: boolean) => void;
+    analyticsCallback?: AnalyticsCallback;
+    analyticsSurvey?: SurveyQuestion[];
 };
 
-export type EvalueringState = {
-    valgt: boolean;
-    valgtSvar: number;
-};
-export default class Evaluering extends Component<
-    EvalueringProps,
-    EvalueringState
-> {
-    ratings = [rating1, rating2, rating3, rating4, rating5];
-    checkLoop: number;
-    constructor(props: EvalueringProps) {
-        super(props);
-        this.state = {
-            valgt: !!getCookie(chatStateKeys.EVAL),
-            valgtSvar: getCookie(chatStateKeys.EVAL),
-        };
-    }
+const toggleArrayValue = (arr: string[], value: string) =>
+    arr.includes(value)
+        ? arr.filter((v: any) => v !== value)
+        : arr.concat(value);
 
-    componentDidMount() {
-        this.checkLoop = setInterval(() => {
-            if (!this.state.valgt && !this.state.valgtSvar) {
-                this.setState({
-                    valgt: !!getCookie(chatStateKeys.EVAL),
-                    valgtSvar: getCookie(chatStateKeys.EVAL),
-                });
-            }
-        }, 100);
-        this.props.opprettEvaluering();
-    }
+const createSurveySessionAndFetchKey = (
+    baseUrl: string,
+    queueKey: string,
+    sessionId: string
+) => axios.post(`${baseUrl}/sessions/${sessionId}/survey`, {});
 
-    componentWillUnmount(): void {
-        clearInterval(this.checkLoop);
-    }
+const sendSurvey = (
+    baseUrl: string,
+    queueKey: string,
+    sessionId: string,
+    surveyKey: string,
+    surveyData: SurveyData,
+    nickName?: string
+) =>
+    axios.post(`${baseUrl}/sessions/${sessionId}/survey`, {
+        parentSessionId: surveyKey,
+        surveyResult: surveyData,
+        note: 'Obs: dette er kun test-data!',
+    });
 
-    render() {
-        const evalueringer = [];
-        for (let i = 1; i <= 5; i++) {
-            evalueringer.push(
-                <Eval
-                    onClick={() => this.props.evaluer(i)}
-                    dangerouslySetInnerHTML={{ __html: this.ratings[i - 1] }}
-                    evalValgt={this.state.valgt}
-                    valgt={this.state.valgtSvar === i}
-                    aria-label={
-                        this.state.valgt
-                            ? ''
-                            : `Valgmulighet ${i}: Evaluering ${i} av 5`
-                    }
-                    tabIndex={this.state.valgt ? -1 : 0}
-                    aria-hidden={this.state.valgt}
-                    key={i}
-                />
-            );
+export const Evaluering = ({
+    baseUrl,
+    queueKey,
+    sessionId,
+    nickName = 'Bruker',
+    handterMelding,
+    analyticsCallback,
+    analyticsSurvey = defaultSurvey,
+}: Props) => {
+    const [surveyKey, setSurveyKey] = useState();
+    const [surveyInput, setSurveyInput] = useState<SurveyData>({});
+    const [surveySent, setSurveySent] = useState(false);
+
+    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setSurveySent(true);
+        console.log(surveyInput);
+
+        if (analyticsCallback) {
+            analyticsCallback('chatbot-tilbakemelding', surveyInput);
         }
-        return (
-            <Outer>
-                <Container
-                    aria-label={`${
-                        this.props.nickName
-                    } har sendt deg en evaluering med 5 valgmuligheter. ${
-                        this.state.valgt
-                            ? 'Du har alt sendt inn din evaluering med valget ' +
-                              this.state.valgtSvar +
-                              ' av 5.'
-                            : ''
-                    }`}
-                    tabIndex={0}
-                >
-                    {evalueringer}
-                </Container>
-            </Outer>
-        );
-    }
-}
+
+        if (surveyKey) {
+            sendSurvey(
+                baseUrl,
+                queueKey,
+                sessionId,
+                surveyKey!,
+                surveyInput,
+                nickName
+            )
+                .then(() => {
+                    setCookie(chatStateKeys.EVAL, surveyInput);
+                    const max = Number.MAX_SAFE_INTEGER - 1000;
+                    const min = Number.MAX_SAFE_INTEGER - 100000;
+                    handterMelding(
+                        {
+                            id:
+                                Math.floor(Math.random() * (max - min + 1)) +
+                                min,
+                            nickName: nickName,
+                            sent: new Date().toString(),
+                            role: 0,
+                            userId: 0,
+                            type: 'Evaluation',
+                            content: surveyInput,
+                            showIndicator: false,
+                        },
+                        true
+                    );
+                })
+                .catch((e) =>
+                    console.error(`Error while sending survey data: ${e}`)
+                );
+        }
+    };
+
+    useEffect(() => {
+        if (!getCookie(chatStateKeys.EVAL)) {
+            createSurveySessionAndFetchKey(
+                baseUrl,
+                queueKey,
+                sessionId
+            ).then((res) => setSurveyKey(res.data));
+        }
+    }, []);
+
+    return (
+        <Container>
+            <SkjemaGruppe>
+                {surveySent ? (
+                    <Header>
+                        <Normaltekst>
+                            {'Takk for din tilbakemelding!'}
+                        </Normaltekst>
+                    </Header>
+                ) : (
+                    <SurveyForm onSubmit={onSubmit}>
+                        {defaultSurvey.map((fieldSet) => {
+                            if (fieldSet.type === 'radio') {
+                                return (
+                                    <RadioGruppe
+                                        legend={fieldSet.label}
+                                        key={fieldSet.event}
+                                    >
+                                        {fieldSet.options.map((option) => (
+                                            <Radio
+                                                label={option}
+                                                name={fieldSet.event}
+                                                onClick={() =>
+                                                    setSurveyInput((state) => ({
+                                                        ...state,
+                                                        [fieldSet.event]: [
+                                                            option,
+                                                        ],
+                                                    }))
+                                                }
+                                                key={option}
+                                            />
+                                        ))}
+                                    </RadioGruppe>
+                                );
+                            } else if (fieldSet.type === 'checkbox') {
+                                return (
+                                    <CheckboxGruppe
+                                        legend={fieldSet.label}
+                                        key={fieldSet.event}
+                                    >
+                                        {fieldSet.options.map((option) => (
+                                            <Checkbox
+                                                label={option}
+                                                name={fieldSet.event}
+                                                onClick={() => {
+                                                    setSurveyInput((state) => ({
+                                                        ...state,
+                                                        [fieldSet.event]: toggleArrayValue(
+                                                            state[
+                                                                fieldSet.event
+                                                            ] || [],
+                                                            option
+                                                        ),
+                                                    }));
+                                                }}
+                                                key={option}
+                                            />
+                                        ))}
+                                    </CheckboxGruppe>
+                                );
+                            } else {
+                                return null;
+                            }
+                        })}
+                        <Hovedknapp htmlType={'submit'} kompakt={true}>
+                            {'Send tilbakemelding'}
+                        </Hovedknapp>
+                    </SurveyForm>
+                )}
+            </SkjemaGruppe>
+        </Container>
+    );
+};
+
+export default Evaluering;
