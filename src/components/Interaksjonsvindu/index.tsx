@@ -25,7 +25,7 @@ import EmailFeedback from '../EmailFeedback';
 import moment from 'moment';
 import Bekreftelsesboks from '../Bekreftelsesboks';
 import { chatStateKeys } from '../../utils/stateUtils';
-import { Undertittel } from 'nav-frontend-typografi';
+import { Systemtittel, Undertittel } from 'nav-frontend-typografi';
 
 export interface Bruker {
     userId: number;
@@ -226,9 +226,9 @@ export default class Interaksjonsvindu extends Component<
                     {this.props.avsluttet && (
                         <Avsluttet>
                             <AvsluttetHeader type={'info'} form={'inline'}>
-                                <Undertittel>
+                                <Systemtittel>
                                     {'Chatten er avsluttet.'}
-                                </Undertittel>
+                                </Systemtittel>
                             </AvsluttetHeader>
                             <Evaluering
                                 baseUrl={this.props.baseUrl}

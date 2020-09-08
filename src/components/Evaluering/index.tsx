@@ -12,7 +12,7 @@ import axios from 'axios';
 import { Hovedknapp } from 'nav-frontend-knapper';
 import { SurveyData, SurveyQuestion, defaultSurvey } from './surveyFields';
 import { MessageWithIndicator } from '../ChatContainer';
-import { Normaltekst } from 'nav-frontend-typografi';
+import { Normaltekst, Undertittel } from 'nav-frontend-typografi';
 import { Container, Header, SurveyForm } from './styles';
 import { AnalyticsCallback } from '../../index';
 
@@ -121,15 +121,23 @@ export const Evaluering = ({
     return (
         <Container>
             <SkjemaGruppe>
-                {surveySent ? (
-                    <Header>
+                <Header>
+                    {surveySent ? (
                         <Normaltekst>
                             {'Takk for din tilbakemelding!'}
                         </Normaltekst>
-                    </Header>
-                ) : (
+                    ) : (
+                        <>
+                            <Undertittel>{'Tilbakemelding'}</Undertittel>
+                            <Normaltekst>
+                                {'Jeg ønsker å lære av opplevelsen din.'}
+                            </Normaltekst>
+                        </>
+                    )}
+                </Header>
+                {!surveySent && (
                     <SurveyForm onSubmit={onSubmit}>
-                        {defaultSurvey.map((fieldSet) => {
+                        {analyticsSurvey.map((fieldSet) => {
                             if (fieldSet.type === 'radio') {
                                 return (
                                     <RadioGruppe
