@@ -64,6 +64,8 @@ export const Evaluering = ({
     const [surveyInput, setSurveyInput] = useState<SurveyData>({});
     const [surveySent, setSurveySent] = useState(false);
 
+    console.log(analyticsSurvey);
+
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setSurveySent(true);
