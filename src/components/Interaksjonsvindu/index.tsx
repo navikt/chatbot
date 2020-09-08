@@ -25,7 +25,8 @@ import EmailFeedback from '../EmailFeedback';
 import moment from 'moment';
 import Bekreftelsesboks from '../Bekreftelsesboks';
 import { chatStateKeys } from '../../utils/stateUtils';
-import { Systemtittel, Undertittel } from 'nav-frontend-typografi';
+import { Systemtittel } from 'nav-frontend-typografi';
+import { SurveyQuestion } from '../Evaluering/surveyFields';
 
 export interface Bruker {
     userId: number;
@@ -57,6 +58,7 @@ interface InteraksjonsvinduProps extends Omit<ConnectionConfig, 'configId'> {
     href: string | null;
     feil: boolean;
     analyticsCallback?: AnalyticsCallback;
+    analyticsSurvey?: SurveyQuestion[];
 }
 
 type InteraksjonsvinduState = {
@@ -235,6 +237,8 @@ export default class Interaksjonsvindu extends Component<
                                 queueKey={this.props.queueKey}
                                 sessionId={this.props.config.sessionId}
                                 handterMelding={this.props.handterMelding}
+                                analyticsCallback={this.props.analyticsCallback}
+                                analyticsSurvey={this.props.analyticsSurvey}
                             />
                             {this.state.tidIgjen &&
                                 this.state.tidIgjen.tid >= 0 && (

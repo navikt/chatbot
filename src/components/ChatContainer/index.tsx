@@ -205,6 +205,7 @@ export default class ChatContainer extends Component<
                     href={this.state.lastHref}
                     feil={this.state.feil}
                     analyticsCallback={this.props.analyticsCallback}
+                    analyticsSurvey={this.props.analyticsSurvey}
                 />
             </Container>
         );
