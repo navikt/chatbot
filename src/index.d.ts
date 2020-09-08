@@ -57,6 +57,7 @@ declare module 'src/tema/tema' {
 	                feilmelding: string;
 	                bakgrunn: string;
 	                inputBakgrunn: string;
+	                border: string;
 	            };
 	        };
 	        interaksjon: string;
@@ -317,17 +318,6 @@ declare module 'src/components/Knapp/index' {
 	}
 
 }
-declare module 'src/components/Alertstripe/index' {
-	import { Component } from 'react';
-	export type AlertstripeProps = {
-	    type: 'info' | 'suksess' | 'advarsel' | 'feil';
-	};
-	export default class Alertstripe extends Component<AlertstripeProps, {}> {
-	    componentDidMount(): void;
-	    render(): JSX.Element;
-	}
-
-}
 declare module 'src/utils/cookies' {
 	 const setCookie: (key: string, data: any | any[]) => void; const getCookie: (key: string) => any | any[] | null; const deleteCookie: (key: string) => void;
 	export { setCookie, getCookie, deleteCookie };
@@ -356,68 +346,61 @@ declare module 'src/utils/stateUtils' {
 	export const hasActiveSession: (config: Config | undefined) => boolean | undefined;
 
 }
+declare module 'src/components/Evaluering/surveyFields' {
+	export type SurveyQuestion = {
+	    label: string;
+	    event: string;
+	    options: string[];
+	    type: 'radio' | 'checkbox';
+	};
+	export type SurveyData = {
+	    [key: string]: string[];
+	};
+	export const defaultSurvey: SurveyQuestion[];
+
+}
 declare module 'src/components/Evaluering/index' {
-	import { Component } from 'react'; type EvalueringProps = {
-	    evaluer: (evaluering: number) => void;
-	    opprettEvaluering: () => void;
+	/// <reference types="react" />
+	import { SurveyQuestion } from 'src/components/Evaluering/surveyFields';
+	import { MessageWithIndicator } from 'src/components/ChatContainer';
+	import { AnalyticsCallback } from 'src/index'; type Props = {
 	    baseUrl: string;
+	    sessionId: string;
 	    queueKey: string;
-	    nickName: string;
+	    nickName?: string;
+	    handterMelding: (melding: MessageWithIndicator, oppdater: boolean) => void;
+	    analyticsCallback?: AnalyticsCallback;
+	    analyticsSurvey?: SurveyQuestion[];
 	};
-	export type EvalueringState = {
-	    valgt: boolean;
-	    valgtSvar: number;
-	};
-	export default class Evaluering extends Component<EvalueringProps, EvalueringState> {
-	    ratings: any[];
-	    checkLoop: number;
-	    constructor(props: EvalueringProps);
-	    componentDidMount(): void;
-	    componentWillUnmount(): void;
-	    render(): JSX.Element;
-	}
-	export {};
+	export const Evaluering: ({ baseUrl, queueKey, sessionId, nickName, handterMelding, analyticsCallback, analyticsSurvey, }: Props) => JSX.Element;
+	export default Evaluering;
 
 }
 declare module 'src/components/EmailFeedback/index' {
-	import { ChangeEvent, Component, FormEvent } from 'react';
-	import { Config } from 'src/components/Interaksjonsvindu/index'; type EmailFeedbackProps = {
+	/// <reference types="react" />
+	import { Config, Tidigjen } from 'src/components/Interaksjonsvindu'; type Props = {
 	    baseUrl: string;
 	    config: Config;
-	}; type EmailFeedbackState = {
-	    melding: string;
-	    tilbakemelding: Tilbakemelding;
+	    tidIgjen: Tidigjen;
 	};
-	interface Tilbakemelding {
-	    error: string;
-	    suksess: string;
-	}
-	export default class EmailFeedback extends Component<EmailFeedbackProps, EmailFeedbackState> {
-	    constructor(props: any);
-	    render(): JSX.Element;
-	    sendMail(e?: FormEvent<HTMLFormElement>): Promise<void>;
-	    handleChange(e: ChangeEvent<HTMLInputElement>): void;
-	}
-	export {};
+	export const EmailFeedback: ({ baseUrl, config, tidIgjen }: Props) => JSX.Element;
+	export default EmailFeedback;
 
 }
 declare module 'src/components/Bekreftelsesboks/index' {
-	import { Component } from 'react'; type BekreftelsesboksProps = {
+	 type Props = {
 	    tekst?: string;
 	    undertekst?: string | null;
 	    ja?: () => void;
 	    nei?: () => void;
 	};
-	export default class Bekreftelsesboks extends Component<BekreftelsesboksProps, {}> {
-	    componentDidMount(): void;
-	    render(): JSX.Element;
-	}
-	export {};
+	export const Bekreftelsesboks: (props: Props) => JSX.Element;
+	export default Bekreftelsesboks;
 
 }
 declare module 'src/components/Interaksjonsvindu/index' {
 	import React, { ChangeEvent, Component, FormEvent } from 'react';
-	import { ConnectionConfig } from 'src/index';
+	import { AnalyticsCallback, ConnectionConfig } from 'src/index';
 	import { MessageWithIndicator } from 'src/components/ChatContainer';
 	export interface Bruker {
 	    userId: number;
@@ -447,6 +430,7 @@ declare module 'src/components/Interaksjonsvindu/index' {
 	    lukkOgAvslutt: () => void;
 	    href: string | null;
 	    feil: boolean;
+	    analyticsCallback?: AnalyticsCallback;
 	} type InteraksjonsvinduState = {
 	    melding: string;
 	    sendt: boolean;
@@ -460,7 +444,7 @@ declare module 'src/components/Interaksjonsvindu/index' {
 	    requestId: number;
 	    lastActive: number;
 	}
-	interface Tidigjen {
+	export interface Tidigjen {
 	    formatert: string;
 	    tid: number;
 	}
@@ -480,8 +464,6 @@ declare module 'src/components/Interaksjonsvindu/index' {
 	    handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>): void;
 	    scrollTilBunn(smooth?: boolean): void;
 	    velg(messageId: number, valg: string): Promise<void>;
-	    opprettEvaluering(): Promise<void>;
-	    evaluer(evaluering: number): Promise<void>;
 	    hentBrukerType(brukerId: number): string | undefined;
 	    sendTilLenke(): void;
 	}
@@ -544,6 +526,7 @@ declare module 'src/components/ChatContainer/index' {
 	    componentDidMount(): void;
 	    componentWillUnmount(): void;
 	    render(): JSX.Element;
+	    analytics(event: string, data: any): void;
 	    start(tving?: boolean, beholdApen?: boolean): Promise<void>;
 	    apne(): Promise<void>;
 	    lukk(): Promise<void>;
@@ -568,18 +551,21 @@ declare module 'src/components/ChatContainer/index' {
 
 }
 declare module 'src/index' {
+	/// <reference types="react" />
 	import 'react-app-polyfill/ie11';
 	import 'react-app-polyfill/stable';
-	import { Component } from 'react';
+	import { SurveyQuestion } from 'src/components/Evaluering/surveyFields';
+	export type AnalyticsCallback = (event: string, data: any) => void;
 	export type ConnectionConfig = {
 	    queueKey: string;
 	    customerKey: string;
 	    configId: string;
 	    label?: string;
 	    evaluationMessage?: string;
+	    analyticsCallback?: AnalyticsCallback;
+	    analyticsSurvey?: SurveyQuestion[];
 	};
-	export default class Chat extends Component<ConnectionConfig, {}> {
-	    render(): JSX.Element;
-	}
+	export const Chat: (props: ConnectionConfig) => JSX.Element;
+	export default Chat;
 
 }
