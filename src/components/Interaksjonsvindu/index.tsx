@@ -49,7 +49,6 @@ interface InteraksjonsvinduProps extends Omit<ConnectionConfig, 'configId'> {
     config: Config;
     skriveindikatorTid: number;
     hentHistorie: () => void;
-    evaluationMessage?: string;
     visBekreftelse: 'OMSTART' | 'AVSLUTT' | 'NY_FANE' | undefined;
     confirmAvslutt: () => void;
     confirmCancel: () => void;

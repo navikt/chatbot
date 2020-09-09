@@ -14,7 +14,6 @@ export type ConnectionConfig = {
     customerKey: string;
     configId: string;
     label?: string;
-    evaluationMessage?: string;
     analyticsCallback?: AnalyticsCallback;
     analyticsSurvey?: SurveyQuestion[];
 };

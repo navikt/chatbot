@@ -196,7 +196,6 @@ export default class ChatContainer extends Component<
                     config={this.state.config!}
                     skriveindikatorTid={this.skriveindikatorTid}
                     hentHistorie={() => this.hentHistorie()}
-                    evaluationMessage={this.props.evaluationMessage}
                     visBekreftelse={this.state.visBekreftelse}
                     confirmAvslutt={() => this.confirmAvslutt()}
                     confirmOmstart={() => this.confirmOmstart()}
