@@ -10,9 +10,7 @@ import { Hovedknapp } from 'nav-frontend-knapper';
 import { Normaltekst, Undertittel } from 'nav-frontend-typografi';
 import { Container, Header, SurveyForm } from './styles';
 import { AnalyticsCallback } from '../../index';
-import { Bruker } from '../Interaksjonsvindu';
-import { getCookie, setCookie } from '../../utils/cookies';
-import { chatStateKeys } from '../../utils/stateUtils';
+import { getEvalState, setEvalState } from '../../utils/evalStateUtils';
 
 export type SurveyQuestion = {
     label: string;
@@ -25,7 +23,6 @@ export type SurveyAnswer = {
 };
 
 type Props = {
-    brukere: Bruker[];
     analyticsCallback?: AnalyticsCallback;
     analyticsSurvey: SurveyQuestion[];
 };
@@ -35,29 +32,32 @@ const toggleArrayValue = (arr: string[], value: string) =>
         ? arr.filter((v: any) => v !== value)
         : arr.concat(value);
 
-const hasHumanResponse = (brukere: Bruker[]) =>
-    brukere.some((bruker) => bruker.userType === 'Human');
-
-export const Evaluering = ({
-    brukere,
-    analyticsCallback,
-    analyticsSurvey,
-}: Props) => {
+export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
     const [surveyInput, setSurveyInput] = useState<SurveyAnswer>({});
-    const [surveySent, setSurveySent] = useState(getCookie(chatStateKeys.EVAL));
+    const [surveySent, setSurveySent] = useState(getEvalState().sent);
 
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setSurveySent(true);
-        setCookie(chatStateKeys.EVAL, true);
+        const evalState = getEvalState();
+        setEvalState({ ...evalState, sent: true });
+
+        const analyticsData = {
+            komponent: 'frida',
+            veileder: !!evalState.veileder,
+            english: evalState.english,
+            rollevalg: evalState.rollevalg,
+            temavalg: evalState.temavalg,
+        };
+
+        console.log(analyticsData);
 
         if (analyticsCallback) {
             Object.entries(surveyInput).forEach(([question, answer]) =>
                 analyticsCallback('tilbakemelding', {
-                    komponent: 'frida',
+                    ...analyticsData,
                     spørsmål: question,
                     svar: answer,
-                    veileder: hasHumanResponse(brukere),
                 })
             );
         }

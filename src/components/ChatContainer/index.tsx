@@ -22,6 +22,7 @@ import {
     setHistoryCache,
     updateLastActiveTime,
 } from '../../utils/stateUtils';
+import { getEvalState, setEvalState } from '../../utils/evalStateUtils';
 
 export type ChatContainerState = {
     erApen: boolean;
@@ -509,6 +510,7 @@ export default class ChatContainer extends Component<
                 });
             }
             if (melding.content.userType === 'Human') {
+                setEvalState({ ...getEvalState(), veileder: true });
                 this.setState({
                     iKo: false,
                 });

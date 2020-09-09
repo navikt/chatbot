@@ -26,6 +26,7 @@ import moment from 'moment';
 import Bekreftelsesboks from '../Bekreftelsesboks';
 import { chatStateKeys } from '../../utils/stateUtils';
 import { Systemtittel } from 'nav-frontend-typografi';
+import { updateSelectionState } from '../../utils/evalStateUtils';
 
 export interface Bruker {
     userId: number;
@@ -224,7 +225,6 @@ export default class Interaksjonsvindu extends Component<
                             </AvsluttetHeader>
                             {this.props.analyticsSurvey && (
                                 <Evaluering
-                                    brukere={this.props.brukere}
                                     analyticsCallback={
                                         this.props.analyticsCallback
                                     }
@@ -447,6 +447,7 @@ export default class Interaksjonsvindu extends Component<
                 },
             }
         );
+        updateSelectionState(messageId, valg, this.props.historie);
         this.scrollTilBunn();
     }
 
