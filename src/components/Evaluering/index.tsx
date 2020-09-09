@@ -34,7 +34,7 @@ const findInvalidInput = (
 ): string[] =>
     questions.reduce((missing, question) => {
         const answer = answers[question.label];
-        return question.required && !answer
+        return question.required && (!answer || answer.length === 0)
             ? missing.concat(question.label)
             : missing;
     }, [] as string[]);

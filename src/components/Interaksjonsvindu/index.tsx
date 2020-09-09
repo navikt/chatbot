@@ -427,7 +427,7 @@ export default class Interaksjonsvindu extends Component<
     }
 
     scrollTilBunn(smooth = true) {
-        if (this.scrollEl) {
+        if (this.scrollEl && !this.props.avsluttet) {
             this.scrollEl.scrollIntoView({
                 behavior: smooth ? 'smooth' : undefined,
             });
