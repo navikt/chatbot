@@ -19,7 +19,6 @@ import NAVChatBot from '@navikt/nav-chatbot';
     queueKey='XXXX'                         // Nødvendig config-felt
     configId='xxxx-xxxx-xxxx-xxxx-xxxx'     // Nødvendig config-felt
     label=''                                // Setter tekst på Frida-ikonet (optional)
-    evaluationMessage=''                    // Setter tekst på tilbakemeldings-forespørsel (optional)
 />
 ```
 

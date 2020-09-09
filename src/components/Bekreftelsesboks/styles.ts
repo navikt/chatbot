@@ -1,13 +1,21 @@
 import styled from 'styled-components';
-import { Container } from '../Alertstripe/styles';
 import tema from '../../tema/tema';
+import AlertStripe from 'nav-frontend-alertstriper';
 
-export const Boks = styled(Container)`
-    background: ${tema.farger.alertstripe.advarsel.bakgrunn};
-    border-color: ${tema.farger.alertstripe.advarsel.border};
+export const Boks = styled(AlertStripe)`
+    position: absolute !important;
+    z-index: 9 !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
+    border-bottom-width: 2px !important;
+`;
+
+export const InnerContainer = styled.div`
     z-index: 9;
-    flex: 0 0 auto;
-    min-height: 0;
+    display: flex;
+    justify-content: space-between;
 `;
 
 export const Tekst = styled.div`

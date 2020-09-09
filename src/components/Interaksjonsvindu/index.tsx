@@ -3,29 +3,30 @@ import axios from 'axios';
 import Kommunikasjon from '../Kommunikasjon';
 import Eventviser from '../Eventviser/';
 import {
+    Alertstripe,
+    Avsluttet,
+    AvsluttetHeader,
     Chatlog,
     Interaksjon,
+    KoblerTil,
     SendKnappOgTeller,
     Tekstfelt,
     Tekstomrade,
     Teller,
-    AlertstripeHeader,
-    AlertstripeForklarendeTekst,
-    AlertstripeSeksjon,
-    UthevetTekst,
 } from './styles';
 import Flervalg from '../Flervalg';
 import Knapp from '../Knapp';
-import Alertstripe from '../Alertstripe';
-import { ConnectionConfig } from '../../index';
-import Evaluering from '../Evaluering';
-import { getCookie, setCookie } from '../../utils/cookies';
-import { Message, SurveySend } from '../../api/Sessions';
+import { AnalyticsCallback, ConnectionConfig } from '../../index';
+import Evaluering, { SurveyQuestion } from '../Evaluering';
+import { getCookie } from '../../utils/cookies';
+import { Message } from '../../api/Sessions';
 import { MessageWithIndicator } from '../ChatContainer';
 import EmailFeedback from '../EmailFeedback';
 import moment from 'moment';
 import Bekreftelsesboks from '../Bekreftelsesboks';
 import { chatStateKeys } from '../../utils/stateUtils';
+import { Systemtittel } from 'nav-frontend-typografi';
+import { updateSelectionState } from '../../utils/evalStateUtils';
 
 export interface Bruker {
     userId: number;
@@ -48,7 +49,6 @@ interface InteraksjonsvinduProps extends Omit<ConnectionConfig, 'configId'> {
     config: Config;
     skriveindikatorTid: number;
     hentHistorie: () => void;
-    evaluationMessage?: string;
     visBekreftelse: 'OMSTART' | 'AVSLUTT' | 'NY_FANE' | undefined;
     confirmAvslutt: () => void;
     confirmCancel: () => void;
@@ -56,6 +56,8 @@ interface InteraksjonsvinduProps extends Omit<ConnectionConfig, 'configId'> {
     lukkOgAvslutt: () => void;
     href: string | null;
     feil: boolean;
+    analyticsCallback?: AnalyticsCallback;
+    analyticsSurvey?: SurveyQuestion[];
 }
 
 type InteraksjonsvinduState = {
@@ -73,7 +75,7 @@ export interface Config {
     lastActive: number;
 }
 
-interface Tidigjen {
+export interface Tidigjen {
     formatert: string;
     tid: number;
 }
@@ -100,8 +102,6 @@ export default class Interaksjonsvindu extends Component<
         this.sendMelding = this.sendMelding.bind(this);
         this.lastHistorie = this.lastHistorie.bind(this);
         this.velg = this.velg.bind(this);
-        this.evaluer = this.evaluer.bind(this);
-        this.opprettEvaluering = this.opprettEvaluering.bind(this);
         this.scrollTilBunn = this.scrollTilBunn.bind(this);
         this.hentBrukerType = this.hentBrukerType.bind(this);
         this.sendTilLenke = this.sendTilLenke.bind(this);
@@ -111,28 +111,17 @@ export default class Interaksjonsvindu extends Component<
         moment.locale('nb-NO');
         this.tidIgjen = setInterval(() => {
             if (this.props.avsluttet) {
-                this.setState(
-                    {
-                        tidIgjen: {
-                            formatert: moment().to(
-                                getCookie(chatStateKeys.MAILTIMEOUT),
-                                true
-                            ),
-                            tid: moment(
-                                getCookie(chatStateKeys.MAILTIMEOUT)
-                            ).diff(moment()),
-                        },
+                this.setState({
+                    tidIgjen: {
+                        formatert: moment().to(
+                            getCookie(chatStateKeys.MAILTIMEOUT),
+                            true
+                        ),
+                        tid: moment(getCookie(chatStateKeys.MAILTIMEOUT)).diff(
+                            moment()
+                        ),
                     },
-                    () => {
-                        if (
-                            this.state.tidIgjen &&
-                            this.state.tidIgjen.tid <= 0
-                        ) {
-                            setCookie(chatStateKeys.APEN, false);
-                            this.props.lukkOgAvslutt();
-                        }
-                    }
-                );
+                });
             }
         }, 1000);
         this.scrollTilBunn(false);
@@ -151,15 +140,7 @@ export default class Interaksjonsvindu extends Component<
             return null;
         } else {
             const { historie } = this.props;
-            const sisteBrukerSomSnakket = historie
-                .slice()
-                .reverse()
-                .find((_historie) => _historie.role === 1);
-            let sisteBrukerSomSnakketNick;
 
-            if (sisteBrukerSomSnakket) {
-                sisteBrukerSomSnakketNick = sisteBrukerSomSnakket.nickName;
-            }
             const historieListe = historie.map(
                 (historieItem: MessageWithIndicator, index: number) => {
                     const sistehistorie: Message =
@@ -215,7 +196,7 @@ export default class Interaksjonsvindu extends Component<
                         )}
                     {this.props.iKo && !this.props.avsluttet && (
                         <Alertstripe type='info'>
-                            Du blir nå satt over til en veileder.
+                            {'Du blir nå satt over til en veileder.'}
                         </Alertstripe>
                     )}
                     {this.props.brukere.length > 0 &&
@@ -223,7 +204,7 @@ export default class Interaksjonsvindu extends Component<
                         !harAktiveBrukere &&
                         !this.props.avsluttet && (
                             <Alertstripe type='advarsel'>
-                                Det er ikke flere aktive brukere i kanalen.
+                                {'Det er ikke flere aktive brukere i kanalen.'}
                             </Alertstripe>
                         )}
                     {this.props.historie.length > 0 &&
@@ -231,73 +212,38 @@ export default class Interaksjonsvindu extends Component<
                             (historie: MessageWithIndicator) =>
                                 historie.type === 'Intro'
                         ) && (
-                            <Alertstripe type='info'>
-                                Kobler til Frida...
-                            </Alertstripe>
+                            <KoblerTil type='info' form={'inline'}>
+                                {'Kobler til Frida...'}
+                            </KoblerTil>
                         )}
-                    {this.props.avsluttet &&
-                        this.state.tidIgjen &&
-                        this.state.tidIgjen.tid >= 0 && (
-                            <Alertstripe type='info'>
-                                <AlertstripeSeksjon tabIndex={0}>
-                                    <AlertstripeHeader>
-                                        Chatten er avsluttet.
-                                    </AlertstripeHeader>
-                                </AlertstripeSeksjon>
-                                <AlertstripeSeksjon tabIndex={0}>
-                                    <AlertstripeHeader>
-                                        Trenger du en kopi?
-                                    </AlertstripeHeader>
-                                    <AlertstripeForklarendeTekst>
-                                        Vi sender deg gjerne chat-dialogen på
-                                        e-post.
-                                    </AlertstripeForklarendeTekst>
-                                    <AlertstripeForklarendeTekst>
-                                        Du kan få chat-dialogen tilsendt i{' '}
-                                        <UthevetTekst>
-                                            {this.state.tidIgjen.formatert}{' '}
-                                        </UthevetTekst>
-                                        til.
-                                    </AlertstripeForklarendeTekst>
+                    {this.props.avsluttet && (
+                        <Avsluttet>
+                            <AvsluttetHeader type={'info'} form={'inline'}>
+                                <Systemtittel>
+                                    {'Chatten er avsluttet.'}
+                                </Systemtittel>
+                            </AvsluttetHeader>
+                            {this.props.analyticsSurvey && (
+                                <Evaluering
+                                    analyticsCallback={
+                                        this.props.analyticsCallback
+                                    }
+                                    analyticsSurvey={this.props.analyticsSurvey}
+                                />
+                            )}
+                            {this.state.tidIgjen &&
+                                this.state.tidIgjen.tid >= 0 && (
                                     <EmailFeedback
                                         baseUrl={this.props.baseUrl}
                                         config={this.props.config}
+                                        tidIgjen={this.state.tidIgjen}
                                     />
-                                </AlertstripeSeksjon>
-                                <AlertstripeSeksjon tabIndex={0}>
-                                    <AlertstripeHeader>
-                                        Tilbakemelding
-                                    </AlertstripeHeader>
-                                    <AlertstripeForklarendeTekst>
-                                        {getCookie(chatStateKeys.EVAL)
-                                            ? 'Takk for din tilbakemelding!'
-                                            : this.props.evaluationMessage
-                                            ? this.props.evaluationMessage
-                                            : 'Jeg ønsker å lære av din opplevelse. I hvilken grad fikk du svar på det du lurte på?'}
-                                    </AlertstripeForklarendeTekst>
-                                    <Evaluering
-                                        evaluer={(evaluering) =>
-                                            this.evaluer(evaluering)
-                                        }
-                                        baseUrl={this.props.baseUrl}
-                                        queueKey={this.props.queueKey}
-                                        nickName={
-                                            sisteBrukerSomSnakket &&
-                                            sisteBrukerSomSnakketNick ===
-                                                'Chatbot Frida'
-                                                ? sisteBrukerSomSnakketNick
-                                                : 'NAV Chat'
-                                        }
-                                        opprettEvaluering={() =>
-                                            this.opprettEvaluering()
-                                        }
-                                    />
-                                </AlertstripeSeksjon>
-                            </Alertstripe>
-                        )}
+                                )}
+                        </Avsluttet>
+                    )}
                     {this.props.feil && (
                         <Alertstripe type='feil'>
-                            En feil har oppstått.
+                            {'En feil har oppstått.'}
                         </Alertstripe>
                     )}
                     <Chatlog
@@ -308,35 +254,39 @@ export default class Interaksjonsvindu extends Component<
                     >
                         {historieListe}
                     </Chatlog>
-                    <Tekstomrade
-                        ref={(el) => (this.formRef = el)}
-                        onSubmit={(e) => this.sendMelding(e)}
-                    >
-                        <Tekstfelt
-                            onKeyDown={(e) => this.handleKeyDown(e)}
-                            onChange={(e) => this.handleChange(e)}
-                            placeholder={'Skriv spørsmålet ditt'}
-                            disabled={this.props.avsluttet}
-                        />
-                        <SendKnappOgTeller>
-                            <Knapp
-                                disabled={
-                                    this.state.melding.length > this.maxTegn ||
-                                    this.props.avsluttet
-                                }
-                                aktiv={this.state.sendt}
-                            >
-                                {this.state.sendt ? 'Sendt' : 'Send'}
-                            </Knapp>
-                            <Teller
-                                tabIndex={-1}
-                                aria-hidden={true}
-                                error={this.state.melding.length > this.maxTegn}
-                            >
-                                {this.state.melding.length} / {this.maxTegn}
-                            </Teller>
-                        </SendKnappOgTeller>
-                    </Tekstomrade>
+                    {!this.props.avsluttet && (
+                        <Tekstomrade
+                            ref={(el) => (this.formRef = el)}
+                            onSubmit={(e) => this.sendMelding(e)}
+                        >
+                            <Tekstfelt
+                                onKeyDown={(e) => this.handleKeyDown(e)}
+                                onChange={(e) => this.handleChange(e)}
+                                placeholder={'Skriv spørsmålet ditt'}
+                                disabled={this.props.avsluttet}
+                            />
+                            <SendKnappOgTeller>
+                                <Knapp
+                                    disabled={
+                                        this.state.melding.length >
+                                            this.maxTegn || this.props.avsluttet
+                                    }
+                                    aktiv={this.state.sendt}
+                                >
+                                    {this.state.sendt ? 'Sendt' : 'Send'}
+                                </Knapp>
+                                <Teller
+                                    tabIndex={-1}
+                                    aria-hidden={true}
+                                    error={
+                                        this.state.melding.length > this.maxTegn
+                                    }
+                                >
+                                    {this.state.melding.length} / {this.maxTegn}
+                                </Teller>
+                            </SendKnappOgTeller>
+                        </Tekstomrade>
+                    )}
                 </Interaksjon>
             );
         }
@@ -477,7 +427,7 @@ export default class Interaksjonsvindu extends Component<
     }
 
     scrollTilBunn(smooth = true) {
-        if (this.scrollEl) {
+        if (this.scrollEl && !this.props.avsluttet) {
             this.scrollEl.scrollIntoView({
                 behavior: smooth ? 'smooth' : undefined,
             });
@@ -497,68 +447,8 @@ export default class Interaksjonsvindu extends Component<
                 },
             }
         );
+        updateSelectionState(messageId, valg, this.props.historie);
         this.scrollTilBunn();
-    }
-
-    async opprettEvaluering() {
-        if (!getCookie(chatStateKeys.EVAL)) {
-            const evaluering = await axios.post(
-                `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/survey`,
-                {
-                    nickName: 'Bruker',
-                    surveyQuestion:
-                        'Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med meg.',
-                    surveyMaxScore: 5,
-                    surveyMinScore: 1,
-                    offerSurvey: true,
-                    queueKey: this.props.queueKey,
-                }
-            );
-            this.setState({
-                evalueringsNokkel: evaluering.data,
-            });
-        }
-    }
-
-    async evaluer(evaluering: number) {
-        if (!getCookie(chatStateKeys.EVAL)) {
-            try {
-                await axios.post(
-                    `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/survey`,
-                    {
-                        nickName: 'Bruker',
-                        surveyQuestion:
-                            'Jeg vil bli bedre. Evaluer gjerne din chatopplevelse med meg.',
-                        surveyMaxScore: 5,
-                        surveyMinScore: 1,
-                        offerSurvey: false,
-                        queueKey: this.props.queueKey,
-                        surveyResult: evaluering,
-                        parentSessionId: this.state.evalueringsNokkel,
-                    } as SurveySend
-                );
-            } catch (e) {
-                this.setState({
-                    feil: true,
-                });
-            }
-            setCookie(chatStateKeys.EVAL, evaluering);
-            const max = Number.MAX_SAFE_INTEGER - 1000;
-            const min = Number.MAX_SAFE_INTEGER - 100000;
-            this.props.handterMelding(
-                {
-                    id: Math.floor(Math.random() * (max - min + 1)) + min,
-                    nickName: 'Bruker',
-                    sent: new Date().toString(),
-                    role: 0,
-                    userId: 0,
-                    type: 'Evaluation',
-                    content: evaluering,
-                    showIndicator: false,
-                },
-                true
-            );
-        }
     }
 
     hentBrukerType(brukerId: number): string | undefined {

@@ -22,6 +22,7 @@ import {
     setHistoryCache,
     updateLastActiveTime,
 } from '../../utils/stateUtils';
+import { getEvalState, setEvalState } from '../../utils/evalStateUtils';
 
 export type ChatContainerState = {
     erApen: boolean;
@@ -196,7 +197,6 @@ export default class ChatContainer extends Component<
                     config={this.state.config!}
                     skriveindikatorTid={this.skriveindikatorTid}
                     hentHistorie={() => this.hentHistorie()}
-                    evaluationMessage={this.props.evaluationMessage}
                     visBekreftelse={this.state.visBekreftelse}
                     confirmAvslutt={() => this.confirmAvslutt()}
                     confirmOmstart={() => this.confirmOmstart()}
@@ -204,9 +204,17 @@ export default class ChatContainer extends Component<
                     lukkOgAvslutt={() => this.lukkOgAvslutt()}
                     href={this.state.lastHref}
                     feil={this.state.feil}
+                    analyticsCallback={this.props.analyticsCallback}
+                    analyticsSurvey={this.props.analyticsSurvey}
                 />
             </Container>
         );
+    }
+
+    analytics(event: string, data: any) {
+        if (this.props.analyticsCallback) {
+            this.props.analyticsCallback(event, data);
+        }
     }
 
     async start(tving: boolean = false, beholdApen: boolean = false) {
@@ -271,10 +279,15 @@ export default class ChatContainer extends Component<
                     () => this.lesIkkeLastethistorie(),
                     50
                 );
+
                 // this.leggTilLenkeHandlerIntervall = setInterval(
                 //     () => this.leggTilLenkeHandler(),
                 //     100
                 // );
+
+                this.analytics('chat-åpen', {
+                    komponent: 'frida',
+                });
             }
         } catch (e) {
             console.error(e);
@@ -295,6 +308,9 @@ export default class ChatContainer extends Component<
     async lukk() {
         await this.setState({ erApen: false });
         setCookie(chatStateKeys.APEN, false);
+        this.analytics('chat-lukket', {
+            komponent: 'frida',
+        });
     }
 
     omstart() {
@@ -355,6 +371,9 @@ export default class ChatContainer extends Component<
             );
         }
         this.confirmCancel();
+        this.analytics('chat-avsluttet', {
+            komponent: 'frida',
+        });
     }
 
     confirmCancel() {
@@ -491,6 +510,7 @@ export default class ChatContainer extends Component<
                 });
             }
             if (melding.content.userType === 'Human') {
+                setEvalState({ ...getEvalState(), veileder: true });
                 this.setState({
                     iKo: false,
                 });
@@ -556,7 +576,7 @@ export default class ChatContainer extends Component<
         if (
             this.state.config &&
             melding.role === 0 &&
-            moment(melding.sent).isAfter(this.state.config?.lastActive)
+            moment(melding.sent).isAfter(this.state.config.lastActive)
         ) {
             updateLastActiveTime(this.state.config);
         }

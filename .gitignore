@@ -6,3 +6,5 @@
 /umd
 npm-debug.log*
 /.idea
+/chatbot.iml
+/src/index.d.ts

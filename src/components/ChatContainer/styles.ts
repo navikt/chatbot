@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 import tema from '../../tema/tema';
 import { liten } from '../../tema/mediaqueries';
-import { ikonSizePx } from '../FridaKnapp/styles';
+import { ikonSizeMobilPx, ikonSizePx } from '../FridaKnapp/styles';
 
 interface Props {
     erApen: boolean;
@@ -35,7 +35,7 @@ export const Container = styled.div`
 
     ${liten} {
         width: fit-content;
-        height: ${ikonSizePx};
+        height: ${ikonSizeMobilPx};
         box-shadow: none;
         border: none;
     }

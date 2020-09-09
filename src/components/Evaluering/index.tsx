@@ -1,92 +1,204 @@
-import React, { Component } from 'react';
-import { Container, Eval, Outer } from './styles';
-import rating1 from '../../assets/rating-1.svg';
-import rating2 from '../../assets/rating-2.svg';
-import rating3 from '../../assets/rating-3.svg';
-import rating4 from '../../assets/rating-4.svg';
-import rating5 from '../../assets/rating-5.svg';
-import { getCookie } from '../../utils/cookies';
-import { chatStateKeys } from '../../utils/stateUtils';
+import {
+    Checkbox,
+    CheckboxGruppe,
+    Radio,
+    RadioGruppe,
+    SkjemaGruppe,
+} from 'nav-frontend-skjema';
+import React, { useState } from 'react';
+import { Hovedknapp } from 'nav-frontend-knapper';
+import { Normaltekst, Undertittel } from 'nav-frontend-typografi';
+import { Container, Header, SurveyForm } from './styles';
+import { AnalyticsCallback } from '../../index';
+import { getEvalState, setEvalState } from '../../utils/evalStateUtils';
 
-type EvalueringProps = {
-    evaluer: (evaluering: number) => void;
-    opprettEvaluering: () => void;
-    baseUrl: string;
-    queueKey: string;
-    nickName: string;
+export type SurveyQuestion = {
+    label: string;
+    options: string[];
+    type: 'radio' | 'checkbox';
+    required?: boolean;
 };
 
-export type EvalueringState = {
-    valgt: boolean;
-    valgtSvar: number;
+type SurveyAnswers = {
+    [key: string]: string[];
 };
-export default class Evaluering extends Component<
-    EvalueringProps,
-    EvalueringState
-> {
-    ratings = [rating1, rating2, rating3, rating4, rating5];
-    checkLoop: number;
-    constructor(props: EvalueringProps) {
-        super(props);
-        this.state = {
-            valgt: !!getCookie(chatStateKeys.EVAL),
-            valgtSvar: getCookie(chatStateKeys.EVAL),
-        };
-    }
 
-    componentDidMount() {
-        this.checkLoop = setInterval(() => {
-            if (!this.state.valgt && !this.state.valgtSvar) {
-                this.setState({
-                    valgt: !!getCookie(chatStateKeys.EVAL),
-                    valgtSvar: getCookie(chatStateKeys.EVAL),
-                });
-            }
-        }, 100);
-        this.props.opprettEvaluering();
-    }
+type Props = {
+    analyticsCallback?: AnalyticsCallback;
+    analyticsSurvey: SurveyQuestion[];
+};
 
-    componentWillUnmount(): void {
-        clearInterval(this.checkLoop);
-    }
+const findInvalidInput = (
+    questions: SurveyQuestion[],
+    answers: SurveyAnswers
+): string[] =>
+    questions.reduce((missing, question) => {
+        const answer = answers[question.label];
+        return question.required && (!answer || answer.length === 0)
+            ? missing.concat(question.label)
+            : missing;
+    }, [] as string[]);
 
-    render() {
-        const evalueringer = [];
-        for (let i = 1; i <= 5; i++) {
-            evalueringer.push(
-                <Eval
-                    onClick={() => this.props.evaluer(i)}
-                    dangerouslySetInnerHTML={{ __html: this.ratings[i - 1] }}
-                    evalValgt={this.state.valgt}
-                    valgt={this.state.valgtSvar === i}
-                    aria-label={
-                        this.state.valgt
-                            ? ''
-                            : `Valgmulighet ${i}: Evaluering ${i} av 5`
-                    }
-                    tabIndex={this.state.valgt ? -1 : 0}
-                    aria-hidden={this.state.valgt}
-                    key={i}
-                />
+const toggleArrayValue = (arr: string[], value: string) =>
+    arr.includes(value)
+        ? arr.filter((v: any) => v !== value)
+        : arr.concat(value);
+
+export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
+    const [surveyInput, setSurveyInput] = useState<SurveyAnswers>({});
+    const [invalidInput, setInvalidInput] = useState<string[]>([]);
+    const [surveySent, setSurveySent] = useState(getEvalState().sent);
+
+    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const _invalidInput = findInvalidInput(analyticsSurvey, surveyInput);
+        if (_invalidInput.length > 0) {
+            setInvalidInput(_invalidInput);
+            return;
+        }
+
+        const evalState = getEvalState();
+        setEvalState({ ...evalState, sent: true });
+        setSurveySent(true);
+
+        if (analyticsCallback) {
+            analyticsCallback('tilbakemelding', {
+                komponent: 'frida',
+                veileder: !!evalState.veileder,
+                english: evalState.english,
+                rollevalg: evalState.rollevalg,
+                temavalg: evalState.temavalg,
+            });
+            Object.entries(surveyInput).forEach(([question, answer]) =>
+                analyticsCallback('tilbakemelding', {
+                    komponent: 'frida',
+                    spørsmål: question,
+                    svar: answer,
+                })
             );
         }
-        return (
-            <Outer>
-                <Container
-                    aria-label={`${
-                        this.props.nickName
-                    } har sendt deg en evaluering med 5 valgmuligheter. ${
-                        this.state.valgt
-                            ? 'Du har alt sendt inn din evaluering med valget ' +
-                              this.state.valgtSvar +
-                              ' av 5.'
-                            : ''
-                    }`}
-                    tabIndex={0}
-                >
-                    {evalueringer}
-                </Container>
-            </Outer>
-        );
-    }
-}
+    };
+
+    return (
+        <Container>
+            <SkjemaGruppe
+                feil={
+                    invalidInput.length > 0
+                        ? 'Obligatoriske felt mangler'
+                        : undefined
+                }
+            >
+                <Header>
+                    {surveySent ? (
+                        <Normaltekst>
+                            {'Takk for din tilbakemelding!'}
+                        </Normaltekst>
+                    ) : (
+                        <>
+                            <Undertittel>{'Tilbakemelding'}</Undertittel>
+                            <Normaltekst>
+                                {'Jeg ønsker å lære av opplevelsen din.'}
+                            </Normaltekst>
+                        </>
+                    )}
+                </Header>
+                {!surveySent && (
+                    <SurveyForm onSubmit={onSubmit}>
+                        {analyticsSurvey.map((question, index) => {
+                            if (question.type === 'radio') {
+                                return (
+                                    <RadioGruppe
+                                        legend={question.label}
+                                        feil={
+                                            invalidInput.includes(
+                                                question.label
+                                            )
+                                                ? '* obligatorisk'
+                                                : undefined
+                                        }
+                                        key={index}
+                                    >
+                                        {question.options.map((option) => (
+                                            <Radio
+                                                label={option}
+                                                name={question.label}
+                                                onClick={() => {
+                                                    setInvalidInput(
+                                                        invalidInput.filter(
+                                                            (value) =>
+                                                                value !==
+                                                                question.label
+                                                        )
+                                                    );
+                                                    setSurveyInput((state) => ({
+                                                        ...state,
+                                                        [question.label]: [
+                                                            option,
+                                                        ],
+                                                    }));
+                                                }}
+                                                key={option}
+                                            />
+                                        ))}
+                                    </RadioGruppe>
+                                );
+                            } else if (question.type === 'checkbox') {
+                                return (
+                                    <CheckboxGruppe
+                                        legend={question.label}
+                                        feil={
+                                            invalidInput.includes(
+                                                question.label
+                                            )
+                                                ? '* obligatorisk'
+                                                : undefined
+                                        }
+                                        key={index}
+                                    >
+                                        {question.options.map((option) => (
+                                            <Checkbox
+                                                label={option}
+                                                name={question.label}
+                                                onClick={() => {
+                                                    setInvalidInput(
+                                                        invalidInput.filter(
+                                                            (value) =>
+                                                                value !==
+                                                                question.label
+                                                        )
+                                                    );
+                                                    setSurveyInput((state) => ({
+                                                        ...state,
+                                                        [question.label]: toggleArrayValue(
+                                                            state[
+                                                                question.label
+                                                            ] || [],
+                                                            option
+                                                        ),
+                                                    }));
+                                                }}
+                                                key={option}
+                                            />
+                                        ))}
+                                    </CheckboxGruppe>
+                                );
+                            } else {
+                                return null;
+                            }
+                        })}
+                        <Hovedknapp
+                            htmlType={'submit'}
+                            kompakt={true}
+                            disabled={invalidInput.length > 0}
+                        >
+                            {'Send tilbakemelding'}
+                        </Hovedknapp>
+                    </SurveyForm>
+                )}
+            </SkjemaGruppe>
+        </Container>
+    );
+};
+
+export default Evaluering;

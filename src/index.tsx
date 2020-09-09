@@ -1,39 +1,27 @@
 import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
 
-import React, { Component } from 'react';
+import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import ChatContainer from './components/ChatContainer';
-
 import tema from './tema/tema';
+import { SurveyQuestion } from './components/Evaluering';
+
+export type AnalyticsCallback = (event: string, data: any) => void;
 
 export type ConnectionConfig = {
     queueKey: string;
     customerKey: string;
     configId: string;
     label?: string;
-    evaluationMessage?: string;
+    analyticsCallback?: AnalyticsCallback;
+    analyticsSurvey?: SurveyQuestion[];
 };
 
-export default class Chat extends Component<ConnectionConfig, {}> {
-    render() {
-        const {
-            queueKey,
-            customerKey,
-            configId,
-            label,
-            evaluationMessage,
-        } = this.props;
-        return (
-            <ThemeProvider theme={tema}>
-                <ChatContainer
-                    customerKey={customerKey}
-                    queueKey={queueKey}
-                    configId={configId}
-                    label={label}
-                    evaluationMessage={evaluationMessage}
-                />
-            </ThemeProvider>
-        );
-    }
-}
+export const Chat = (props: ConnectionConfig) => (
+    <ThemeProvider theme={tema}>
+        <ChatContainer {...props} />
+    </ThemeProvider>
+);
+
+export default Chat;
