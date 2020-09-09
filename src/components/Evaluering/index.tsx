@@ -42,7 +42,7 @@ export const Evaluering = ({
         if (analyticsCallback) {
             Object.entries(surveyInput).forEach(([question, answer]) =>
                 analyticsCallback('tilbakemelding', {
-                    komponent: 'chatbot',
+                    komponent: 'frida',
                     spørsmål: question,
                     svar: answer,
                     veileder: hasHumanResponse(brukere),
