@@ -7,16 +7,25 @@ import {
 } from 'nav-frontend-skjema';
 import React, { useState } from 'react';
 import { Hovedknapp } from 'nav-frontend-knapper';
-import { SurveyAnswer, SurveyQuestion, defaultSurvey } from './surveyFields';
 import { Normaltekst, Undertittel } from 'nav-frontend-typografi';
 import { Container, Header, SurveyForm } from './styles';
 import { AnalyticsCallback } from '../../index';
 import { Bruker } from '../Interaksjonsvindu';
 
+export type SurveyQuestion = {
+    label: string;
+    options: string[];
+    type: 'radio' | 'checkbox';
+};
+
+export type SurveyAnswer = {
+    [key: string]: string[];
+};
+
 type Props = {
     brukere: Bruker[];
     analyticsCallback?: AnalyticsCallback;
-    analyticsSurvey?: SurveyQuestion[];
+    analyticsSurvey: SurveyQuestion[];
 };
 
 const toggleArrayValue = (arr: string[], value: string) =>
@@ -30,7 +39,7 @@ const hasHumanResponse = (brukere: Bruker[]) =>
 export const Evaluering = ({
     brukere,
     analyticsCallback,
-    analyticsSurvey = defaultSurvey,
+    analyticsSurvey,
 }: Props) => {
     const [surveyInput, setSurveyInput] = useState<SurveyAnswer>({});
     const [surveySent, setSurveySent] = useState(false);

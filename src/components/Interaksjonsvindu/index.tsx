@@ -17,7 +17,7 @@ import {
 import Flervalg from '../Flervalg';
 import Knapp from '../Knapp';
 import { AnalyticsCallback, ConnectionConfig } from '../../index';
-import Evaluering from '../Evaluering';
+import Evaluering, { SurveyQuestion } from '../Evaluering';
 import { getCookie } from '../../utils/cookies';
 import { Message } from '../../api/Sessions';
 import { MessageWithIndicator } from '../ChatContainer';
@@ -26,7 +26,6 @@ import moment from 'moment';
 import Bekreftelsesboks from '../Bekreftelsesboks';
 import { chatStateKeys } from '../../utils/stateUtils';
 import { Systemtittel } from 'nav-frontend-typografi';
-import { SurveyQuestion } from '../Evaluering/surveyFields';
 
 export interface Bruker {
     userId: number;
@@ -223,11 +222,15 @@ export default class Interaksjonsvindu extends Component<
                                     {'Chatten er avsluttet.'}
                                 </Systemtittel>
                             </AvsluttetHeader>
-                            <Evaluering
-                                brukere={this.props.brukere}
-                                analyticsCallback={this.props.analyticsCallback}
-                                analyticsSurvey={this.props.analyticsSurvey}
-                            />
+                            {this.props.analyticsSurvey && (
+                                <Evaluering
+                                    brukere={this.props.brukere}
+                                    analyticsCallback={
+                                        this.props.analyticsCallback
+                                    }
+                                    analyticsSurvey={this.props.analyticsSurvey}
+                                />
+                            )}
                             {this.state.tidIgjen &&
                                 this.state.tidIgjen.tid >= 0 && (
                                     <EmailFeedback

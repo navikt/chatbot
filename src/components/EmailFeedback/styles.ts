@@ -23,7 +23,7 @@ export const Suksessmelding = styled.p`
 `;
 
 export const Container = styled.div`
-    margin-top: 2rem;
+    margin-top: 1rem;
 `;
 
 export const UthevetTekst = styled.span`
