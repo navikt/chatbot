@@ -74,13 +74,11 @@ export const Teller = styled.div`
 `;
 
 export const Alertstripe = styled(AlertStripe)`
-    && {
-        border-top: none;
-        border-left: none;
-        border-right: none;
-        border-bottom-width: 2px;
-        border-radius: 0;
-    }
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom-width: 2px !important;
+    border-radius: 0 !important;
 `;
 
 export const Avsluttet = styled.div`
@@ -91,19 +89,15 @@ export const Avsluttet = styled.div`
 `;
 
 export const AvsluttetHeader = styled(AlertStripe)`
-    && {
-        border-bottom: 1px solid black;
-        border-radius: 0;
-        padding-bottom: 1rem;
-    }
+    border-bottom: 1px solid black !important;
+    border-radius: 0 !important;
+    padding-bottom: 1rem !important;
 `;
 
 export const KoblerTil = styled(AlertStripe)`
-    && {
-        position: absolute;
-        border-radius: 0;
-        padding: 1.5rem;
-        background-color: white;
-        width: 100%;
-    }
+    position: absolute !important;
+    border-radius: 0 !important;
+    padding: 1.5rem !important;
+    background-color: white !important;
+    width: 100% !important;
 `;
