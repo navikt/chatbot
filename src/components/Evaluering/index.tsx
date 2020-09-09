@@ -16,9 +16,10 @@ export type SurveyQuestion = {
     label: string;
     options: string[];
     type: 'radio' | 'checkbox';
+    required?: boolean;
 };
 
-export type SurveyAnswer = {
+type SurveyAnswers = {
     [key: string]: string[];
 };
 
@@ -27,17 +28,36 @@ type Props = {
     analyticsSurvey: SurveyQuestion[];
 };
 
+const findInvalidInput = (
+    questions: SurveyQuestion[],
+    answers: SurveyAnswers
+): string[] =>
+    questions.reduce((missing, question) => {
+        const answer = answers[question.label];
+        return question.required && !answer
+            ? missing.concat(question.label)
+            : missing;
+    }, [] as string[]);
+
 const toggleArrayValue = (arr: string[], value: string) =>
     arr.includes(value)
         ? arr.filter((v: any) => v !== value)
         : arr.concat(value);
 
 export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
-    const [surveyInput, setSurveyInput] = useState<SurveyAnswer>({});
+    const [surveyInput, setSurveyInput] = useState<SurveyAnswers>({});
+    const [invalidInput, setInvalidInput] = useState<string[]>([]);
     const [surveySent, setSurveySent] = useState(getEvalState().sent);
 
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const _invalidInput = findInvalidInput(analyticsSurvey, surveyInput);
+        if (_invalidInput.length > 0) {
+            setInvalidInput(_invalidInput);
+            return;
+        }
+
         const evalState = getEvalState();
         setEvalState({ ...evalState, sent: true });
         setSurveySent(true);
@@ -62,7 +82,13 @@ export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
 
     return (
         <Container>
-            <SkjemaGruppe>
+            <SkjemaGruppe
+                feil={
+                    invalidInput.length > 0
+                        ? 'Obligatoriske felt mangler'
+                        : undefined
+                }
+            >
                 <Header>
                     {surveySent ? (
                         <Normaltekst>
@@ -79,46 +105,74 @@ export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
                 </Header>
                 {!surveySent && (
                     <SurveyForm onSubmit={onSubmit}>
-                        {analyticsSurvey.map((fieldSet, index) => {
-                            if (fieldSet.type === 'radio') {
+                        {analyticsSurvey.map((question, index) => {
+                            if (question.type === 'radio') {
                                 return (
                                     <RadioGruppe
-                                        legend={fieldSet.label}
+                                        legend={question.label}
+                                        feil={
+                                            invalidInput.includes(
+                                                question.label
+                                            )
+                                                ? '* obligatorisk'
+                                                : undefined
+                                        }
                                         key={index}
                                     >
-                                        {fieldSet.options.map((option) => (
+                                        {question.options.map((option) => (
                                             <Radio
                                                 label={option}
-                                                name={fieldSet.label}
-                                                onClick={() =>
+                                                name={question.label}
+                                                onClick={() => {
+                                                    setInvalidInput(
+                                                        invalidInput.filter(
+                                                            (value) =>
+                                                                value !==
+                                                                question.label
+                                                        )
+                                                    );
                                                     setSurveyInput((state) => ({
                                                         ...state,
-                                                        [fieldSet.label]: [
+                                                        [question.label]: [
                                                             option,
                                                         ],
-                                                    }))
-                                                }
+                                                    }));
+                                                }}
                                                 key={option}
                                             />
                                         ))}
                                     </RadioGruppe>
                                 );
-                            } else if (fieldSet.type === 'checkbox') {
+                            } else if (question.type === 'checkbox') {
                                 return (
                                     <CheckboxGruppe
-                                        legend={fieldSet.label}
+                                        legend={question.label}
+                                        feil={
+                                            invalidInput.includes(
+                                                question.label
+                                            )
+                                                ? '* obligatorisk'
+                                                : undefined
+                                        }
                                         key={index}
                                     >
-                                        {fieldSet.options.map((option) => (
+                                        {question.options.map((option) => (
                                             <Checkbox
                                                 label={option}
-                                                name={fieldSet.label}
+                                                name={question.label}
                                                 onClick={() => {
+                                                    setInvalidInput(
+                                                        invalidInput.filter(
+                                                            (value) =>
+                                                                value !==
+                                                                question.label
+                                                        )
+                                                    );
                                                     setSurveyInput((state) => ({
                                                         ...state,
-                                                        [fieldSet.label]: toggleArrayValue(
+                                                        [question.label]: toggleArrayValue(
                                                             state[
-                                                                fieldSet.label
+                                                                question.label
                                                             ] || [],
                                                             option
                                                         ),
@@ -133,7 +187,11 @@ export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
                                 return null;
                             }
                         })}
-                        <Hovedknapp htmlType={'submit'} kompakt={true}>
+                        <Hovedknapp
+                            htmlType={'submit'}
+                            kompakt={true}
+                            disabled={invalidInput.length > 0}
+                        >
                             {'Send tilbakemelding'}
                         </Hovedknapp>
                     </SurveyForm>
