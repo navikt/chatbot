@@ -402,6 +402,7 @@ declare module 'src/components/Interaksjonsvindu/index' {
 	import React, { ChangeEvent, Component, FormEvent } from 'react';
 	import { AnalyticsCallback, ConnectionConfig } from 'src/index';
 	import { MessageWithIndicator } from 'src/components/ChatContainer';
+	import { SurveyQuestion } from 'src/components/Evaluering/surveyFields';
 	export interface Bruker {
 	    userId: number;
 	    avatarUrl: string;
@@ -431,6 +432,7 @@ declare module 'src/components/Interaksjonsvindu/index' {
 	    href: string | null;
 	    feil: boolean;
 	    analyticsCallback?: AnalyticsCallback;
+	    analyticsSurvey?: SurveyQuestion[];
 	} type InteraksjonsvinduState = {
 	    melding: string;
 	    sendt: boolean;
