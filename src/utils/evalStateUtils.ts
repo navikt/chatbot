@@ -33,9 +33,8 @@ export const updateSelectionState = (
     historie: MessageWithIndicator[]
 ) => {
     const messageIndex = findMessageIndexById(messageId, historie);
-    const message = historie[messageIndex];
     const preambleMessage = historie[messageIndex - 1];
-    if (!message || !preambleMessage) {
+    if (!preambleMessage) {
         return;
     }
 

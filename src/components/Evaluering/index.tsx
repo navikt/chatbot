@@ -38,24 +38,21 @@ export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
 
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setSurveySent(true);
         const evalState = getEvalState();
         setEvalState({ ...evalState, sent: true });
-
-        const analyticsData = {
-            komponent: 'frida',
-            veileder: !!evalState.veileder,
-            english: evalState.english,
-            rollevalg: evalState.rollevalg,
-            temavalg: evalState.temavalg,
-        };
-
-        console.log(analyticsData);
+        setSurveySent(true);
 
         if (analyticsCallback) {
+            analyticsCallback('tilbakemelding', {
+                komponent: 'frida',
+                veileder: !!evalState.veileder,
+                english: evalState.english,
+                rollevalg: evalState.rollevalg,
+                temavalg: evalState.temavalg,
+            });
             Object.entries(surveyInput).forEach(([question, answer]) =>
                 analyticsCallback('tilbakemelding', {
-                    ...analyticsData,
+                    komponent: 'frida',
                     spørsmål: question,
                     svar: answer,
                 })
