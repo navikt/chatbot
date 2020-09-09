@@ -3,12 +3,14 @@ import tema from '../../tema/tema';
 import AlertStripe from 'nav-frontend-alertstriper';
 
 export const Boks = styled(AlertStripe)`
-    position: absolute;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    border-radius: 0;
-    border-bottom-width: 2px;
+    && {
+        position: absolute;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        border-radius: 0;
+        border-bottom-width: 2px;
+    }
 `;
 
 export const InnerContainer = styled.div`

@@ -4,7 +4,6 @@ import 'react-app-polyfill/stable';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import ChatContainer from './components/ChatContainer';
-
 import tema from './tema/tema';
 import { SurveyQuestion } from './components/Evaluering/surveyFields';
 
