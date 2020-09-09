@@ -11,6 +11,8 @@ import { Normaltekst, Undertittel } from 'nav-frontend-typografi';
 import { Container, Header, SurveyForm } from './styles';
 import { AnalyticsCallback } from '../../index';
 import { Bruker } from '../Interaksjonsvindu';
+import { getCookie, setCookie } from '../../utils/cookies';
+import { chatStateKeys } from '../../utils/stateUtils';
 
 export type SurveyQuestion = {
     label: string;
@@ -42,11 +44,12 @@ export const Evaluering = ({
     analyticsSurvey,
 }: Props) => {
     const [surveyInput, setSurveyInput] = useState<SurveyAnswer>({});
-    const [surveySent, setSurveySent] = useState(false);
+    const [surveySent, setSurveySent] = useState(getCookie(chatStateKeys.EVAL));
 
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setSurveySent(true);
+        setCookie(chatStateKeys.EVAL, true);
 
         if (analyticsCallback) {
             Object.entries(surveyInput).forEach(([question, answer]) =>
