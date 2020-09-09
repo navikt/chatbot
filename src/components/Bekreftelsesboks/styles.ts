@@ -4,6 +4,7 @@ import AlertStripe from 'nav-frontend-alertstriper';
 
 export const Boks = styled(AlertStripe)`
     position: absolute !important;
+    z-index: 9 !important;
     border-top: none !important;
     border-left: none !important;
     border-right: none !important;

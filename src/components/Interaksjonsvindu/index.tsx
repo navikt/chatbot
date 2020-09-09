@@ -141,15 +141,7 @@ export default class Interaksjonsvindu extends Component<
             return null;
         } else {
             const { historie } = this.props;
-            const sisteBrukerSomSnakket = historie
-                .slice()
-                .reverse()
-                .find((_historie) => _historie.role === 1);
-            let sisteBrukerSomSnakketNick;
 
-            if (sisteBrukerSomSnakket) {
-                sisteBrukerSomSnakketNick = sisteBrukerSomSnakket.nickName;
-            }
             const historieListe = historie.map(
                 (historieItem: MessageWithIndicator, index: number) => {
                     const sistehistorie: Message =
@@ -233,10 +225,7 @@ export default class Interaksjonsvindu extends Component<
                                 </Systemtittel>
                             </AvsluttetHeader>
                             <Evaluering
-                                baseUrl={this.props.baseUrl}
-                                queueKey={this.props.queueKey}
-                                sessionId={this.props.config.sessionId}
-                                handterMelding={this.props.handterMelding}
+                                brukere={this.props.brukere}
                                 analyticsCallback={this.props.analyticsCallback}
                                 analyticsSurvey={this.props.analyticsSurvey}
                             />

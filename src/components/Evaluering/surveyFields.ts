@@ -1,24 +1,21 @@
 export type SurveyQuestion = {
     label: string;
-    event: string;
     options: string[];
     type: 'radio' | 'checkbox';
 };
 
-export type SurveyData = {
+export type SurveyAnswer = {
     [key: string]: string[];
 };
 
 export const defaultSurvey: SurveyQuestion[] = [
     {
         label: 'Fikk du svar på det du lurte på?',
-        event: 'fullforing',
         options: ['Ja', 'Nei', 'Delvis'],
         type: 'radio',
     },
     {
         label: 'Hva kom du hit for å gjøre?',
-        event: 'oppgaver',
         options: [
             'Levere sykemelding',
             'Sjekke eller oppdatere aktivitetsplanen',
@@ -39,7 +36,6 @@ export const defaultSurvey: SurveyQuestion[] = [
     },
     {
         label: 'Er du fornøyd med hjelpen du fikk?',
-        event: 'tilfredshet',
         options: [
             'Jeg er veldig fornøyd',
             'Jeg er fornøyd',

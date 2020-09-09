@@ -96,6 +96,7 @@ export const AvsluttetHeader = styled(AlertStripe)`
 
 export const KoblerTil = styled(AlertStripe)`
     position: absolute !important;
+    z-index: 9 !important;
     border-radius: 0 !important;
     padding: 1.5rem !important;
     background-color: white !important;
