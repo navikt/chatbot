@@ -217,7 +217,11 @@ export default class ChatContainer extends Component<
         }
     }
 
-    async start(tving: boolean = false, beholdApen: boolean = false) {
+    async start(
+        tving: boolean = false,
+        beholdApen: boolean = false,
+        omstart?: boolean
+    ) {
         try {
             if (!hasActiveSession(this.state.config) || tving) {
                 await this.settTimerConfig();
@@ -287,6 +291,7 @@ export default class ChatContainer extends Component<
 
                 this.analytics('chat-åpen', {
                     komponent: 'frida',
+                    omstart: omstart,
                 });
             }
         } catch (e) {
@@ -327,7 +332,7 @@ export default class ChatContainer extends Component<
         const apen = getCookie(chatStateKeys.APEN) === true;
         clearState();
         setCookie(chatStateKeys.APEN, apen);
-        this.start(true, apen);
+        this.start(true, apen, true);
     }
 
     oppdaterNavn(navn: string): void {
