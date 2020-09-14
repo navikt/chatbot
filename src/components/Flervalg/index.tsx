@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import MetaInfo from '../MetaInfo';
 import { Container, Valg, ValgContainer } from './styles';
 import { Message } from '../../api/Sessions';
 import Skriveindikator from '../Skriveindikator';
 
-type FlervalgProps = {
+type Props = {
     beskjed: Message;
     harBlittBesvart: boolean;
     fridaHarSvart: boolean;
@@ -13,73 +13,73 @@ type FlervalgProps = {
     scrollTilBunn?: () => void;
 };
 
-type FlervalgState = {
-    kollaps: boolean;
-};
-
 export interface ValgProps {
     valgt?: boolean;
     aktiv?: boolean;
     kollaps?: boolean;
 }
 
-export default class Flervalg extends Component<FlervalgProps, FlervalgState> {
-    constructor(props: FlervalgProps) {
-        super(props);
-        this.state = {
-            kollaps:
-                (this.props.sisteBrukerId &&
-                    this.props.sisteBrukerId === this.props.beskjed.userId) ||
-                false,
-        };
-    }
+export const Flervalg = ({
+    beskjed,
+    harBlittBesvart,
+    fridaHarSvart,
+    velg,
+    sisteBrukerId,
+    scrollTilBunn,
+}: Props) => {
+    const [valgtIndex, setValgtIndex] = useState<number>(-1);
+    const kollaps = !!(sisteBrukerId && sisteBrukerId === beskjed.userId);
+    const harValgt = harBlittBesvart || valgtIndex >= 0;
 
-    componentDidMount() {
-        if (this.props.scrollTilBunn) {
-            this.props.scrollTilBunn();
+    useEffect(() => {
+        const index = beskjed.content.findIndex(
+            (item: { valgt: boolean }) => item.valgt
+        );
+        setValgtIndex(index);
+    }, []);
+
+    useEffect(() => {
+        if (scrollTilBunn) {
+            scrollTilBunn();
         }
-    }
+    }, [scrollTilBunn]);
 
-    render() {
-        const options = this.props.beskjed.content.map(
-            (_h: { tekst: string; valgt: boolean }, index: number) => (
-                <Valg
-                    key={index}
-                    valgt={_h.valgt}
-                    aktiv={this.props.harBlittBesvart}
-                    tabIndex={-1}
-                >
+    const options = beskjed.content.map(
+        (item: { tekst: string }, index: number) => {
+            const valgt = index === valgtIndex;
+            return (
+                <Valg key={index} valgt={valgt} aktiv={harValgt} tabIndex={-1}>
                     <button
                         onClick={() => {
-                            if (!this.props.harBlittBesvart) {
-                                this.props.velg(
-                                    this.props.beskjed.id,
-                                    _h.tekst
-                                );
+                            if (!harValgt) {
+                                setValgtIndex(index);
+                                velg(beskjed.id, item.tekst);
                             }
                         }}
                         tabIndex={0}
                     >
-                        {_h.tekst}
-                        {_h.valgt && !this.props.fridaHarSvart && (
+                        {item.tekst}
+                        {valgt && !fridaHarSvart && (
                             <Skriveindikator visIndikator={true} />
                         )}
                     </button>
                 </Valg>
-            )
-        );
+            );
+        }
+    );
 
-        return (
-            <Container kollaps={this.state.kollaps}>
-                {!this.state.kollaps && (
-                    <MetaInfo
-                        nickName={this.props.beskjed.nickName}
-                        sent={this.props.beskjed.sent}
-                        side='VENSTRE'
-                    />
-                )}
-                <ValgContainer>{options}</ValgContainer>
-            </Container>
-        );
-    }
-}
+    return (
+        <Container kollaps={kollaps}>
+            {!kollaps && (
+                <MetaInfo
+                    nickName={beskjed.nickName}
+                    sent={beskjed.sent}
+                    side='VENSTRE'
+                />
+            )}
+            <ValgContainer>{options}</ValgContainer>
+        </Container>
+    );
+};
+
+export default Flervalg;
