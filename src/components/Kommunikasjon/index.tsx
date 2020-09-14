@@ -6,16 +6,11 @@ import {
     Hoyre,
     Indre,
     Snakkeboble,
-    Venstre
+    Venstre,
 } from './styles';
-import { Bruker } from '../Interaksjonsvindu/index';
-import rating1 from '../../assets/rating-1.svg';
-import rating2 from '../../assets/rating-2.svg';
-import rating3 from '../../assets/rating-3.svg';
-import rating4 from '../../assets/rating-4.svg';
-import rating5 from '../../assets/rating-5.svg';
+import { Bruker } from '../Interaksjonsvindu';
 import Skriveindikator from '../Skriveindikator';
-import { MessageWithIndicator } from '../ChatContainer/index';
+import { MessageWithIndicator } from '../ChatContainer';
 
 export type KommunikasjonProps = {
     beskjed: MessageWithIndicator;
@@ -47,7 +42,7 @@ export default class Kommunikasjon extends Component<
                 !this.props.sisteBrukerId,
             visMelding:
                 !this.props.beskjed.showIndicator ||
-                this.props.beskjed.role === 0
+                this.props.beskjed.role === 0,
         };
 
         this.hentBruker = this.hentBruker.bind(this);
@@ -63,7 +58,7 @@ export default class Kommunikasjon extends Component<
             setTimeout(() => {
                 this.setState(
                     {
-                        visMelding: true
+                        visMelding: true,
                     },
                     () => {
                         if (this.props.scrollTilBunn) {
@@ -77,26 +72,11 @@ export default class Kommunikasjon extends Component<
     }
 
     render() {
-        const { nickName, sent, content, type, userId } = this.props.beskjed;
+        const { nickName, sent, content, userId } = this.props.beskjed;
         const bruker = this.hentBruker(userId);
-        let htmlToRender;
-        if (type === 'Evaluation') {
-            if (content === 1) {
-                htmlToRender = rating1;
-            } else if (content === 2) {
-                htmlToRender = rating2;
-            } else if (content === 3) {
-                htmlToRender = rating3;
-            } else if (content === 4) {
-                htmlToRender = rating4;
-            } else if (content === 5) {
-                htmlToRender = rating5;
-            }
-        } else {
-            htmlToRender = unescape(
-                escape(content.optionChoice ? content.optionChoice : content)
-            );
-        }
+        const htmlToRender = unescape(
+            escape(content.optionChoice ? content.optionChoice : content)
+        );
         return (
             <Container>
                 {this.state.visBilde && (
@@ -128,11 +108,9 @@ export default class Kommunikasjon extends Component<
                                 this.props.beskjed.userId
                             ) !== 'Human' && (
                                 <Skriveindikator
-                                    beskjed={this.props.beskjed}
-                                    skriveindikatorTid={
-                                        this.props.skriveindikatorTid
+                                    visIndikator={
+                                        this.props.beskjed.showIndicator
                                     }
-                                    gjemAutomatisk={false}
                                 />
                             )}
                         {(this.state.visMelding ||
@@ -141,7 +119,7 @@ export default class Kommunikasjon extends Component<
                             ) === 'Human') && (
                             <Snakkeboble
                                 dangerouslySetInnerHTML={{
-                                    __html: htmlToRender as string
+                                    __html: htmlToRender as string,
                                 }}
                                 side={this.state.side}
                                 visBilde={this.state.visBilde}
@@ -183,7 +161,7 @@ export default class Kommunikasjon extends Component<
     }
 
     stripHtml(html: string): string {
-        var doc = new DOMParser().parseFromString(html, 'text/html');
+        const doc = new DOMParser().parseFromString(html, 'text/html');
         return doc.body.textContent || '';
     }
 }

@@ -340,16 +340,16 @@ export default class Interaksjonsvindu extends Component<
     }
 
     lastHistorie(
-        historie: MessageWithIndicator,
+        message: MessageWithIndicator,
         forrigeHistorieBrukerId: number | null
     ) {
-        switch (historie.type) {
+        switch (message.type) {
             case 'Message':
                 return (
-                    <div key={`el-${historie.id}`}>
+                    <div key={`el-${message.id}`}>
                         <Kommunikasjon
-                            key={historie.id}
-                            beskjed={historie}
+                            key={message.id}
+                            beskjed={message}
                             brukere={this.props.brukere}
                             sisteBrukerId={forrigeHistorieBrukerId}
                             scrollTilBunn={() => this.scrollTilBunn()}
@@ -362,7 +362,7 @@ export default class Interaksjonsvindu extends Component<
                             skriveindikatorTid={this.props.skriveindikatorTid}
                         />
                         <div
-                            key={`scroll-el-${historie.id}`}
+                            key={`scroll-el-${message.id}`}
                             ref={(e) => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
@@ -370,9 +370,9 @@ export default class Interaksjonsvindu extends Component<
                 );
             case 'Event':
                 return (
-                    <div key={`el-${historie.id}`}>
+                    <div key={`el-${message.id}`}>
                         <Eventviser
-                            beskjed={historie}
+                            beskjed={message}
                             skriveindikatorTid={this.props.skriveindikatorTid}
                             brukere={this.props.brukere}
                             hentBrukerType={(brukerId: number) =>
@@ -380,19 +380,22 @@ export default class Interaksjonsvindu extends Component<
                             }
                         />
                         <div
-                            key={`scroll-el-${historie.id}`}
+                            key={`scroll-el-${message.id}`}
                             ref={(e) => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
                     </div>
                 );
             case 'Option':
+                const [lastMsgFromFrida] = this.props.historie
+                    .filter((msg) => msg.role === 1)
+                    .slice(-1);
                 return (
-                    <div key={`el-${historie.id}`}>
+                    <div key={`el-${message.id}`}>
                         <Flervalg
-                            beskjed={historie}
+                            beskjed={message}
                             harBlittBesvart={
-                                historie.content.find(
+                                message.content.find(
                                     (b: { tekst: string; valgt: boolean }) =>
                                         b.valgt
                                 ) || this.props.avsluttet
@@ -402,9 +405,10 @@ export default class Interaksjonsvindu extends Component<
                             }
                             sisteBrukerId={forrigeHistorieBrukerId}
                             scrollTilBunn={() => this.scrollTilBunn()}
+                            fridaHarSvart={lastMsgFromFrida.id !== message.id}
                         />
                         <div
-                            key={`scroll-el-${historie.id}`}
+                            key={`scroll-el-${message.id}`}
                             ref={(e) => (this.scrollEl = e)}
                             aria-hidden='true'
                         />
