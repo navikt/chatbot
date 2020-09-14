@@ -2,6 +2,7 @@ import styled, { css } from 'styled-components';
 import tema from '../../tema/tema';
 import valgtIkon from '../../assets/valgt.svg';
 import { ValgProps } from './index';
+import { Indikator } from '../Skriveindikator/styles';
 
 export const ValgContainer = styled.ul`
     list-style: none;
@@ -27,6 +28,8 @@ export const Valg = styled.li`
         position: relative;
         width: 100%;
         text-align: left;
+        display: flex;
+        align-items: center;
 
         &:before {
             content: '';
@@ -103,6 +106,12 @@ export const Valg = styled.li`
                 }
             }
         `}
+
+        ${Indikator} {
+            background-color: transparent;
+            margin-left: 1rem;
+            padding: 0;
+        }
     }
 `;
 

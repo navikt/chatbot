@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import MetaInfo from '../MetaInfo';
 import { Container, Valg, ValgContainer } from './styles';
 import { Message } from '../../api/Sessions';
+import Skriveindikator from '../Skriveindikator';
 
 type FlervalgProps = {
     beskjed: Message;
     harBlittBesvart: boolean;
+    fridaHarSvart: boolean;
     velg: (messageId: number, valg: string) => void;
     sisteBrukerId: number | null;
     scrollTilBunn?: () => void;
@@ -28,7 +30,7 @@ export default class Flervalg extends Component<FlervalgProps, FlervalgState> {
             kollaps:
                 (this.props.sisteBrukerId &&
                     this.props.sisteBrukerId === this.props.beskjed.userId) ||
-                false
+                false,
         };
     }
 
@@ -59,10 +61,18 @@ export default class Flervalg extends Component<FlervalgProps, FlervalgState> {
                         tabIndex={0}
                     >
                         {_h.tekst}
+                        {_h.valgt && !this.props.fridaHarSvart && (
+                            <Skriveindikator
+                                visIndikator={true}
+                                skriveindikatorTid={0}
+                                gjemAutomatisk={false}
+                            />
+                        )}
                     </button>
                 </Valg>
             )
         );
+
         return (
             <Container kollaps={this.state.kollaps}>
                 {!this.state.kollaps && (

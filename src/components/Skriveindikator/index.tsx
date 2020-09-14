@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { Container, Indikator, IndikatorDot } from './styles';
-import { MessageWithIndicator } from '../ChatContainer/index';
 
 type SkriveindikatorProps = {
-    beskjed: MessageWithIndicator;
+    visIndikator: boolean;
     skriveindikatorTid: number;
     gjemAutomatisk: boolean;
 };
@@ -20,7 +19,7 @@ export default class Skriveindikator extends Component<
     constructor(props: SkriveindikatorProps) {
         super(props);
         this.state = {
-            vis: this.props.beskjed.showIndicator
+            vis: this.props.visIndikator,
         };
 
         this.setGjemTimeout = this.setGjemTimeout.bind(this);
@@ -35,7 +34,7 @@ export default class Skriveindikator extends Component<
     }
 
     render() {
-        if (this.props.beskjed.showIndicator) {
+        if (this.props.visIndikator) {
             return (
                 <Container>
                     <Indikator>
@@ -54,7 +53,7 @@ export default class Skriveindikator extends Component<
         if (this.props.gjemAutomatisk) {
             this.gjemTid = setTimeout(() => {
                 this.setState({
-                    vis: false
+                    vis: false,
                 });
             }, this.props.skriveindikatorTid - 500);
         }

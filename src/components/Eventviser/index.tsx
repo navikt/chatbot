@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { KommunikasjonProps } from '../Kommunikasjon/index';
+import { KommunikasjonProps } from '../Kommunikasjon';
 import { Event } from './styles';
 import Skriveindikator from '../Skriveindikator';
 
@@ -28,7 +28,7 @@ export default class Eventviser extends Component<KommunikasjonProps, {}> {
         ) {
             return (
                 <Skriveindikator
-                    beskjed={this.props.beskjed}
+                    visIndikator={this.props.beskjed.showIndicator}
                     skriveindikatorTid={this.props.skriveindikatorTid!}
                     gjemAutomatisk={false}
                 />
