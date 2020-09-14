@@ -17,6 +17,7 @@ type Props = {
 export const FridaTekst = styled.span`
     display: flex;
     align-items: center;
+    align-self: center;
     padding: 0 calc(${ikonSizePx} / 2 + 8px) 0 calc(${tekstHeightPx} / 2);
     color: ${navDypBla};
     white-space: nowrap;
@@ -28,7 +29,6 @@ export const FridaTekst = styled.span`
     ${liten} {
         padding: 0 calc(${ikonSizeMobilPx} / 2 + 8px) 0
             calc(${tekstHeightMobilPx} / 2);
-        align-self: flex-end;
         height: ${tekstHeightMobilPx};
     }
 `;
