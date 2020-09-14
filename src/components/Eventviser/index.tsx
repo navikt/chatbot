@@ -29,8 +29,6 @@ export default class Eventviser extends Component<KommunikasjonProps, {}> {
             return (
                 <Skriveindikator
                     visIndikator={this.props.beskjed.showIndicator}
-                    skriveindikatorTid={this.props.skriveindikatorTid!}
-                    gjemAutomatisk={false}
                 />
             );
         } else {

@@ -111,10 +111,6 @@ export default class Kommunikasjon extends Component<
                                     visIndikator={
                                         this.props.beskjed.showIndicator
                                     }
-                                    skriveindikatorTid={
-                                        this.props.skriveindikatorTid
-                                    }
-                                    gjemAutomatisk={false}
                                 />
                             )}
                         {(this.state.visMelding ||

@@ -62,11 +62,7 @@ export default class Flervalg extends Component<FlervalgProps, FlervalgState> {
                     >
                         {_h.tekst}
                         {_h.valgt && !this.props.fridaHarSvart && (
-                            <Skriveindikator
-                                visIndikator={true}
-                                skriveindikatorTid={0}
-                                gjemAutomatisk={false}
-                            />
+                            <Skriveindikator visIndikator={true} />
                         )}
                     </button>
                 </Valg>
