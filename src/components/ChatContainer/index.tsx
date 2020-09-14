@@ -74,7 +74,6 @@ export default class ChatContainer extends Component<
     skriveindikatorTid = 1000;
     hentHistorieIntervall: number;
     lesIkkeLastethistorieIntervall: number;
-    leggTilLenkeHandlerIntervall: number;
     events: Element[] = [];
     config: ConfigurationResponse;
 
@@ -140,7 +139,6 @@ export default class ChatContainer extends Component<
     componentWillUnmount(): void {
         clearInterval(this.hentHistorieIntervall);
         clearInterval(this.lesIkkeLastethistorieIntervall);
-        clearInterval(this.leggTilLenkeHandlerIntervall);
     }
 
     render() {
@@ -271,19 +269,16 @@ export default class ChatContainer extends Component<
                     });
                 }
 
-                this.hentHistorieIntervall = setInterval(
-                    () => this.hentHistorie(),
-                    1000
-                );
+                clearInterval(this.hentHistorieIntervall);
+                clearInterval(this.lesIkkeLastethistorieIntervall);
+
+                this.hentHistorieIntervall = setInterval(() => {
+                    this.hentHistorie();
+                }, 1000);
                 this.lesIkkeLastethistorieIntervall = setInterval(
                     () => this.lesIkkeLastethistorie(),
                     50
                 );
-
-                // this.leggTilLenkeHandlerIntervall = setInterval(
-                //     () => this.leggTilLenkeHandler(),
-                //     100
-                // );
 
                 this.analytics('chat-åpen', {
                     komponent: 'frida',
@@ -323,7 +318,6 @@ export default class ChatContainer extends Component<
         if (!this.state.avsluttet) await this.avslutt();
         clearInterval(this.hentHistorieIntervall);
         clearInterval(this.lesIkkeLastethistorieIntervall);
-        clearInterval(this.leggTilLenkeHandlerIntervall);
         const apen = getCookie(chatStateKeys.APEN) === true;
         clearState();
         setCookie(chatStateKeys.APEN, apen);
