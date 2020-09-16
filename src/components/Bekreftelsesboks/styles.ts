@@ -10,6 +10,7 @@ export const Boks = styled(AlertStripe)`
     border-right: none !important;
     border-radius: 0 !important;
     border-bottom-width: 2px !important;
+    width: 100% !important;
 `;
 
 export const InnerContainer = styled.div`

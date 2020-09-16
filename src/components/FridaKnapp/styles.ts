@@ -63,12 +63,16 @@ export const FridaIkon = styled.span`
 
 export const FridaKnapp = styled.button`
     display: flex;
-    height: ${tekstHeightPx};
+    height: ${ikonSizePx};
     cursor: pointer;
     background-color: transparent;
     border: none;
     padding: 0;
     filter: drop-shadow(5px 3px 4px #666);
+
+    ${liten} {
+        height: ${ikonSizeMobilPx};
+    }
 
     &:hover {
         ${FridaTekst} {
