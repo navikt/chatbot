@@ -3,11 +3,9 @@ import tema from '../../tema/tema';
 import AlertStripe from 'nav-frontend-alertstriper';
 
 export const Interaksjon = styled.div`
-    display: flex;
-    flex-direction: column;
     height: 100%;
     position: relative;
-    overflow-x: hidden;
+    overflow: auto;
 
     &:before {
         content: '';
@@ -22,10 +20,10 @@ export const Interaksjon = styled.div`
 `;
 
 export const Chatlog = styled.div`
-    height: 100%;
+    height: 80%;
+    max-height: calc(100% - 85px);
     overflow-y: scroll;
     padding: 15px;
-    min-height: 50%;
 `;
 
 export const Tekstomrade = styled.form`
@@ -33,6 +31,7 @@ export const Tekstomrade = styled.form`
     display: flex;
     border-top: 1px solid ${tema.farger.tekstfelt};
     height: 20%;
+    width: 100%;
     padding: 15px;
     align-items: center;
     min-height: 85px;
