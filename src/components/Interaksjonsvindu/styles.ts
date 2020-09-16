@@ -81,8 +81,6 @@ export const Alertstripe = styled(AlertStripe)`
 `;
 
 export const Avsluttet = styled.div`
-    display: flex;
-    flex-direction: column;
     padding: 1.5rem;
     border-bottom: 2px solid black;
 `;
