@@ -87,11 +87,9 @@ const minimizeMobileOnLinkClick = (
 ): void => {
     const isLink = (element: HTMLElement | null): boolean => {
         if (!element) {
-            console.log('not a link');
             return false;
         }
         if (element.tagName?.toLowerCase() === 'a') {
-            console.log('link found!');
             return true;
         }
         return isLink(element.parentElement);
