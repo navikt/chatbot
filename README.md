@@ -4,7 +4,7 @@
 **Nytt fra v.1.3.0**<br>
 Chatbot Frida er nå implementert i [Nav-dekoratøren](https://github.com/navikt/nav-dekoratoren).
 Chatbot'en kan aktiveres i appene via et parameter til dekoratøren. Se dekoratørens readme for hvordan dette gjøres.
-Komponenten fra NPM-pakka skal ikke benyttes i apper som også benytter Nav-dekoratøren, da dette vil komme i konflikt med dekoratørens Chatbot.
+Komponenten fra NPM-pakka skal ikke benyttes i apper som også benytter Nav-dekoratøren, da dette vil komme i konflikt med dekoratørens chatbot-instans.
 
 ## Installasjon
 Apper uten Nav-dekoratøren kan ta i bruk Chatbot med NPM-pakka. 
