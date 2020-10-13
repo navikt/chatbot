@@ -10,6 +10,8 @@ type EvalState = {
     temavalg?: string;
 };
 
+// TODO: This is a very non-robust way to detect these selections, which will break if these strings
+// are changed on the backend!
 const englishPreamble =
     '<a class="bbcode-link" href="https://www.nav.no/en/home" target="_blank">Nav.no in English</a>';
 
