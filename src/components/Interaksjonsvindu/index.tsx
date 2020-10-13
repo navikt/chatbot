@@ -87,9 +87,11 @@ const minimizeMobileOnLinkClick = (
 ): void => {
     const isLink = (element: HTMLElement | null): boolean => {
         if (!element) {
+            console.log('not a link');
             return false;
         }
         if (element.tagName?.toLowerCase() === 'a') {
+            console.log('link found!');
             return true;
         }
         return isLink(element.parentElement);
@@ -263,7 +265,10 @@ export default class Interaksjonsvindu extends Component<
                         aria-atomic='false'
                         aria-relevant='additions'
                         onClick={(e) =>
-                            minimizeMobileOnLinkClick(e, this.props.lukk)
+                            minimizeMobileOnLinkClick(
+                                e,
+                                this.props.lukk.bind(this)
+                            )
                         }
                     >
                         {historieListe}
