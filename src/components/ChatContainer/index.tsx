@@ -38,8 +38,7 @@ export type ChatContainerState = {
         [userId: number]: number;
     };
     hentHistorie: boolean;
-    visBekreftelse: 'OMSTART' | 'AVSLUTT' | 'NY_FANE' | undefined;
-    lastHref: string | null;
+    visBekreftelse: 'OMSTART' | 'AVSLUTT' | undefined;
     feil: boolean;
 };
 
@@ -56,7 +55,6 @@ const defaultState: ChatContainerState = {
     brukereSomSkriver: {},
     hentHistorie: true,
     visBekreftelse: undefined,
-    lastHref: '',
     feil: false,
 };
 
@@ -114,7 +112,6 @@ export default class ChatContainer extends Component<
         this.confirmAvslutt = this.confirmAvslutt.bind(this);
         this.confirmCancel = this.confirmCancel.bind(this);
         this.confirmOmstart = this.confirmOmstart.bind(this);
-        this.leggTilLenkeHandler = this.leggTilLenkeHandler.bind(this);
         this.lukkOgAvslutt = this.lukkOgAvslutt.bind(this);
         this.settTimerConfig = this.settTimerConfig.bind(this);
     }
@@ -199,8 +196,8 @@ export default class ChatContainer extends Component<
                     confirmAvslutt={() => this.confirmAvslutt()}
                     confirmOmstart={() => this.confirmOmstart()}
                     confirmCancel={() => this.confirmCancel()}
+                    lukk={() => this.lukk()}
                     lukkOgAvslutt={() => this.lukkOgAvslutt()}
-                    href={this.state.lastHref}
                     feil={this.state.feil}
                     analyticsCallback={this.props.analyticsCallback}
                     analyticsSurvey={this.props.analyticsSurvey}
@@ -700,26 +697,6 @@ export default class ChatContainer extends Component<
                 };
             });
         });
-    }
-
-    leggTilLenkeHandler() {
-        const lenker = document.getElementsByClassName('bbcode-link');
-        for (const lenke of Array.from(lenker)) {
-            if (!(this.events.indexOf(lenke) > -1)) {
-                lenke.addEventListener('click', (e: Event) => {
-                    e.preventDefault();
-                    if (lenke.getAttribute('target') === '_blank') {
-                        this.setState({
-                            visBekreftelse: 'NY_FANE',
-                            lastHref: lenke.getAttribute('href'),
-                        });
-                    } else if (lenke.getAttribute('href')) {
-                        window.location.href = lenke.getAttribute('href')!;
-                    }
-                });
-                this.events.push(lenke);
-            }
-        }
     }
 
     async settTimerConfig() {

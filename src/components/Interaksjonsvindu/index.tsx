@@ -27,6 +27,7 @@ import Bekreftelsesboks from '../Bekreftelsesboks';
 import { chatStateKeys } from '../../utils/stateUtils';
 import { Systemtittel } from 'nav-frontend-typografi';
 import { updateSelectionState } from '../../utils/evalStateUtils';
+import { mobileMaxWidth } from '../../tema/mediaqueries';
 
 export interface Bruker {
     userId: number;
@@ -49,12 +50,12 @@ interface InteraksjonsvinduProps extends Omit<ConnectionConfig, 'configId'> {
     config: Config;
     skriveindikatorTid: number;
     hentHistorie: () => void;
-    visBekreftelse: 'OMSTART' | 'AVSLUTT' | 'NY_FANE' | undefined;
+    visBekreftelse: 'OMSTART' | 'AVSLUTT' | undefined;
     confirmAvslutt: () => void;
     confirmCancel: () => void;
     confirmOmstart: () => void;
+    lukk: () => void;
     lukkOgAvslutt: () => void;
-    href: string | null;
     feil: boolean;
     analyticsCallback?: AnalyticsCallback;
     analyticsSurvey?: SurveyQuestion[];
@@ -80,6 +81,28 @@ export interface Tidigjen {
     tid: number;
 }
 
+const minimizeMobileOnLinkClick = (
+    e: React.MouseEvent,
+    minimizeFunc: () => void
+): void => {
+    const isLink = (element: HTMLElement | null): boolean => {
+        if (!element) {
+            return false;
+        }
+        if (element.tagName?.toLowerCase() === 'a') {
+            return true;
+        }
+        return isLink(element.parentElement);
+    };
+
+    if (
+        window.innerWidth <= mobileMaxWidth &&
+        isLink(e.target as HTMLElement)
+    ) {
+        minimizeFunc();
+    }
+};
+
 export default class Interaksjonsvindu extends Component<
     InteraksjonsvinduProps,
     InteraksjonsvinduState
@@ -104,7 +127,6 @@ export default class Interaksjonsvindu extends Component<
         this.velg = this.velg.bind(this);
         this.scrollTilBunn = this.scrollTilBunn.bind(this);
         this.hentBrukerType = this.hentBrukerType.bind(this);
-        this.sendTilLenke = this.sendTilLenke.bind(this);
     }
 
     async componentDidMount() {
@@ -165,35 +187,24 @@ export default class Interaksjonsvindu extends Component<
 
             return (
                 <Interaksjon>
-                    {this.props.visBekreftelse &&
-                        this.props.visBekreftelse === 'NY_FANE' && (
-                            <Bekreftelsesboks
-                                tekst={'Åpne i ny fane?'}
-                                undertekst={this.props.href}
-                                ja={() => this.sendTilLenke()}
-                                nei={() => this.props.confirmCancel()}
-                            />
-                        )}
-                    {this.props.visBekreftelse &&
-                        this.props.visBekreftelse === 'OMSTART' && (
-                            <Bekreftelsesboks
-                                tekst={
-                                    'Er du sikker på at du vil starte samtalen på nytt?'
-                                }
-                                ja={() => this.props.confirmOmstart()}
-                                nei={() => this.props.confirmCancel()}
-                            />
-                        )}
-                    {this.props.visBekreftelse &&
-                        this.props.visBekreftelse === 'AVSLUTT' && (
-                            <Bekreftelsesboks
-                                tekst={
-                                    'Er du sikker på at du vil avslutte samtalen?'
-                                }
-                                ja={() => this.props.confirmAvslutt()}
-                                nei={() => this.props.confirmCancel()}
-                            />
-                        )}
+                    {this.props.visBekreftelse === 'OMSTART' && (
+                        <Bekreftelsesboks
+                            tekst={
+                                'Er du sikker på at du vil starte samtalen på nytt?'
+                            }
+                            ja={() => this.props.confirmOmstart()}
+                            nei={() => this.props.confirmCancel()}
+                        />
+                    )}
+                    {this.props.visBekreftelse === 'AVSLUTT' && (
+                        <Bekreftelsesboks
+                            tekst={
+                                'Er du sikker på at du vil avslutte samtalen?'
+                            }
+                            ja={() => this.props.confirmAvslutt()}
+                            nei={() => this.props.confirmCancel()}
+                        />
+                    )}
                     {this.props.iKo && !this.props.avsluttet && (
                         <Alertstripe type='info'>
                             {'Du blir nå satt over til en veileder.'}
@@ -251,6 +262,9 @@ export default class Interaksjonsvindu extends Component<
                         aria-live='polite'
                         aria-atomic='false'
                         aria-relevant='additions'
+                        onClick={(e) =>
+                            minimizeMobileOnLinkClick(e, this.props.lukk)
+                        }
                     >
                         {historieListe}
                     </Chatlog>
@@ -463,12 +477,6 @@ export default class Interaksjonsvindu extends Component<
             return bruker ? bruker.userType : undefined;
         } else {
             return undefined;
-        }
-    }
-
-    sendTilLenke() {
-        if (this.props.href) {
-            window.open(this.props.href, '_blank');
         }
     }
 }
