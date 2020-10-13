@@ -265,10 +265,7 @@ export default class Interaksjonsvindu extends Component<
                         aria-atomic='false'
                         aria-relevant='additions'
                         onClick={(e) =>
-                            minimizeMobileOnLinkClick(
-                                e,
-                                this.props.lukk.bind(this)
-                            )
+                            minimizeMobileOnLinkClick(e, this.props.lukk)
                         }
                     >
                         {historieListe}
