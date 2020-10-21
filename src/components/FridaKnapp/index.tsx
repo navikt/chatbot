@@ -1,5 +1,5 @@
 import React from 'react';
-import { FridaKnapp, FridaIkon, FridaTekst } from './styles';
+import {FridaKnapp, FridaIkon, FridaTekst} from './styles';
 
 type Props = {
     onClick: () => void;
@@ -16,7 +16,7 @@ export const FridaKnappContainer = (props: Props) => {
             lang={'no'}
             id={'chatbot-frida-knapp'}
         >
-            <FridaTekst>{props.label || 'Chatbot Frida'}</FridaTekst>
+            <FridaTekst>{props.label ?? 'Chatbot Frida'}</FridaTekst>
             <FridaIkon queueKey={props.queueKey} />
         </FridaKnapp>
     );

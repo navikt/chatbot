@@ -1,7 +1,7 @@
-import styled, { css } from 'styled-components';
+import styled, {css} from 'styled-components';
 import tema from '../../tema/tema';
-import { liten } from '../../tema/mediaqueries';
-import { ikonSizeMobilPx, ikonSizePx } from '../FridaKnapp/styles';
+import {liten} from '../../tema/mediaqueries';
+import {ikonSizeMobilPx, ikonSizePx} from '../FridaKnapp/styles';
 
 interface Props {
     erApen: boolean;

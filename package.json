@@ -19,7 +19,7 @@
         "start": "nwb -c ./nwb.demo.config.js serve-react-demo --copy-files",
         "start:host": "nwb -c ./nwb.demo.config.js serve-react-demo --copy-files --host 0.0.0.0",
         "generate:types": "dts-generator --out src/index.d.ts --project ./ --exclude ./src/components/**/styles.ts --exclude ./node_modules/**/*.d.ts --prefix",
-        "test": "nwb test-react",
+        "test": "xo && nwb test-react",
         "test:coverage": "nwb test-react --coverage",
         "test:watch": "nwb test-react --server"
     },
@@ -87,11 +87,38 @@
         "styled-components": "^5.1.1",
         "svg-inline-loader": "^0.8.0",
         "ts-loader": "^8.0.2",
-        "typescript": "^3.9.7"
+        "typescript": "^3.9.7",
+        "xo": "^0.34.1"
     },
     "prettier": {
         "singleQuote": true,
         "jsxSingleQuote": true,
-        "tabWidth": 4
+        "tabWidth": 4,
+        "bracketSpacing": false
+    },
+    "xo": {
+        "envs": ["browser"],
+        "space": true,
+        "prettier": true,
+        "rules": {
+            "@typescript-eslint/no-implicit-any-catch": 0,
+            "import/no-unassigned-import": [
+                "error",
+                {
+                    "allow": [
+                        "@babel/polyfill",
+                        "react-app-polyfill/**",
+                        "**/register",
+                        "**/register/**"
+                    ]
+                }
+            ]
+        },
+        "overrides": [
+            {
+                "files": "tests/**/*",
+                "envs": ["phantomjs", "mocha", "browser"]
+            }
+        ]
     }
 }

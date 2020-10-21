@@ -3,14 +3,14 @@ import {
     CheckboxGruppe,
     Radio,
     RadioGruppe,
-    SkjemaGruppe,
+    SkjemaGruppe
 } from 'nav-frontend-skjema';
-import React, { useState } from 'react';
-import { Hovedknapp } from 'nav-frontend-knapper';
-import { Normaltekst, Undertittel } from 'nav-frontend-typografi';
-import { Container, Header, SurveyForm } from './styles';
-import { AnalyticsCallback } from '../../index';
-import { getEvalState, setEvalState } from '../../utils/evalStateUtils';
+import React, {useState} from 'react';
+import {Hovedknapp} from 'nav-frontend-knapper';
+import {Normaltekst, Undertittel} from 'nav-frontend-typografi';
+import {Container, Header, SurveyForm} from './styles';
+import {AnalyticsCallback} from '../..';
+import {getEvalState, setEvalState} from '../../utils/eval-state-utils';
 
 export type SurveyQuestion = {
     label: string;
@@ -19,9 +19,7 @@ export type SurveyQuestion = {
     required?: boolean;
 };
 
-type SurveyAnswers = {
-    [key: string]: string[];
-};
+type SurveyAnswers = Record<string, string[]>;
 
 type Props = {
     analyticsCallback?: AnalyticsCallback;
@@ -32,49 +30,55 @@ const findInvalidInput = (
     questions: SurveyQuestion[],
     answers: SurveyAnswers
 ): string[] =>
-    questions.reduce((missing, question) => {
+    questions.reduce<string[]>((missing, question) => {
         const answer = answers[question.label];
+
         return question.required && (!answer || answer.length === 0)
             ? missing.concat(question.label)
             : missing;
-    }, [] as string[]);
+    }, []);
 
-const toggleArrayValue = (arr: string[], value: string) =>
-    arr.includes(value)
-        ? arr.filter((v: any) => v !== value)
-        : arr.concat(value);
+const toggleArrayValue = (array: string[], value: string) =>
+    array.includes(value)
+        ? array.filter((v: any) => v !== value)
+        : array.concat(value);
 
-export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
+export default function Evaluering({
+    analyticsCallback,
+    analyticsSurvey
+}: Props) {
     const [surveyInput, setSurveyInput] = useState<SurveyAnswers>({});
     const [invalidInput, setInvalidInput] = useState<string[]>([]);
     const [surveySent, setSurveySent] = useState(getEvalState().sent);
 
-    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
 
         const _invalidInput = findInvalidInput(analyticsSurvey, surveyInput);
+
         if (_invalidInput.length > 0) {
             setInvalidInput(_invalidInput);
             return;
         }
 
         const evalState = getEvalState();
-        setEvalState({ ...evalState, sent: true });
+        setEvalState({...evalState, sent: true});
         setSurveySent(true);
 
         if (analyticsCallback) {
             analyticsCallback('tilbakemelding', {
                 komponent: 'frida',
-                veileder: !!evalState.veileder,
+                veileder: Boolean(evalState.veileder),
                 english: evalState.english,
                 rollevalg: evalState.rollevalg,
-                temavalg: evalState.temavalg,
+                temavalg: evalState.temavalg
             });
+
             Object.entries(surveyInput).forEach(([question, answer]) =>
                 analyticsCallback('tilbakemelding', {
                     komponent: 'frida',
                     spørsmål: question,
-                    svar: answer,
+                    svar: answer
                 })
             );
         }
@@ -103,6 +107,7 @@ export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
                         </>
                     )}
                 </Header>
+
                 {!surveySent && (
                     <SurveyForm onSubmit={onSubmit}>
                         {analyticsSurvey.map((question, index) => {
@@ -134,8 +139,8 @@ export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
                                                     setSurveyInput((state) => ({
                                                         ...state,
                                                         [question.label]: [
-                                                            option,
-                                                        ],
+                                                            option
+                                                        ]
                                                     }));
                                                 }}
                                                 key={option}
@@ -143,7 +148,9 @@ export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
                                         ))}
                                     </RadioGruppe>
                                 );
-                            } else if (question.type === 'checkbox') {
+                            }
+
+                            if (question.type === 'checkbox') {
                                 return (
                                     <CheckboxGruppe
                                         legend={question.label}
@@ -168,6 +175,7 @@ export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
                                                                 question.label
                                                         )
                                                     );
+
                                                     setSurveyInput((state) => ({
                                                         ...state,
                                                         [question.label]: toggleArrayValue(
@@ -175,7 +183,7 @@ export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
                                                                 question.label
                                                             ] || [],
                                                             option
-                                                        ),
+                                                        )
                                                     }));
                                                 }}
                                                 key={option}
@@ -183,9 +191,9 @@ export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
                                         ))}
                                     </CheckboxGruppe>
                                 );
-                            } else {
-                                return null;
                             }
+
+                            return null;
                         })}
                         <Hovedknapp
                             htmlType={'submit'}
@@ -199,6 +207,4 @@ export const Evaluering = ({ analyticsCallback, analyticsSurvey }: Props) => {
             </SkjemaGruppe>
         </Container>
     );
-};
-
-export default Evaluering;
+}

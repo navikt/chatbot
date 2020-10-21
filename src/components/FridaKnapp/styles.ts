@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { liten } from '../../tema/mediaqueries';
+import {liten} from '../../tema/mediaqueries';
 import fridaIkon from '../../assets/frida.svg';
 import defaultIkon from '../../assets/default.svg';
 

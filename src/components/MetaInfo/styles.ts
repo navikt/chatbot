@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import tema from '../../tema/tema';
-import { MetaInfoProps } from './index';
+import {MetaInfoProps} from '.';
 
 export const Container = styled.div`
     color: ${tema.farger.tekst.klokketekst};

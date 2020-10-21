@@ -1,11 +1,11 @@
 import React from 'react';
-import { Container, Indikator, IndikatorDot } from './styles';
+import {Container, Indikator, IndikatorDot} from './styles';
 
 type Props = {
     visIndikator: boolean;
 };
 
-export const Skriveindikator = ({ visIndikator }: Props) => {
+export default function Skriveindikator({visIndikator}: Props) {
     return visIndikator ? (
         <Container>
             <Indikator>
@@ -15,6 +15,4 @@ export const Skriveindikator = ({ visIndikator }: Props) => {
             </Indikator>
         </Container>
     ) : null;
-};
-
-export default Skriveindikator;
+}

@@ -1,6 +1,6 @@
-import { getCookie, setCookie } from './cookies';
-import { MessageWithIndicator } from '../components/ChatContainer';
-import { chatStateKeys } from './stateUtils';
+import {getCookie, setCookie} from './cookies';
+import {MessageWithIndicator} from '../components/ChatContainer';
+import {chatStateKeys} from './state-utils';
 
 type EvalState = {
     sent?: boolean;
