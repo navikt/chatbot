@@ -11,6 +11,15 @@ export const Boks = styled(AlertStripe)`
     border-radius: 0 !important;
     border-bottom-width: 2px !important;
     width: 100% !important;
+
+    &.alertstripe .alertstripe__ikon {
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+
+    &.alertstripe .alertstripe__tekst {
+        max-width: none;
+    }
 `;
 
 export const InnerContainer = styled.div`
@@ -21,7 +30,8 @@ export const InnerContainer = styled.div`
 
 export const Tekst = styled.div`
     flex: 1 1 auto;
-    max-width: 66%;
+    margin: auto;
+    margin-left: 0;
 `;
 
 export const Undertekst = styled.p`
