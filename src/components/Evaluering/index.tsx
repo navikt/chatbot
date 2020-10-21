@@ -29,14 +29,19 @@ type Props = {
 const findInvalidInput = (
     questions: SurveyQuestion[],
     answers: SurveyAnswers
-): string[] =>
-    questions.reduce<string[]>((missing, question) => {
+): string[] => {
+    const invalidFields: string[] = [];
+
+    questions.forEach((question) => {
         const answer = answers[question.label];
 
-        return question.required && (!answer || answer.length === 0)
-            ? missing.concat(question.label)
-            : missing;
-    }, []);
+        if (question.required && (!answer || answer.length === 0)) {
+            invalidFields.push(question.label);
+        }
+    });
+
+    return invalidFields;
+};
 
 const toggleArrayValue = (array: string[], value: string) =>
     array.includes(value)
@@ -53,7 +58,6 @@ export default function Evaluering({
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
         const _invalidInput = findInvalidInput(analyticsSurvey, surveyInput);
 
         if (_invalidInput.length > 0) {
@@ -195,6 +199,7 @@ export default function Evaluering({
 
                             return null;
                         })}
+
                         <Hovedknapp
                             htmlType={'submit'}
                             kompakt={true}

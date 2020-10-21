@@ -56,6 +56,7 @@ function Demo() {
                         required: true
                     }
                 ]}
+                analyticsCallback={console.log}
             />
         </Outer>
     );
