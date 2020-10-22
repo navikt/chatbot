@@ -165,18 +165,18 @@ export default class Interaksjonsvindu extends Component<
 
             const historieListe = historie.map(
                 (historieItem: MessageWithIndicator, index: number) => {
-                    const sistehistorie: Message =
+                    const sisteHistorie: Message =
                         this.props.historie[index - 1] &&
                         this.props.historie[index - 1].content !== 'TYPE_MSG'
                             ? this.props.historie[index - 1]
                             : this.props.historie[index - 2];
                     return this.lastHistorie(
                         historieItem,
-                        sistehistorie &&
-                            (sistehistorie.type === 'Message' ||
-                            sistehistorie.type === 'Option' ||
-                            sistehistorie.type === 'Evaluation'
-                                ? sistehistorie.userId
+                        sisteHistorie &&
+                            (sisteHistorie.type === 'Message' ||
+                            sisteHistorie.type === 'Option' ||
+                            sisteHistorie.type === 'Evaluation'
+                                ? sisteHistorie.userId
                                 : null)
                     );
                 }
