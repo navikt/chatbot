@@ -28,7 +28,7 @@ export type ChatContainerState = {
     erApen: boolean;
     navn?: string | undefined;
     historie: MessageWithIndicator[];
-    ikkeLastethistorie: MessageWithIndicator[];
+    ikkeLastetHistorie: MessageWithIndicator[];
     brukere: Bruker[];
     config?: Config;
     iKo: boolean;
@@ -44,7 +44,7 @@ const defaultState: ChatContainerState = {
     erApen: false,
     navn: 'Chatbot Frida',
     historie: [],
-    ikkeLastethistorie: [],
+    ikkeLastetHistorie: [],
     config: undefined,
     brukere: [],
     iKo: false,
@@ -69,7 +69,7 @@ export default class ChatContainer extends Component<
     baseUrl = 'https://api.puzzel.com/chat/v1';
     skriveindikatorTid = 1000;
     hentHistorieIntervall: number;
-    lesIkkeLastethistorieIntervall: number;
+    lesIkkeLastetHistorieIntervall: number;
     events: Element[] = [];
     config: ConfigurationResponse;
 
@@ -103,7 +103,7 @@ export default class ChatContainer extends Component<
         this.hentFullHistorie = this.hentFullHistorie.bind(this);
         this.handterMelding = this.handterMelding.bind(this);
         this.leggTilIHistorie = this.leggTilIHistorie.bind(this);
-        this.lesIkkeLastethistorie = this.lesIkkeLastethistorie.bind(this);
+        this.lesIkkeLastetHistorie = this.lesIkkeLastetHistorie.bind(this);
         this.skjulIndikator = this.skjulIndikator.bind(this);
         this.skjulAlleIndikatorForBruker = this.skjulAlleIndikatorForBruker.bind(
             this
@@ -135,7 +135,7 @@ export default class ChatContainer extends Component<
 
     componentWillUnmount(): void {
         clearInterval(this.hentHistorieIntervall);
-        clearInterval(this.lesIkkeLastethistorieIntervall);
+        clearInterval(this.lesIkkeLastetHistorieIntervall);
     }
 
     render() {
@@ -269,14 +269,14 @@ export default class ChatContainer extends Component<
                 }
 
                 clearInterval(this.hentHistorieIntervall);
-                clearInterval(this.lesIkkeLastethistorieIntervall);
+                clearInterval(this.lesIkkeLastetHistorieIntervall);
 
                 this.hentHistorieIntervall = setInterval(() => {
                     void this.hentHistorie();
                 }, 1000);
 
-                this.lesIkkeLastethistorieIntervall = setInterval(
-                    () => this.lesIkkeLastethistorie(),
+                this.lesIkkeLastetHistorieIntervall = setInterval(
+                    () => this.lesIkkeLastetHistorie(),
                     50
                 );
 
@@ -311,7 +311,7 @@ export default class ChatContainer extends Component<
         if (!this.state.avsluttet) await this.avslutt();
 
         clearInterval(this.hentHistorieIntervall);
-        clearInterval(this.lesIkkeLastethistorieIntervall);
+        clearInterval(this.lesIkkeLastetHistorieIntervall);
 
         const apen = getCookie(chatStateKeys.APEN) === true;
 
@@ -427,9 +427,9 @@ export default class ChatContainer extends Component<
                         };
 
                         this.setState({
-                            ikkeLastethistorie: [
-                                ...this.state.ikkeLastethistorie,
-                                historieMedIndikator
+                            ikkeLastetHistorie: [
+                                ...this.state.ikkeLastetHistorie,
+                                historieMedIndikator,
                             ]
                         });
                     }
@@ -582,10 +582,10 @@ export default class ChatContainer extends Component<
         setHistoryCache(this.state.historie);
     }
 
-    lesIkkeLastethistorie() {
+    lesIkkeLastetHistorie() {
         const now = moment().valueOf();
-        if (this.state.erApen && this.state.ikkeLastethistorie.length > 0) {
-            const [historie, ...resten] = this.state.ikkeLastethistorie;
+        if (this.state.erApen && this.state.ikkeLastetHistorie.length > 0) {
+            const [historie, ...resten] = this.state.ikkeLastetHistorie;
             if (
                 historie.role === 1 &&
                 (historie.type === 'Message' ||
@@ -606,7 +606,7 @@ export default class ChatContainer extends Component<
 
                                 return {
                                     brukereSomSkriver,
-                                    ikkeLastethistorie: resten
+                                    ikkeLastetHistorie: resten
                                 };
                             },
                             () => {
@@ -626,7 +626,7 @@ export default class ChatContainer extends Component<
                     });
                 }
             } else {
-                this.setState({ikkeLastethistorie: resten}, () => {
+                this.setState({ikkeLastetHistorie: resten}, () => {
                     this.handterMelding(historie, true);
                 });
             }
