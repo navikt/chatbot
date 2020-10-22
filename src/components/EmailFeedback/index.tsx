@@ -1,25 +1,25 @@
-import React, { ChangeEvent, FormEvent, useState } from 'react';
+import React, {ChangeEvent, FormEvent, useState} from 'react';
 import axios from 'axios';
-import { Config, Tidigjen } from '../Interaksjonsvindu';
-import { EmailSend } from '../../api/Sessions';
+import {Config, Tidigjen} from '../Interaksjonsvindu';
+import {EmailSend} from '../../api/sessions';
 import tema from '../../tema/tema';
 import {
     Container,
     Feilmelding,
     Form,
     Suksessmelding,
-    UthevetTekst,
+    UthevetTekst
 } from './styles';
-import { Knapp } from 'nav-frontend-knapper';
-import { Input } from 'nav-frontend-skjema';
-import { Normaltekst, Undertittel } from 'nav-frontend-typografi';
+import {Knapp} from 'nav-frontend-knapper';
+import {Input} from 'nav-frontend-skjema';
+import {Normaltekst, Undertittel} from 'nav-frontend-typografi';
 
 const validateEmail = (email: string) =>
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i.test(
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[(?:\d{1,3}\.){3}\d{1,3}])|(([a-z\-\d]+\.)+[a-z]{2,}))$/i.test(
         email
     );
 
-const sendEmail = (url: string, email: string) =>
+const sendEmail = async (url: string, email: string) =>
     axios.post(url, {
         toEmailAddress: email,
         emailSubject: 'Chatlog fra NAV',
@@ -31,7 +31,7 @@ const sendEmail = (url: string, email: string) =>
         logo: {
             url: 'https://www.nav.no/_public/beta.nav.no/images/logo.png',
             link: 'https://www.nav.no',
-            alt: 'NAV Kontaktsenter',
+            alt: 'NAV Kontaktsenter'
         },
         layout: {
             topBackgroundColor: '#FFFFFF',
@@ -41,8 +41,8 @@ const sendEmail = (url: string, email: string) =>
                 'font-size:' +
                 tema.storrelser.tekst.generell +
                 ';font-family:' +
-                tema.tekstFamilie,
-        },
+                tema.tekstFamilie
+        }
     } as EmailSend);
 
 type Props = {
@@ -51,41 +51,41 @@ type Props = {
     tidIgjen: Tidigjen;
 };
 
-export const EmailFeedback = ({ baseUrl, config, tidIgjen }: Props) => {
+export default function EmailFeedback({baseUrl, config, tidIgjen}: Props) {
     const [emailInput, setEmailInput] = useState<string>('');
     const [emailSentTo, setEmailSentTo] = useState('');
-    const [error, setError] = useState<string>('');
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setError('');
-        setEmailInput(e.target.value);
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setErrorMessage('');
+        setEmailInput(event.target.value);
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
 
         if (!emailInput) {
-            setError('Skriv inn din e-post adresse');
+            setErrorMessage('Skriv inn din e-post adresse');
             return;
         }
 
         if (!validateEmail(emailInput)) {
-            setError('E-post adressen er ikke gyldig');
+            setErrorMessage('E-post adressen er ikke gyldig');
             return;
         }
 
         sendEmail(`${baseUrl}/sessions/${config.sessionId}/email`, emailInput)
             .then(() => {
-                setError('');
+                setErrorMessage('');
                 setEmailSentTo(emailInput);
             })
-            .catch((err) => {
-                setError(
+            .catch((error) => {
+                setErrorMessage(
                     'Sending feilet - dobbeltsjekk e-post adressen og prøv igjen'
                 );
-                console.error(
-                    `Error sending chatlog to email ${emailInput} - ${err}`
-                );
+
+                console.log(`Error sending chatlog to email ${emailInput}`);
+                console.error(error);
             });
     };
 
@@ -98,19 +98,22 @@ export const EmailFeedback = ({ baseUrl, config, tidIgjen }: Props) => {
                 <UthevetTekst>{tidIgjen.formatert}</UthevetTekst>
                 {' til.'}
             </Normaltekst>
+
             <Form onSubmit={handleSubmit} noValidate>
                 <Input
                     type={'email'}
                     aria-label={'Din e-post'}
                     placeholder={'Din e-post'}
                     onChange={handleChange}
-                    feil={!!error}
+                    feil={Boolean(errorMessage)}
                 />
+
                 <Knapp htmlType={'submit'} kompakt={true}>
                     {'Send'}
                 </Knapp>
             </Form>
-            {error && <Feilmelding>{error}</Feilmelding>}
+
+            {errorMessage && <Feilmelding>{errorMessage}</Feilmelding>}
             {emailSentTo && (
                 <Suksessmelding>
                     {`E-post ble sendt til ${emailSentTo}`}
@@ -118,6 +121,4 @@ export const EmailFeedback = ({ baseUrl, config, tidIgjen }: Props) => {
             )}
         </Container>
     );
-};
-
-export default EmailFeedback;
+}

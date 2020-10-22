@@ -1,8 +1,8 @@
-import styled, { css } from 'styled-components';
+import styled, {css} from 'styled-components';
 import tema from '../../tema/tema';
 import valgtIkon from '../../assets/valgt.svg';
-import { ValgProps } from './index';
-import { Indikator } from '../Skriveindikator/styles';
+import {ValgProps} from '.';
+import {Indikator} from '../Skriveindikator/styles';
 
 export const ValgContainer = styled.ul`
     list-style: none;

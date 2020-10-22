@@ -24,43 +24,43 @@ module.exports = {
                 'nav-frontend-skjema-style': 'nav-frontend-skjema-style',
                 'nav-frontend-typografi': 'nav-frontend-typografi',
                 'nav-frontend-typografi-style': 'nav-frontend-typografi-style',
-                'styled-components': 'styled-components',
-            },
+                'styled-components': 'styled-components'
+            }
         },
         cjs: false,
-        esModules: false,
+        esModules: false
     },
     webpack: {
         extra: {
             entry: './src/index',
             resolve: {
-                extensions: ['.ts', '.tsx', '.js', '.jsx', '.less'],
+                extensions: ['.ts', '.tsx', '.js', '.jsx', '.less']
             },
             module: {
                 rules: [
-                    { test: /\.ts|\.tsx$/, loader: 'ts-loader' },
+                    {test: /\.ts|\.tsx$/, loader: 'ts-loader'},
                     {
                         test: /\.less$/,
                         use: [
                             {
-                                loader: 'style-loader',
+                                loader: 'style-loader'
                             },
                             {
-                                loader: 'css-loader',
+                                loader: 'css-loader'
                             },
                             {
-                                loader: 'less-loader',
-                            },
-                        ],
-                    },
-                ],
-            },
+                                loader: 'less-loader'
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         rules: {
             svg: {
-                loader: 'svg-inline-loader?classPrefix',
-            },
+                loader: 'svg-inline-loader?classPrefix'
+            }
         },
-        copy: [{ from: './src/index.d.ts', to: './' }],
-    },
+        copy: [{from: './src/index.d.ts', to: './'}]
+    }
 };

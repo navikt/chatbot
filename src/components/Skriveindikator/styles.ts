@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, {keyframes} from 'styled-components';
 import tema from '../../tema/tema';
 
 const blink = keyframes`

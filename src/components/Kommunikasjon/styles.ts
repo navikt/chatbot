@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import fridaIkon from '../../assets/frida.svg';
 import tema from '../../tema/tema';
-import { KommunikasjonState } from './index';
+import {KommunikasjonState} from '.';
 
 export const Container = styled.div`
     display: flex;
@@ -28,7 +28,7 @@ export const Hoyre = styled.div`
 export const Brukerbilde = styled.div`
     width: 50px;
     height: 50px;
-    ${(props: { brukerBilde: string | undefined }) =>
+    ${(props: {brukerBilde: string | undefined}) =>
         props.brukerBilde
             ? `background: transparent url('${props.brukerBilde.trim()}') no-repeat center center`
             : `background: transparent url('data:image/svg+xml;base64, ${window.btoa(

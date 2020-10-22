@@ -5,7 +5,7 @@ import {
     JaKnapp,
     NeiKnapp,
     Tekst,
-    Undertekst,
+    Undertekst
 } from './styles';
 import avsluttIkon from '../../assets/avslutt.svg';
 import checkIkon from '../../assets/check.svg';
@@ -17,27 +17,30 @@ type Props = {
     nei?: () => void;
 };
 
-export const Bekreftelsesboks = (props: Props) => {
+export default function Bekreftelsesboks(props: Props) {
     return (
         <Boks type={'advarsel'}>
             <InnerContainer>
                 <Tekst>
                     {props.tekst}
+
                     {props.undertekst && (
                         <Undertekst>{props.undertekst}</Undertekst>
                     )}
                 </Tekst>
+
                 {props.ja && (
                     <JaKnapp
-                        dangerouslySetInnerHTML={{ __html: checkIkon }}
+                        dangerouslySetInnerHTML={{__html: checkIkon}}
                         onClick={() => props.ja!()}
                         aria-label={'Ja'}
                     />
                 )}
+
                 {props.nei && (
                     <NeiKnapp
                         dangerouslySetInnerHTML={{
-                            __html: avsluttIkon,
+                            __html: avsluttIkon
                         }}
                         onClick={() => props.nei!()}
                         aria-label={'Nei'}
@@ -46,6 +49,4 @@ export const Bekreftelsesboks = (props: Props) => {
             </InnerContainer>
         </Boks>
     );
-};
-
-export default Bekreftelsesboks;
+}

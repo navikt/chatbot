@@ -7,9 +7,9 @@ export interface Message {
     type: string;
     content: any | any[];
     arguments?: {
-        additionalProp1: {};
-        additionalProp2: {};
-        additionalProp3: {};
+        additionalProp1: Record<string, unknown>;
+        additionalProp2: Record<string, unknown>;
+        additionalProp3: Record<string, unknown>;
     };
 }
 
@@ -67,9 +67,7 @@ export interface SurveySend {
     queueKey: string;
 }
 
-export interface ConfigurationResponse {
-    [key: string]: string;
-}
+export type ConfigurationResponse = Record<string, string>;
 
 export interface SessionCreateIntro {
     /**
@@ -79,7 +77,7 @@ export interface SessionCreateIntro {
     /**
      * Variables to add
      */
-    variables?: { [key: string]: string };
+    variables?: Record<string, string>;
     /**
      * Welcome message header
      */
