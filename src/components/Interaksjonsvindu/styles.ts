@@ -68,7 +68,7 @@ export const Teller = styled.div`
     font-size: ${tema.storrelser.tekst.teller};
     font-family: ${tema.tekstFamilie};
     margin-top: 5px;
-    color: ${(props: { error: boolean }) =>
+    color: ${(props: {error: boolean}) =>
         props.error ? 'red' : tema.farger.tekst.klokketekst};
 `;
 

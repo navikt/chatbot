@@ -7,11 +7,11 @@ export const Bar = styled.div`
     font-size: ${tema.storrelser.tekst.toppBar};
     margin: 0;
     display: flex;
-    background: ${(props: { navn: string }) =>
+    background: ${(props: {navn: string}) =>
         props.navn === 'Chatbot Frida'
             ? tema.farger.toppBar.bot
             : tema.farger.toppBar.ekstern};
-    color: ${(props: { navn: string }) =>
+    color: ${(props: {navn: string}) =>
         props.navn === 'Chatbot Frida' ? undefined : '#fff'};
     transition: all 300ms ease-in-out;
     z-index: 10;
@@ -41,7 +41,7 @@ export const Knapp = styled.button`
 
         line,
         path {
-            stroke: ${(props: { navn: string }) =>
+            stroke: ${(props: {navn: string}) =>
                 props.navn === 'Chatbot Frida' ? undefined : '#fff'};
             transition: all 300ms ease-in-out;
         }

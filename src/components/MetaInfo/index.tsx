@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { Container, NickName } from './styles';
-import moment from "moment";
+import React from 'react';
+import {Container, NickName} from './styles';
+import moment from 'moment';
 
 export type MetaInfoProps = {
     nickName?: string;
@@ -9,18 +9,18 @@ export type MetaInfoProps = {
     skraTekst?: boolean;
 };
 
-export default class MetaInfo extends Component<MetaInfoProps, {}> {
-    render() {
-        const { nickName, sent } = this.props;
-        return (
-            <Container side={this.props.side}>
-                {nickName !== 'Bruker' && (
-                    <NickName aria-hidden='true' side={this.props.side}>
-                        {nickName}
-                    </NickName>
-                )}
-                {moment(sent).format("HH:mm")}
-            </Container>
-        );
-    }
+export default function MetaInfo(props: MetaInfoProps) {
+    const {nickName, sent, side} = props;
+
+    return (
+        <Container side={side}>
+            {nickName !== 'Bruker' && (
+                <NickName aria-hidden='true' side={side}>
+                    {nickName}
+                </NickName>
+            )}
+
+            {moment(sent).format('HH:mm')}
+        </Container>
+    );
 }

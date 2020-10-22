@@ -1,24 +1,23 @@
-import React, { Component } from 'react';
-import { KnappElement } from './styles';
+import React from 'react';
+import {KnappElement} from './styles';
 
 export type KnappProps = {
     disabled?: boolean;
     aktiv?: boolean;
     prosent?: number;
+    children?: React.ReactNode;
 };
 
-export default class Knapp extends Component<KnappProps, {}> {
-    render() {
-        return (
-            <KnappElement
-                disabled={this.props.disabled}
-                type='submit'
-                aktiv={this.props.aktiv}
-                tabIndex={0}
-                prosent={this.props.prosent}
-            >
-                {this.props.children}
-            </KnappElement>
-        );
-    }
+export default function Knapp(props: KnappProps) {
+    return (
+        <KnappElement
+            disabled={props.disabled}
+            type='submit'
+            aktiv={props.aktiv}
+            tabIndex={0}
+            prosent={props.prosent}
+        >
+            {props.children}
+        </KnappElement>
+    );
 }
