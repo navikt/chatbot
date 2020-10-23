@@ -302,12 +302,12 @@ const Interaksjonsvindu = (properties: Properties) => {
                             : null)
                 );
             }),
-        [historie, brukere]
+        [historie, brukere] // eslint-disable-line react-hooks/exhaustive-deps
     );
 
     useEffect(() => {
         scrollToBottom();
-    }, [log]);
+    }, [log]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!properties.vis) {
         return null;

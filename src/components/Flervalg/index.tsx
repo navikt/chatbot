@@ -26,10 +26,10 @@ const Flervalg = ({
     sisteBrukerId
 }: Properties) => {
     const [choice, setChoice] = useState<number>(-1);
+    const hasChosen = harBlittBesvart || choice >= 0;
     const isCollapsed = Boolean(
         sisteBrukerId && sisteBrukerId === beskjed.userId
     );
-    const hasChosen = harBlittBesvart || choice >= 0;
 
     useEffect(() => {
         const index = beskjed.content.findIndex(
@@ -37,7 +37,7 @@ const Flervalg = ({
         );
 
         setChoice(index);
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const options = beskjed.content.map(
         (item: {tekst: string}, index: number) => {

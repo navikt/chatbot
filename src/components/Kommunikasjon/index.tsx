@@ -67,7 +67,7 @@ const Kommunikasjon = (properties: Properties) => {
         }
 
         return undefined;
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         setIsMessageVisible(!showIndicator || role === 0);

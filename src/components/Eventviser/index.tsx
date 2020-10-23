@@ -33,7 +33,7 @@ const Eventviser = (properties: Properties) => {
         }
 
         return '';
-    }, [properties.beskjed]);
+    }, [properties.beskjed]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return <Event tabIndex={0}>{event}</Event>;
 };

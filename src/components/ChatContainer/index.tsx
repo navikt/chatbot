@@ -1,5 +1,4 @@
-import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
+import React, {Component, createRef} from 'react';
 import moment from 'moment';
 import axios, {AxiosResponse} from 'axios';
 import {userTypeConstants, eventTypeConstants} from '../../constants';
@@ -73,9 +72,8 @@ export default class ChatContainer extends Component<
     events: Element[] = [];
     config: ConfigurationResponse;
 
-    constructor(props: ConnectionConfig) {
-        super(props);
-
+    reference = createRef<HTMLDivElement>();
+    state = (() => {
         const historie = loadHistoryCache() || [];
         const sisteMelding = historie
             .slice()
@@ -83,7 +81,7 @@ export default class ChatContainer extends Component<
             .find((_historie: any) => _historie.role === 1);
         const config = getCookie(chatStateKeys.CONFIG);
 
-        this.state = hasActiveSession(config)
+        return hasActiveSession(config)
             ? {
                   ...defaultState,
                   erApen: getCookie(chatStateKeys.APEN) || false,
@@ -92,6 +90,10 @@ export default class ChatContainer extends Component<
                   sisteMeldingId: sisteMelding ? sisteMelding.id : 0
               }
             : defaultState;
+    })();
+
+    constructor(props: ConnectionConfig) {
+        super(props);
 
         this.start = this.start.bind(this);
         this.apne = this.apne.bind(this);
@@ -144,6 +146,7 @@ export default class ChatContainer extends Component<
 
         return (
             <Container
+                ref={this.reference as any}
                 erApen={this.state.erApen}
                 tabIndex={this.state.erApen ? 0 : -1}
                 aria-label={
@@ -192,7 +195,7 @@ export default class ChatContainer extends Component<
                     brukere={this.state.brukere}
                     iKo={this.state.iKo}
                     avsluttet={this.state.avsluttet}
-                    config={this.state.config!}
+                    config={this.state.config}
                     skriveindikatorTid={this.skriveindikatorTid}
                     hentHistorie={async () => this.hentHistorie()}
                     visBekreftelse={this.state.visBekreftelse}
@@ -200,7 +203,6 @@ export default class ChatContainer extends Component<
                     confirmOmstart={async () => this.confirmOmstart()}
                     confirmCancel={async () => this.confirmCancel()}
                     lukk={async () => this.lukk()}
-                    lukkOgAvslutt={async () => this.lukkOgAvslutt()}
                     feil={this.state.feil}
                     analyticsCallback={this.props.analyticsCallback}
                     analyticsSurvey={this.props.analyticsSurvey}
@@ -234,8 +236,7 @@ export default class ChatContainer extends Component<
             }
 
             if (!this.state.feil && this.state.erApen) {
-                const node = ReactDOM.findDOMNode(this) as HTMLElement;
-                node.focus();
+                this.reference.current?.focus();
 
                 if (this.state.historie && this.state.historie.length === 0) {
                     // Henter full historie fra API
@@ -343,10 +344,11 @@ export default class ChatContainer extends Component<
     }
 
     async confirmAvslutt() {
+        const sessionId: string = this.state.config.sessionId ?? '';
+        const requestId: string = this.state.config.requestId ?? '';
+
         await axios.delete(
-            `${this.baseUrl}/sessions/${this.state.config!.sessionId}/${
-                this.state.config!.requestId
-            }`
+            `${this.baseUrl}/sessions/${sessionId}/${requestId}`
         );
 
         if (!getCookie(chatStateKeys.MAILTIMEOUT)) {
@@ -398,8 +400,10 @@ export default class ChatContainer extends Component<
 
     hentFullHistorie() {
         if (this.state.config) {
+            const sessionId: string = this.state.config.sessionId ?? '';
+
             return axios.get(
-                `${this.baseUrl}/sessions/${this.state.config.sessionId}/messages/0`
+                `${this.baseUrl}/sessions/${sessionId}/messages/0`
             );
         }
 
@@ -413,8 +417,11 @@ export default class ChatContainer extends Component<
             !this.state.avsluttet
         ) {
             try {
+                const sessionId: string = this.state.config.sessionId ?? '';
+                const sisteMeldingId: string = this.state.sisteMeldingId ?? '';
+
                 const response = await axios.get(
-                    `${this.baseUrl}/sessions/${this.state.config.sessionId}/messages/${this.state.sisteMeldingId}`
+                    `${this.baseUrl}/sessions/${sessionId}/messages/${sisteMeldingId}`
                 );
 
                 const data: Message[] = response.data;
