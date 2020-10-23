@@ -2,23 +2,23 @@ import styled, {keyframes} from 'styled-components';
 import tema from '../../tema/tema';
 
 const blink = keyframes`
-50% {
-    background: ${tema.farger.skriveIndikator.dot.aktiv};
-  }
+    50% {
+        background: ${tema.farger.skriveIndikator.dot.aktiv};
+    }
 `;
 
 const visAnimasjon = keyframes`
-    from { 
-      opacity: 0;
-      transform: translateY(-10px);
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
     }
     to {
-      opacity: 1;
-      transform: translateY(0);
+        opacity: 1;
+        transform: translateY(0);
     }
 `;
 
-export const Container = styled.div`
+export const Boks = styled.div`
     font-style: normal;
 `;
 
@@ -30,7 +30,7 @@ export const Indikator = styled.div`
     animation: ${visAnimasjon} 300ms;
 `;
 
-export const IndikatorDot = styled.span`
+export const IndikatorPrikk = styled.span`
     height: 10px;
     width: 10px;
     background: ${tema.farger.skriveIndikator.dot.inaktiv};

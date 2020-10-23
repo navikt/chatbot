@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import ToppBar from '../ToppBar';
-import Interaksjonsvindu, {Bruker, Config} from '../Interaksjonsvindu';
-import {Container} from './styles';
-import {ConnectionConfig} from '../..';
+import moment from 'moment';
 import axios, {AxiosResponse} from 'axios';
+import {userTypeConstants, eventTypeConstants} from '../../constants';
 import {getCookie, setCookie} from '../../utils/cookies';
 import {
     ConfigurationResponse,
@@ -12,8 +10,6 @@ import {
     SessionCreate,
     SessionCreateResponse
 } from '../../api/sessions';
-import moment from 'moment';
-import {FridaKnappContainer} from '../FridaKnapp';
 import {
     chatStateKeys,
     clearState,
@@ -23,6 +19,11 @@ import {
     updateLastActiveTime
 } from '../../utils/state-utils';
 import {getEvalState, setEvalState} from '../../utils/eval-state-utils';
+import {ConnectionConfig} from '../..';
+import {FridaKnappContainer} from '../FridaKnapp';
+import Interaksjonsvindu, {Bruker, Config} from '../Interaksjonsvindu';
+import ToppBar from '../ToppBar';
+import {Container} from './styles';
 
 export type ChatContainerState = {
     erApen: boolean;
@@ -56,17 +57,21 @@ const defaultState: ChatContainerState = {
     feil: false
 };
 
-export interface ShowIndicator {
-    showIndicator: boolean;
-}
-
+export interface ShowIndicator {showIndicator: boolean}
 export interface MessageWithIndicator extends Message, ShowIndicator {}
+
+const baseUrl = 'https://api.puzzel.com/chat/v1';
+const typingIndicatorTime = 1000;
+
+const ChatContainer = (properties: Properties) => {
+
+}
 
 export default class ChatContainer extends Component<
     ConnectionConfig,
     ChatContainerState
 > {
-    baseUrl = 'https://api.puzzel.com/chat/v1';
+    baseUrl = ;
     skriveindikatorTid = 1000;
     hentHistorieIntervall: number;
     lesIkkeLastetHistorieIntervall: number;
@@ -154,10 +159,10 @@ export default class ChatContainer extends Component<
             >
                 {!this.state.erApen && (
                     <FridaKnappContainer
-                        onClick={this.apne}
                         navn={navn}
                         queueKey={this.props.queueKey}
                         label={this.props.label}
+                        onClick={this.apne}
                     />
                 )}
 
@@ -165,7 +170,8 @@ export default class ChatContainer extends Component<
                     <ToppBar
                         navn={
                             this.state.brukere.some(
-                                (bruker: Bruker) => bruker.userType === 'Human'
+                                (bruker: Bruker) =>
+                                    bruker.userType === userTypeConstants.human
                             )
                                 ? `Chat med NAV`
                                 : navn
@@ -420,18 +426,20 @@ export default class ChatContainer extends Component<
 
                 if (data && data.length > 0) {
                     for (const historie of data) {
-                        const showIndicator = historie.content === 'TYPE_MSG';
+                        const showIndicator =
+                            historie.content ===
+                            eventTypeConstants.remoteIsTyping;
                         const historieMedIndikator: MessageWithIndicator = {
                             ...historie,
                             showIndicator
                         };
 
-                        this.setState({
+                        this.setState((previousState) => ({
                             ikkeLastetHistorie: [
-                                ...this.state.ikkeLastetHistorie,
-                                historieMedIndikator,
+                                ...previousState.ikkeLastetHistorie,
+                                historieMedIndikator
                             ]
-                        });
+                        }));
                     }
 
                     let fantId = false;
@@ -493,7 +501,7 @@ export default class ChatContainer extends Component<
                 });
             }
 
-            if (melding.content.userType === 'Human') {
+            if (melding.content.userType === userTypeConstants.human) {
                 setEvalState({...getEvalState(), veileder: true});
                 this.setState({iKo: false});
             }
@@ -523,7 +531,7 @@ export default class ChatContainer extends Component<
                 temporary.valgt = true;
             }
         } else if (melding.type === 'Event') {
-            if (melding.content === 'USER_DISCONNECTED') {
+            if (melding.content === eventTypeConstants.remoteDisconnected) {
                 this.setState(
                     (state: ChatContainerState) => {
                         const brukere = state.brukere.map((bruker) => {
@@ -549,9 +557,11 @@ export default class ChatContainer extends Component<
                         }
                     }
                 );
-            } else if (melding.content.includes('REQUEST_PUTINQUEUE')) {
+            } else if (melding.content.includes(eventTypeConstants.isQueued)) {
                 this.setState({iKo: true});
-            } else if (melding.content === 'REQUEST_DISCONNECTED') {
+            } else if (
+                melding.content === eventTypeConstants.userDisconnected
+            ) {
                 this.setState({avsluttet: true});
             }
         }
@@ -576,7 +586,9 @@ export default class ChatContainer extends Component<
                 (historie: Message) => historie.id === melding.id
             )
         ) {
-            this.setState({historie: [...this.state.historie, melding]});
+            this.setState((previousState) => ({
+                historie: [...previousState.historie, melding]
+            }));
         }
 
         setHistoryCache(this.state.historie);
@@ -662,7 +674,7 @@ export default class ChatContainer extends Component<
         const indikatorer = this.state.historie.filter(
             (historie: MessageWithIndicator) =>
                 historie.userId === brukerId &&
-                historie.content === 'TYPE_MSG' &&
+                historie.content === eventTypeConstants.remoteIsTyping &&
                 historie.showIndicator
         );
 

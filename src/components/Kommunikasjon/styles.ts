@@ -1,15 +1,21 @@
 import styled from 'styled-components';
+import {userTypeConstants} from '../../constants';
 import fridaIkon from '../../assets/frida.svg';
 import tema from '../../tema/tema';
-import {KommunikasjonState} from '.';
 
-export const Container = styled.div`
+type Properties = {
+    side?: 'VENSTRE' | 'HOYRE';
+    brukerBilde?: string;
+    brukerType?: 'HUMAN' | 'BOT' | string | undefined;
+};
+
+export const Boks = styled.div`
     display: flex;
     flex-direction: column;
     margin: 10px 0;
 `;
 
-export const Indre = styled.div`
+export const Innhold = styled.div`
     display: flex;
 `;
 
@@ -21,16 +27,16 @@ export const Venstre = styled.div`
 `;
 
 export const Hoyre = styled.div`
-    margin-left: ${(props: KommunikasjonState) =>
-        props.side === 'VENSTRE' ? undefined : 'auto'};
+    margin-left: ${(properties: Properties) =>
+        properties.side === 'VENSTRE' ? undefined : 'auto'};
 `;
 
 export const Brukerbilde = styled.div`
     width: 50px;
     height: 50px;
-    ${(props: {brukerBilde: string | undefined}) =>
-        props.brukerBilde
-            ? `background: transparent url('${props.brukerBilde.trim()}') no-repeat center center`
+    ${(properties: Properties) =>
+        properties.brukerBilde
+            ? `background: transparent url('${properties.brukerBilde.trim()}') no-repeat center center`
             : `background: transparent url('data:image/svg+xml;base64, ${window.btoa(
                   fridaIkon
               )}') no-repeat center center`};
@@ -40,14 +46,20 @@ export const Snakkeboble = styled.div`
     font-family: ${tema.tekstFamilie};
     font-size: ${tema.storrelser.tekst.generell};
     padding: 15px;
-    background: ${(props: KommunikasjonState) =>
-        props.brukerType === 'Bot'
-            ? tema.farger.snakkebobler.bot
-            : props.brukerType === 'Human'
-            ? tema.farger.snakkebobler.agent
-            : tema.farger.snakkebobler.bruker};
-    border-radius: ${(props: KommunikasjonState) =>
-        props.side === 'VENSTRE' ? '0 7px 7px 7px' : '7px 0 7px 7px'};
+    background: ${(properties: Properties) => {
+        if (properties.brukerType === userTypeConstants.bot) {
+            return tema.farger.snakkebobler.bot;
+        }
+
+        if (properties.brukerType === userTypeConstants.human) {
+            return tema.farger.snakkebobler.agent;
+        }
+
+        return tema.farger.snakkebobler.bruker;
+    }};
+
+    border-radius: ${(properties: Properties) =>
+        properties.side === 'VENSTRE' ? '0 7px 7px 7px' : '7px 0 7px 7px'};
     word-break: break-word;
 
     svg {

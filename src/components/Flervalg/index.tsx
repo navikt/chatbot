@@ -1,69 +1,69 @@
 import React, {useEffect, useState} from 'react';
-import MetaInfo from '../MetaInfo';
-import {Container, Valg, ValgContainer} from './styles';
 import {Message} from '../../api/sessions';
+import MetaInfo from '../MetaInfo';
 import Skriveindikator from '../Skriveindikator';
+import {Boks, Valg, ValgBoks} from './styles';
 
-type Props = {
+type Properties = {
     beskjed: Message;
     harBlittBesvart: boolean;
     fridaHarSvart: boolean;
     velg: (messageId: number, valg: string) => void;
     sisteBrukerId: number | null;
-    scrollTilBunn?: () => void;
 };
 
-export interface ValgProps {
-    valgt?: boolean;
-    aktiv?: boolean;
-    kollaps?: boolean;
+export interface ValgProperties {
+    isChosen?: boolean;
+    isActive?: boolean;
+    isCollapsed?: boolean;
 }
 
-export default function Flervalg({
+const Flervalg = ({
     beskjed,
     harBlittBesvart,
     fridaHarSvart,
     velg,
-    sisteBrukerId,
-    scrollTilBunn
-}: Props) {
-    const [valgtIndex, setValgtIndex] = useState<number>(-1);
-    const kollaps = Boolean(sisteBrukerId && sisteBrukerId === beskjed.userId);
-    const harValgt = harBlittBesvart || valgtIndex >= 0;
+    sisteBrukerId
+}: Properties) => {
+    const [choice, setChoice] = useState<number>(-1);
+    const isCollapsed = Boolean(
+        sisteBrukerId && sisteBrukerId === beskjed.userId
+    );
+    const hasChosen = harBlittBesvart || choice >= 0;
 
     useEffect(() => {
         const index = beskjed.content.findIndex(
-            (item: {valgt: boolean}) => item.valgt
+            (item: {isChosen: boolean}) => item.isChosen
         );
 
-        setValgtIndex(index);
+        setChoice(index);
     }, []);
-
-    useEffect(() => {
-        if (scrollTilBunn) {
-            scrollTilBunn();
-        }
-    }, [scrollTilBunn]);
 
     const options = beskjed.content.map(
         (item: {tekst: string}, index: number) => {
-            const valgt = index === valgtIndex;
+            const isChosen = index === choice;
 
             return (
-                <Valg key={index} valgt={valgt} aktiv={harValgt} tabIndex={-1}>
+                <Valg
+                    key={item.tekst}
+                    isChosen={isChosen}
+                    isActive={hasChosen}
+                    tabIndex={-1}
+                >
                     <button
+                        type='button'
+                        tabIndex={0}
                         onClick={() => {
-                            if (!harValgt) {
-                                setValgtIndex(index);
+                            if (!hasChosen) {
+                                setChoice(index);
                                 velg(beskjed.id, item.tekst);
                             }
                         }}
-                        tabIndex={0}
                     >
-                        {item.tekst}
+                        <span>{item.tekst}</span>
 
-                        {valgt && !fridaHarSvart && (
-                            <Skriveindikator visIndikator={true} />
+                        {isChosen && !fridaHarSvart && (
+                            <Skriveindikator visIndikator />
                         )}
                     </button>
                 </Valg>
@@ -72,8 +72,8 @@ export default function Flervalg({
     );
 
     return (
-        <Container kollaps={kollaps}>
-            {!kollaps && (
+        <Boks isCollapsed={isCollapsed}>
+            {!isCollapsed && (
                 <MetaInfo
                     nickName={beskjed.nickName}
                     sent={beskjed.sent}
@@ -81,7 +81,9 @@ export default function Flervalg({
                 />
             )}
 
-            <ValgContainer>{options}</ValgContainer>
-        </Container>
+            <ValgBoks>{options}</ValgBoks>
+        </Boks>
     );
-}
+};
+
+export default Flervalg;

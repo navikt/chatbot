@@ -1,3 +1,4 @@
+import React, {useState} from 'react';
 import {
     Checkbox,
     CheckboxGruppe,
@@ -5,12 +6,11 @@ import {
     RadioGruppe,
     SkjemaGruppe
 } from 'nav-frontend-skjema';
-import React, {useState} from 'react';
 import {Hovedknapp} from 'nav-frontend-knapper';
 import {Normaltekst, Undertittel} from 'nav-frontend-typografi';
-import {Container, Header, SurveyForm} from './styles';
-import {AnalyticsCallback} from '../..';
 import {getEvalState, setEvalState} from '../../utils/eval-state-utils';
+import {AnalyticsCallback} from '../..';
+import {Boks, Topp, Skjema} from './styles';
 
 export type SurveyQuestion = {
     label: string;
@@ -20,8 +20,7 @@ export type SurveyQuestion = {
 };
 
 type SurveyAnswers = Record<string, string[]>;
-
-type Props = {
+type Properties = {
     analyticsCallback?: AnalyticsCallback;
     analyticsSurvey: SurveyQuestion[];
 };
@@ -48,10 +47,7 @@ const toggleArrayValue = (array: string[], value: string) =>
         ? array.filter((v: any) => v !== value)
         : array.concat(value);
 
-export default function Evaluering({
-    analyticsCallback,
-    analyticsSurvey
-}: Props) {
+const Evaluering = ({analyticsCallback, analyticsSurvey}: Properties) => {
     const [surveyInput, setSurveyInput] = useState<SurveyAnswers>({});
     const [invalidInput, setInvalidInput] = useState<string[]>([]);
     const [surveySent, setSurveySent] = useState(getEvalState().sent);
@@ -89,7 +85,7 @@ export default function Evaluering({
     };
 
     return (
-        <Container>
+        <Boks>
             <SkjemaGruppe
                 feil={
                     invalidInput.length > 0
@@ -97,27 +93,26 @@ export default function Evaluering({
                         : undefined
                 }
             >
-                <Header>
+                <Topp>
                     {surveySent ? (
-                        <Normaltekst>
-                            {'Takk for din tilbakemelding!'}
-                        </Normaltekst>
+                        <Normaltekst>Takk for din tilbakemelding!</Normaltekst>
                     ) : (
                         <>
-                            <Undertittel>{'Tilbakemelding'}</Undertittel>
+                            <Undertittel>Tilbakemelding</Undertittel>
                             <Normaltekst>
-                                {'Jeg ønsker å lære av opplevelsen din.'}
+                                Jeg ønsker å lære av opplevelsen din.
                             </Normaltekst>
                         </>
                     )}
-                </Header>
+                </Topp>
 
                 {!surveySent && (
-                    <SurveyForm onSubmit={onSubmit}>
+                    <Skjema onSubmit={onSubmit}>
                         {analyticsSurvey.map((question, index) => {
                             if (question.type === 'radio') {
                                 return (
                                     <RadioGruppe
+                                        key={question.label}
                                         legend={question.label}
                                         feil={
                                             invalidInput.includes(
@@ -126,10 +121,10 @@ export default function Evaluering({
                                                 ? '* obligatorisk'
                                                 : undefined
                                         }
-                                        key={index}
                                     >
                                         {question.options.map((option) => (
                                             <Radio
+                                                key={option}
                                                 label={option}
                                                 name={question.label}
                                                 onClick={() => {
@@ -147,7 +142,6 @@ export default function Evaluering({
                                                         ]
                                                     }));
                                                 }}
-                                                key={option}
                                             />
                                         ))}
                                     </RadioGruppe>
@@ -157,6 +151,7 @@ export default function Evaluering({
                             if (question.type === 'checkbox') {
                                 return (
                                     <CheckboxGruppe
+                                        key={question.label}
                                         legend={question.label}
                                         feil={
                                             invalidInput.includes(
@@ -165,10 +160,10 @@ export default function Evaluering({
                                                 ? '* obligatorisk'
                                                 : undefined
                                         }
-                                        key={index}
                                     >
                                         {question.options.map((option) => (
                                             <Checkbox
+                                                key={option}
                                                 label={option}
                                                 name={question.label}
                                                 onClick={() => {
@@ -190,7 +185,6 @@ export default function Evaluering({
                                                         )
                                                     }));
                                                 }}
-                                                key={option}
                                             />
                                         ))}
                                     </CheckboxGruppe>
@@ -201,15 +195,17 @@ export default function Evaluering({
                         })}
 
                         <Hovedknapp
-                            htmlType={'submit'}
-                            kompakt={true}
+                            kompakt
+                            htmlType='submit'
                             disabled={invalidInput.length > 0}
                         >
-                            {'Send tilbakemelding'}
+                            Send tilbakemelding
                         </Hovedknapp>
-                    </SurveyForm>
+                    </Skjema>
                 )}
             </SkjemaGruppe>
-        </Container>
+        </Boks>
     );
-}
+};
+
+export default Evaluering;

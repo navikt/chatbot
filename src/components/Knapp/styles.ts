@@ -1,12 +1,13 @@
 import styled from 'styled-components';
 import tema from '../../tema/tema';
 
-export const KnappElement = styled.button`
-    background: ${(props: {aktiv?: boolean; prosent?: number}) =>
-        props.aktiv ? tema.farger.interaksjon : '#fff'};
+export type Properties = {aktiv?: boolean};
+export const Knapp = styled.button`
+    background: ${(properties: Properties) =>
+        properties.aktiv ? tema.farger.interaksjon : '#fff'};
     border: 1px solid ${tema.farger.interaksjon};
-    color: ${(props: {aktiv?: boolean; prosent?: number}) =>
-        props.aktiv ? '#fff' : tema.farger.interaksjon};
+    color: ${(properties: Properties) =>
+        properties.aktiv ? '#fff' : tema.farger.interaksjon};
     cursor: pointer;
     padding: 10px;
     font-family: ${tema.tekstFamilie};

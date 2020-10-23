@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import tema from '../../tema/tema';
 import AlertStripe from 'nav-frontend-alertstriper';
+import tema from '../../tema/tema';
 
 export const Interaksjon = styled.div`
     height: 100%;
@@ -59,7 +59,7 @@ export const Tekstfelt = styled.textarea`
 `;
 
 export const SendKnappOgTeller = styled.div`
-    margin-left: auto;
+    margin-left: 12px;
     display: flex;
     flex-direction: column;
 `;

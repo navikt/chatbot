@@ -1,23 +1,23 @@
 import React from 'react';
-import {KnappElement} from './styles';
+import {Knapp as KnappKomponent} from './styles';
 
-export type KnappProps = {
+export type Properties = {
     disabled?: boolean;
     aktiv?: boolean;
-    prosent?: number;
     children?: React.ReactNode;
 };
 
-export default function Knapp(props: KnappProps) {
+const Knapp = (properties: Properties) => {
     return (
-        <KnappElement
-            disabled={props.disabled}
+        <KnappKomponent
+            disabled={properties.disabled}
             type='submit'
-            aktiv={props.aktiv}
+            aktiv={properties.aktiv}
             tabIndex={0}
-            prosent={props.prosent}
         >
-            {props.children}
-        </KnappElement>
+            {properties.children}
+        </KnappKomponent>
     );
-}
+};
+
+export default Knapp;

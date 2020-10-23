@@ -9,6 +9,8 @@ interface Props {
 
 const bottomOffset = '50px';
 const rightOffset = '50px';
+const smallBottomOffset = '25px';
+const smallRightOffset = '25px';
 
 export const Container = styled.div`
     width: fit-content;
@@ -49,18 +51,23 @@ export const Container = styled.div`
             border: 1px solid #b5b5b5;
             box-shadow: 6px 6px 6px 0 rgba(0, 0, 0, 0.16);
             position: fixed;
-            bottom: ${bottomOffset};
-            right: ${rightOffset};
+            bottom: 1px;
+            right: 1px;
 
             *,
             *:before,
             *:after {
                 box-sizing: inherit;
             }
-            
-            @media (max-height: calc(${tema.hoyde} + ${bottomOffset})) {
-                top: 0;
-                bottom: auto;
+
+            @media (min-height: calc(${tema.hoyde} + ${smallBottomOffset})) {
+                bottom: ${smallBottomOffset};
+                right: ${smallRightOffset};
+            }
+
+            @media (min-height: calc(${tema.hoyde} + ${bottomOffset} + ${bottomOffset})) {
+                bottom: ${bottomOffset};
+                right: ${rightOffset};
             }
 
             ${liten} {

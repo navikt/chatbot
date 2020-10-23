@@ -1,43 +1,41 @@
-import React, {Component} from 'react';
-import {KommunikasjonProps} from '../Kommunikasjon';
-import {Event} from './styles';
+import React, {useMemo} from 'react';
+import {userTypeConstants, eventTypeConstants} from '../../constants';
+import {MessageWithIndicator} from '../ChatContainer';
 import Skriveindikator from '../Skriveindikator';
+import {Event} from './styles';
 
-export default class Eventviser extends Component<KommunikasjonProps> {
-    constructor(props: KommunikasjonProps) {
-        super(props);
-        this.visEventTekst = this.visEventTekst.bind(this);
-    }
+export type Properties = {
+    beskjed: MessageWithIndicator;
+    hentBrukerType: (brukerId: number) => string | undefined;
+};
 
-    render() {
-        return <Event tabIndex={0}>{this.visEventTekst()}</Event>;
-    }
+const Eventviser = (properties: Properties) => {
+    const event = useMemo<React.ReactNode>(() => {
+        const {content, nickName, userId, showIndicator} = properties.beskjed;
 
-    private visEventTekst() {
-        const {nickName, userId} = this.props.beskjed;
-        if (this.props.beskjed.content === 'USER_DISCONNECTED') {
+        if (content === eventTypeConstants.remoteDisconnected) {
             return `${nickName} forlot chatten.`;
         }
 
-        if (this.props.beskjed.content === 'USER_CONNECTED') {
+        if (content === eventTypeConstants.remoteConnected) {
             return `${nickName} ble med i chatten.`;
         }
 
-        if (this.props.beskjed.content === 'REQUEST_DISCONNECTED') {
+        if (content === eventTypeConstants.userDisconnected) {
             return 'Du avsluttet chatten.';
         }
 
         if (
-            this.props.beskjed.content === 'TYPE_MSG' &&
-            this.props.hentBrukerType(userId) === 'Human'
+            content === eventTypeConstants.remoteIsTyping &&
+            properties.hentBrukerType(userId) === userTypeConstants.human
         ) {
-            return (
-                <Skriveindikator
-                    visIndikator={this.props.beskjed.showIndicator}
-                />
-            );
+            return <Skriveindikator visIndikator={showIndicator} />;
         }
 
         return '';
-    }
-}
+    }, [properties.beskjed]);
+
+    return <Event tabIndex={0}>{event}</Event>;
+};
+
+export default Eventviser;

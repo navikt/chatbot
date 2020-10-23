@@ -1,18 +1,18 @@
 import React, {ChangeEvent, FormEvent, useState} from 'react';
 import axios from 'axios';
-import {Config, Tidigjen} from '../Interaksjonsvindu';
-import {EmailSend} from '../../api/sessions';
-import tema from '../../tema/tema';
-import {
-    Container,
-    Feilmelding,
-    Form,
-    Suksessmelding,
-    UthevetTekst
-} from './styles';
 import {Knapp} from 'nav-frontend-knapper';
 import {Input} from 'nav-frontend-skjema';
 import {Normaltekst, Undertittel} from 'nav-frontend-typografi';
+import {EmailSend} from '../../api/sessions';
+import tema from '../../tema/tema';
+import {Config, TidIgjen} from '../Interaksjonsvindu';
+import {
+    Innhold,
+    Feilmelding,
+    Skjema,
+    Suksessmelding,
+    UthevetTekst
+} from './styles';
 
 const validateEmail = (email: string) =>
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[(?:\d{1,3}\.){3}\d{1,3}])|(([a-z\-\d]+\.)+[a-z]{2,}))$/i.test(
@@ -45,13 +45,13 @@ const sendEmail = async (url: string, email: string) =>
         }
     } as EmailSend);
 
-type Props = {
+type Properties = {
     baseUrl: string;
     config: Config;
-    tidIgjen: Tidigjen;
+    tidIgjen: TidIgjen;
 };
 
-export default function EmailFeedback({baseUrl, config, tidIgjen}: Props) {
+const EmailFeedback = ({baseUrl, config, tidIgjen}: Properties) => {
     const [emailInput, setEmailInput] = useState<string>('');
     const [emailSentTo, setEmailSentTo] = useState('');
     const [errorMessage, setErrorMessage] = useState<string>('');
@@ -90,8 +90,8 @@ export default function EmailFeedback({baseUrl, config, tidIgjen}: Props) {
     };
 
     return (
-        <Container>
-            <Undertittel>{'Trenger du en kopi?'}</Undertittel>
+        <Innhold>
+            <Undertittel>Trenger du en kopi?</Undertittel>
             <Normaltekst>
                 {'Vi sender deg gjerne chat-dialogen på e-post. Du kan få' +
                     ' chat-dialogen tilsendt i '}
@@ -99,19 +99,19 @@ export default function EmailFeedback({baseUrl, config, tidIgjen}: Props) {
                 {' til.'}
             </Normaltekst>
 
-            <Form onSubmit={handleSubmit} noValidate>
+            <Skjema noValidate onSubmit={handleSubmit}>
                 <Input
-                    type={'email'}
-                    aria-label={'Din e-post'}
-                    placeholder={'Din e-post'}
-                    onChange={handleChange}
+                    type='email'
+                    aria-label='Din e-post'
+                    placeholder='Din e-post'
                     feil={Boolean(errorMessage)}
+                    onChange={handleChange}
                 />
 
-                <Knapp htmlType={'submit'} kompakt={true}>
-                    {'Send'}
+                <Knapp kompakt htmlType='submit'>
+                    Send
                 </Knapp>
-            </Form>
+            </Skjema>
 
             {errorMessage && <Feilmelding>{errorMessage}</Feilmelding>}
             {emailSentTo && (
@@ -119,6 +119,8 @@ export default function EmailFeedback({baseUrl, config, tidIgjen}: Props) {
                     {`E-post ble sendt til ${emailSentTo}`}
                 </Suksessmelding>
             )}
-        </Container>
+        </Innhold>
     );
-}
+};
+
+export default EmailFeedback;

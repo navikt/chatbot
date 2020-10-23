@@ -1,19 +1,19 @@
 import React from 'react';
-import minimerIkon from '../../assets/minimer.svg';
-import omstartIkon from '../../assets/omstart.svg';
-import avsluttIkon from '../../assets/avslutt.svg';
+import minimizeIcon from '../../assets/minimize.svg';
+import restartIcon from '../../assets/restart.svg';
+import cancelIcon from '../../assets/cancel.svg';
 import {Bar, Knapp, Knapper, Navn} from './styles';
 
-export type ToppBarProps = {
+export type ToppBarProperties = {
     lukk: () => void;
     avslutt: () => void;
     omstart: () => void;
     navn: string | undefined;
 };
 
-export default function ToppBar(props: ToppBarProps) {
-    const navn = props.navn ?? 'Chatbot Frida';
-    const {lukk, omstart, avslutt} = props;
+const ToppBar = (properties: ToppBarProperties) => {
+    const navn = properties.navn ?? 'Chatbot Frida';
+    const {lukk, omstart, avslutt} = properties;
 
     return (
         <Bar navn={navn}>
@@ -22,28 +22,30 @@ export default function ToppBar(props: ToppBarProps) {
             <Knapper>
                 <Knapp
                     navn={navn}
-                    onClick={lukk}
-                    dangerouslySetInnerHTML={{__html: minimerIkon}}
+                    dangerouslySetInnerHTML={{__html: minimizeIcon}}
                     tabIndex={0}
                     aria-label={`Minimer ${navn}`}
+                    onClick={lukk}
                 />
 
                 <Knapp
                     navn={navn}
-                    onClick={omstart}
-                    dangerouslySetInnerHTML={{__html: omstartIkon}}
+                    dangerouslySetInnerHTML={{__html: restartIcon}}
                     tabIndex={0}
                     aria-label={`Start ${navn} på nytt.`}
+                    onClick={omstart}
                 />
 
                 <Knapp
                     navn={navn}
-                    onClick={() => avslutt()}
-                    dangerouslySetInnerHTML={{__html: avsluttIkon}}
+                    dangerouslySetInnerHTML={{__html: cancelIcon}}
                     tabIndex={0}
                     aria-label={`Avslutt ${navn}`}
+                    onClick={() => avslutt()}
                 />
             </Knapper>
         </Bar>
     );
-}
+};
+
+export default ToppBar;

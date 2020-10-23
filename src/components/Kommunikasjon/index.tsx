@@ -1,169 +1,114 @@
-import React, {Component} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
+import {userTypeConstants} from '../../constants';
 import MetaInfo from '../MetaInfo';
-import {
-    Brukerbilde,
-    Container,
-    Hoyre,
-    Indre,
-    Snakkeboble,
-    Venstre
-} from './styles';
 import {Bruker} from '../Interaksjonsvindu';
 import Skriveindikator from '../Skriveindikator';
 import {MessageWithIndicator} from '../ChatContainer';
+import {
+    Brukerbilde,
+    Boks,
+    Hoyre,
+    Innhold,
+    Snakkeboble,
+    Venstre
+} from './styles';
 
-export type KommunikasjonProps = {
+export type Properties = {
     beskjed: MessageWithIndicator;
     sisteBrukerId?: number | null;
     brukere?: Bruker[];
-    skriveindikatorTid: number;
-    scrollTilBunn?: () => void;
+    skriveindikatorTid?: number;
     skjulIndikator?: (melding: MessageWithIndicator) => void;
     hentBrukerType: (brukerId: number) => string | undefined;
 };
 
-export type KommunikasjonState = {
-    side: 'VENSTRE' | 'HOYRE';
-    visBilde: boolean;
-    visMelding?: boolean;
-    brukerType?: string;
-};
+const Kommunikasjon = (properties: Properties) => {
+    const {brukere, beskjed, sisteBrukerId} = properties;
+    const {nickName, sent, content, userId, role, showIndicator} = beskjed;
+    const alignment = role === 1 ? 'VENSTRE' : 'HOYRE';
+    const isPictureVisible = !sisteBrukerId || sisteBrukerId !== userId;
+    const [isMessageVisible, setIsMessageVisible] = useState(
+        () => !showIndicator || role === 0
+    );
 
-export default class Kommunikasjon extends Component<
-    KommunikasjonProps,
-    KommunikasjonState
-> {
-    constructor(props: KommunikasjonProps) {
-        super(props);
+    const userType = properties.hentBrukerType(userId);
+    const isTypingIndicatorVisible =
+        !isMessageVisible &&
+        role !== 0 &&
+        showIndicator &&
+        userType !== userTypeConstants.human;
 
-        this.state = {
-            side: this.props.beskjed.role === 1 ? 'VENSTRE' : 'HOYRE',
-            visBilde:
-                this.props.sisteBrukerId !== this.props.beskjed.userId ||
-                !this.props.sisteBrukerId,
-            visMelding:
-                !this.props.beskjed.showIndicator ||
-                this.props.beskjed.role === 0
-        };
-
-        this.hentBruker = this.hentBruker.bind(this);
-        this.hentBrukerbilde = this.hentBrukerbilde.bind(this);
-        this.stripHtml = this.stripHtml.bind(this);
-    }
-
-    componentDidMount() {
-        if (this.props.scrollTilBunn) {
-            this.props.scrollTilBunn();
+    const user = useMemo(() => {
+        if (brukere) {
+            return brukere.find((bruker: Bruker) => bruker.userId === userId);
         }
 
-        if (!this.state.visMelding) {
-            setTimeout(() => {
-                this.setState({visMelding: true}, () => {
-                    if (this.props.scrollTilBunn) {
-                        this.props.scrollTilBunn();
-                    }
+        return undefined;
+    }, [userId, brukere]);
 
-                    this.props.skjulIndikator!(this.props.beskjed);
-                });
-            }, this.props.skriveindikatorTid);
+    const choice = useMemo(
+        () =>
+            unescape(
+                escape(content.optionChoice ? content.optionChoice : content)
+            ),
+        [content]
+    );
+
+    useEffect(() => {
+        if (!isMessageVisible) {
+            const timeout = setTimeout(() => {
+                setIsMessageVisible(true);
+                properties.skjulIndikator!(beskjed);
+            }, properties.skriveindikatorTid);
+
+            return () => {
+                clearTimeout(timeout);
+            };
         }
-    }
 
-    render() {
-        const {nickName, sent, content, userId} = this.props.beskjed;
-        const bruker = this.hentBruker(userId);
-        const htmlToRender = unescape(
-            escape(content.optionChoice ? content.optionChoice : content)
-        );
+        return undefined;
+    }, []);
 
-        return (
-            <Container>
-                {this.state.visBilde && (
-                    <MetaInfo
-                        nickName={nickName}
-                        sent={sent}
-                        side={this.state.side}
-                    />
-                )}
-                <Indre>
-                    {this.state.side === 'VENSTRE' && (
-                        <Venstre>
-                            {this.state.visBilde && (
-                                <Brukerbilde
-                                    aria-hidden='true'
-                                    brukerBilde={this.hentBrukerbilde(userId)}
-                                />
-                            )}
-                        </Venstre>
-                    )}
+    useEffect(() => {
+        setIsMessageVisible(!showIndicator || role === 0);
+    }, [showIndicator, role]);
 
-                    <Hoyre
-                        side={this.state.side}
-                        visBilde={this.state.visBilde}
-                    >
-                        {!this.state.visMelding &&
-                            this.props.beskjed.role !== 0 &&
-                            this.props.beskjed.showIndicator &&
-                            this.props.hentBrukerType(
-                                this.props.beskjed.userId
-                            ) !== 'Human' && (
-                                <Skriveindikator
-                                    visIndikator={
-                                        this.props.beskjed.showIndicator
-                                    }
-                                />
-                            )}
+    return (
+        <Boks>
+            {isPictureVisible && (
+                <MetaInfo nickName={nickName} sent={sent} side={alignment} />
+            )}
 
-                        {(this.state.visMelding ||
-                            this.props.hentBrukerType(
-                                this.props.beskjed.userId
-                            ) === 'Human') && (
-                            <Snakkeboble
-                                dangerouslySetInnerHTML={{
-                                    __html: htmlToRender
-                                }}
-                                side={this.state.side}
-                                visBilde={this.state.visBilde}
-                                brukerType={
-                                    bruker ? bruker.userType : undefined
-                                }
-                                tabIndex={0}
+            <Innhold>
+                {alignment === 'VENSTRE' && (
+                    <Venstre>
+                        {isPictureVisible && (
+                            <Brukerbilde
+                                aria-hidden='true'
+                                brukerBilde={user?.avatarUrl}
                             />
                         )}
-                    </Hoyre>
-                </Indre>
-            </Container>
-        );
-    }
+                    </Venstre>
+                )}
 
-    hentBruker(brukerId: number): Bruker | undefined {
-        if (this.props.brukere) {
-            return this.props.brukere.find(
-                (bruker: Bruker) => bruker.userId === brukerId
-            );
-        }
+                <Hoyre side={alignment}>
+                    {isTypingIndicatorVisible && (
+                        <Skriveindikator visIndikator={showIndicator} />
+                    )}
 
-        return undefined;
-    }
+                    {(isMessageVisible ||
+                        userType === userTypeConstants.human) && (
+                        <Snakkeboble
+                            brukerType={userType}
+                            side={alignment}
+                            dangerouslySetInnerHTML={{__html: choice}}
+                            tabIndex={0}
+                        />
+                    )}
+                </Hoyre>
+            </Innhold>
+        </Boks>
+    );
+};
 
-    hentBrukerbilde(brukerId: number): string | undefined {
-        if (this.props.brukere) {
-            const bruker = this.props.brukere.find(
-                (bruker: Bruker) => bruker.userId === brukerId
-            );
-
-            if (bruker) {
-                return bruker.avatarUrl;
-            }
-
-            return undefined;
-        }
-
-        return undefined;
-    }
-
-    stripHtml(html: string): string {
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        return doc.body.textContent ?? '';
-    }
-}
+export default Kommunikasjon;

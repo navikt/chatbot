@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import tema from '../../tema/tema';
 import AlertStripe from 'nav-frontend-alertstriper';
+import tema from '../../tema/tema';
 
 export const Boks = styled(AlertStripe)`
     position: absolute !important;
@@ -22,7 +22,7 @@ export const Boks = styled(AlertStripe)`
     }
 `;
 
-export const InnerContainer = styled.div`
+export const Innhold = styled.div`
     z-index: 9;
     display: flex;
     justify-content: space-between;

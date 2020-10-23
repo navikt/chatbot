@@ -1,18 +1,21 @@
 import React from 'react';
-import {Container, Indikator, IndikatorDot} from './styles';
+import {Boks, Indikator, IndikatorPrikk} from './styles';
 
-type Props = {
-    visIndikator: boolean;
+type Properties = {visIndikator: boolean};
+const Skriveindikator = ({visIndikator}: Properties) => {
+    if (!visIndikator) {
+        return null;
+    }
+
+    return (
+        <Boks>
+            <Indikator>
+                <IndikatorPrikk />
+                <IndikatorPrikk />
+                <IndikatorPrikk />
+            </Indikator>
+        </Boks>
+    );
 };
 
-export default function Skriveindikator({visIndikator}: Props) {
-    return visIndikator ? (
-        <Container>
-            <Indikator>
-                <IndikatorDot />
-                <IndikatorDot />
-                <IndikatorDot />
-            </Indikator>
-        </Container>
-    ) : null;
-}
+export default Skriveindikator;

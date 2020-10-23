@@ -1,26 +1,28 @@
 import React from 'react';
-import {Container, NickName} from './styles';
 import moment from 'moment';
+import {Boks, Navn} from './styles';
 
-export type MetaInfoProps = {
+export type Properties = {
     nickName?: string;
     sent?: string;
     side?: 'VENSTRE' | 'HOYRE';
     skraTekst?: boolean;
 };
 
-export default function MetaInfo(props: MetaInfoProps) {
-    const {nickName, sent, side} = props;
+const MetaInfo = (properties: Properties) => {
+    const {nickName, sent, side} = properties;
 
     return (
-        <Container side={side}>
+        <Boks side={side}>
             {nickName !== 'Bruker' && (
-                <NickName aria-hidden='true' side={side}>
+                <Navn aria-hidden='true' side={side}>
                     {nickName}
-                </NickName>
+                </Navn>
             )}
 
             {moment(sent).format('HH:mm')}
-        </Container>
+        </Boks>
     );
-}
+};
+
+export default MetaInfo;

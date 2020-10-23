@@ -1,52 +1,47 @@
 import React from 'react';
-import {
-    Boks,
-    InnerContainer,
-    JaKnapp,
-    NeiKnapp,
-    Tekst,
-    Undertekst
-} from './styles';
-import avsluttIkon from '../../assets/avslutt.svg';
-import checkIkon from '../../assets/check.svg';
+import cancelIcon from '../../assets/cancel.svg';
+import checkIcon from '../../assets/check.svg';
+import {Boks, Innhold, JaKnapp, NeiKnapp, Tekst, Undertekst} from './styles';
 
-type Props = {
+type Properties = {
     tekst?: string;
     undertekst?: string | null;
     ja?: () => void;
     nei?: () => void;
 };
 
-export default function Bekreftelsesboks(props: Props) {
+const Bekreftelsesboks = (properties: Properties) => {
     return (
-        <Boks type={'advarsel'}>
-            <InnerContainer>
+        <Boks type='advarsel'>
+            <Innhold>
                 <Tekst>
-                    {props.tekst}
+                    {properties.tekst}
 
-                    {props.undertekst && (
-                        <Undertekst>{props.undertekst}</Undertekst>
+                    {properties.undertekst && (
+                        <Undertekst>{properties.undertekst}</Undertekst>
                     )}
                 </Tekst>
 
-                {props.ja && (
+                {properties.ja && (
                     <JaKnapp
-                        dangerouslySetInnerHTML={{__html: checkIkon}}
-                        onClick={() => props.ja!()}
-                        aria-label={'Ja'}
+                        dangerouslySetInnerHTML={{__html: checkIcon}}
+                        aria-label='Ja'
+                        onClick={() => properties.ja!()}
                     />
                 )}
 
-                {props.nei && (
+                {properties.nei && (
                     <NeiKnapp
                         dangerouslySetInnerHTML={{
-                            __html: avsluttIkon
+                            __html: cancelIcon
                         }}
-                        onClick={() => props.nei!()}
-                        aria-label={'Nei'}
+                        aria-label='Nei'
+                        onClick={() => properties.nei!()}
                     />
                 )}
-            </InnerContainer>
+            </Innhold>
         </Boks>
     );
-}
+};
+
+export default Bekreftelsesboks;

@@ -1,7 +1,21 @@
-import React, {ChangeEvent, Component, FormEvent} from 'react';
+import React, {useRef, useCallback, useEffect, useState, useMemo} from 'react';
 import axios from 'axios';
+import moment from 'moment';
+import {Systemtittel} from 'nav-frontend-typografi';
+import {AnalyticsCallback, ConnectionConfig} from '../..';
+import {getCookie} from '../../utils/cookies';
+import {Message} from '../../api/sessions';
+import {chatStateKeys} from '../../utils/state-utils';
+import {updateSelectionState} from '../../utils/eval-state-utils';
+import {mobileMaxWidth} from '../../tema/mediaqueries';
+import Evaluering, {SurveyQuestion} from '../Evaluering';
+import {MessageWithIndicator} from '../ChatContainer';
+import EmailFeedback from '../EmailFeedback';
+import Bekreftelsesboks from '../Bekreftelsesboks';
 import Kommunikasjon from '../Kommunikasjon';
 import Eventviser from '../Eventviser';
+import Flervalg from '../Flervalg';
+import Knapp from '../Knapp';
 import {
     Alertstripe,
     Avsluttet,
@@ -14,20 +28,6 @@ import {
     Tekstomrade,
     Teller
 } from './styles';
-import Flervalg from '../Flervalg';
-import Knapp from '../Knapp';
-import {AnalyticsCallback, ConnectionConfig} from '../..';
-import Evaluering, {SurveyQuestion} from '../Evaluering';
-import {getCookie} from '../../utils/cookies';
-import {Message} from '../../api/sessions';
-import {MessageWithIndicator} from '../ChatContainer';
-import EmailFeedback from '../EmailFeedback';
-import moment from 'moment';
-import Bekreftelsesboks from '../Bekreftelsesboks';
-import {chatStateKeys} from '../../utils/state-utils';
-import {Systemtittel} from 'nav-frontend-typografi';
-import {updateSelectionState} from '../../utils/eval-state-utils';
-import {mobileMaxWidth} from '../../tema/mediaqueries';
 
 export interface Bruker {
     userId: number;
@@ -38,7 +38,7 @@ export interface Bruker {
     aktiv: boolean;
 }
 
-interface InteraksjonsvinduProps extends Omit<ConnectionConfig, 'configId'> {
+interface Properties extends Omit<ConnectionConfig, 'configId'> {
     handterMelding: (melding: MessageWithIndicator, oppdater: boolean) => void;
     skjulIndikator: (melding: MessageWithIndicator) => void;
     vis: boolean;
@@ -61,14 +61,6 @@ interface InteraksjonsvinduProps extends Omit<ConnectionConfig, 'configId'> {
     analyticsSurvey?: SurveyQuestion[];
 }
 
-type InteraksjonsvinduState = {
-    melding: string;
-    sendt: boolean;
-    feil: boolean;
-    evalueringsNokkel: string;
-    tidIgjen?: Tidigjen;
-};
-
 export interface Config {
     sessionId: string;
     sessionIdPure: string;
@@ -76,15 +68,15 @@ export interface Config {
     lastActive: number;
 }
 
-export interface Tidigjen {
+export interface TidIgjen {
     formatert: string;
     tid: number;
 }
 
-const minimizeMobileOnLinkClick = (
+function minimizeMobileOnLinkClick(
     event: React.MouseEvent,
     minimizeFunc: () => void
-): void => {
+) {
     const isLink = (element: HTMLElement | null): boolean => {
         if (!element) {
             return false;
@@ -103,348 +95,107 @@ const minimizeMobileOnLinkClick = (
     ) {
         minimizeFunc();
     }
-};
+}
 
-export default class Interaksjonsvindu extends Component<
-    InteraksjonsvinduProps,
-    InteraksjonsvinduState
-> {
-    formRef: HTMLFormElement | null;
-    scrollElement: HTMLElement | null;
-    tidIgjen: number;
-    maxTegn = 110;
+const messageMaxLength = 110;
 
-    constructor(props: InteraksjonsvinduProps) {
-        super(props);
+const Interaksjonsvindu = (properties: Properties) => {
+    const reference = useRef<HTMLDivElement>();
+    const [message, setMessage] = useState<string>('');
+    const [isMessageSent, setIsMessageSent] = useState<boolean>(false);
+    const [feedbackTime, setFeedbackTime] = useState<TidIgjen>();
 
-        this.state = {
-            evalueringsNokkel: '',
-            feil: this.props.feil,
-            sendt: false,
-            melding: ''
-        };
+    const {
+        baseUrl,
+        config,
+        visBekreftelse,
+        lukk,
+        confirmOmstart,
+        confirmCancel,
+        confirmAvslutt,
+        avsluttet,
+        iKo,
+        brukere,
+        historie,
+        analyticsSurvey,
+        analyticsCallback,
+        feil
+    } = properties;
 
-        this.sendMelding = this.sendMelding.bind(this);
-        this.lastHistorie = this.lastHistorie.bind(this);
-        this.velg = this.velg.bind(this);
-        this.scrollTilBunn = this.scrollTilBunn.bind(this);
-        this.hentBrukerType = this.hentBrukerType.bind(this);
-    }
+    const harAktiveBrukere = useMemo(
+        () => Boolean(brukere.find((bruker: Bruker) => bruker.aktiv)),
+        [brukere]
+    );
 
-    componentDidMount() {
-        moment.locale('nb-NO');
+    function scrollToBottom(options?: ScrollIntoViewOptions) {
+        const element = reference.current;
 
-        this.tidIgjen = setInterval(() => {
-            if (this.props.avsluttet) {
-                this.setState({
-                    tidIgjen: {
-                        formatert: moment().to(
-                            getCookie(chatStateKeys.MAILTIMEOUT),
-                            true
-                        ),
-                        tid: moment(getCookie(chatStateKeys.MAILTIMEOUT)).diff(
-                            moment()
-                        )
-                    }
-                });
-            }
-        }, 1000);
-
-        this.scrollTilBunn(false);
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.tidIgjen);
-    }
-
-    componentWillReceiveProps() {
-        this.scrollTilBunn();
-    }
-
-    render() {
-        if (!this.props.vis) {
-            return null;
-        }
-
-        const {historie} = this.props;
-        const historieListe = historie.map(
-            (historieItem: MessageWithIndicator, index: number) => {
-                const sisteHistorie: Message =
-                    this.props.historie[index - 1] &&
-                    this.props.historie[index - 1].content !== 'TYPE_MSG'
-                        ? this.props.historie[index - 1]
-                        : this.props.historie[index - 2];
-
-                return this.lastHistorie(
-                    historieItem,
-                    sisteHistorie &&
-                        (sisteHistorie.type === 'Message' ||
-                        sisteHistorie.type === 'Option' ||
-                        sisteHistorie.type === 'Evaluation'
-                            ? sisteHistorie.userId
-                            : null)
-                );
-            }
-        );
-
-        const harAktiveBrukere =
-            this.props.brukere.filter((bruker: Bruker) => bruker.aktiv).length >
-            0;
-
-        return (
-            <Interaksjon>
-                {this.props.visBekreftelse === 'OMSTART' && (
-                    <Bekreftelsesboks
-                        tekst={
-                            'Er du sikker på at du vil starte samtalen på nytt?'
-                        }
-                        ja={() => this.props.confirmOmstart()}
-                        nei={() => this.props.confirmCancel()}
-                    />
-                )}
-
-                {this.props.visBekreftelse === 'AVSLUTT' && (
-                    <Bekreftelsesboks
-                        tekst={'Er du sikker på at du vil avslutte samtalen?'}
-                        ja={() => this.props.confirmAvslutt()}
-                        nei={() => this.props.confirmCancel()}
-                    />
-                )}
-
-                {this.props.iKo && !this.props.avsluttet && (
-                    <Alertstripe type='info'>
-                        {'Du blir nå satt over til en veileder.'}
-                    </Alertstripe>
-                )}
-
-                {this.props.brukere.length > 0 &&
-                    !this.props.iKo &&
-                    !harAktiveBrukere &&
-                    !this.props.avsluttet && (
-                        <Alertstripe type='advarsel'>
-                            {'Det er ikke flere aktive brukere i kanalen.'}
-                        </Alertstripe>
-                    )}
-
-                {this.props.historie.length > 0 &&
-                    this.props.historie.every(
-                        (historie: MessageWithIndicator) =>
-                            historie.type === 'Intro'
-                    ) && (
-                        <KoblerTil type='info' form={'inline'}>
-                            {'Kobler til Frida...'}
-                        </KoblerTil>
-                    )}
-
-                {this.props.avsluttet && (
-                    <Avsluttet>
-                        <AvsluttetHeader type={'info'} form={'inline'}>
-                            <Systemtittel>
-                                {'Chatten er avsluttet.'}
-                            </Systemtittel>
-                        </AvsluttetHeader>
-
-                        {this.props.analyticsSurvey && (
-                            <Evaluering
-                                analyticsCallback={this.props.analyticsCallback}
-                                analyticsSurvey={this.props.analyticsSurvey}
-                            />
-                        )}
-
-                        {this.state.tidIgjen &&
-                            this.state.tidIgjen.tid >= 0 && (
-                                <EmailFeedback
-                                    baseUrl={this.props.baseUrl}
-                                    config={this.props.config}
-                                    tidIgjen={this.state.tidIgjen}
-                                />
-                            )}
-                    </Avsluttet>
-                )}
-
-                {this.props.feil && (
-                    <Alertstripe type='feil'>
-                        {'En feil har oppstått.'}
-                    </Alertstripe>
-                )}
-
-                <Chatlog
-                    role='log'
-                    aria-live='polite'
-                    aria-atomic='false'
-                    aria-relevant='additions'
-                    onClick={(event) =>
-                        minimizeMobileOnLinkClick(event, this.props.lukk)
-                    }
-                >
-                    {historieListe}
-                </Chatlog>
-
-                {!this.props.avsluttet && (
-                    <Tekstomrade
-                        ref={(element) => {
-                            this.formRef = element;
-                        }}
-                        onSubmit={async (event) => this.sendMelding(event)}
-                    >
-                        <Tekstfelt
-                            onKeyDown={(event) => this.handleKeyDown(event)}
-                            onChange={(event) => this.handleChange(event)}
-                            placeholder={'Skriv spørsmålet ditt'}
-                            disabled={this.props.avsluttet}
-                        />
-
-                        <SendKnappOgTeller>
-                            <Knapp
-                                disabled={
-                                    this.state.melding.length > this.maxTegn ||
-                                    this.props.avsluttet
-                                }
-                                aktiv={this.state.sendt}
-                            >
-                                {this.state.sendt ? 'Sendt' : 'Send'}
-                            </Knapp>
-
-                            <Teller
-                                tabIndex={-1}
-                                aria-hidden={true}
-                                error={this.state.melding.length > this.maxTegn}
-                            >
-                                {this.state.melding.length} / {this.maxTegn}
-                            </Teller>
-                        </SendKnappOgTeller>
-                    </Tekstomrade>
-                )}
-            </Interaksjon>
-        );
-    }
-
-    async sendMelding(event?: FormEvent<HTMLFormElement>) {
-        if (event) {
-            event.preventDefault();
-        }
-
-        if (
-            this.state.melding.trim() &&
-            this.state.melding.trim().length <= 200 &&
-            !this.props.avsluttet
-        ) {
-            try {
-                await axios.post(
-                    `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/messages`,
-                    {
-                        nickName: 'Bruker',
-                        content: this.state.melding.trim(),
-                        type: 'Message'
-                    }
-                );
-
-                this.props.hentHistorie();
-                this.scrollTilBunn();
-            } catch (error) {
-                console.error(error.response);
-                this.setState({feil: true});
-            }
-
-            if (this.formRef) {
-                this.formRef.reset();
-
-                this.setState({sendt: true, melding: ''}, () => {
-                    this.scrollTilBunn();
-
-                    setTimeout(() => {
-                        this.setState({sendt: false});
-                    }, 3000);
-                });
-            }
+        if (element && !avsluttet) {
+            element.scrollIntoView({block: 'start', ...options});
         }
     }
 
-    lastHistorie(
+    const getUserType = useCallback(
+        (userId: number): string | undefined => {
+            if (brukere) {
+                const user = brukere.find((b: Bruker) => b.userId === userId);
+                return user?.userType ? user.userType.toUpperCase() : undefined;
+            }
+
+            return undefined;
+        },
+        [brukere]
+    );
+
+    function getHistory(
         message: MessageWithIndicator,
         forrigeHistorieBrukerId: number | null
     ) {
         switch (message.type) {
             case 'Message':
                 return (
-                    <div key={`el-${message.id}`}>
-                        <Kommunikasjon
-                            key={message.id}
-                            beskjed={message}
-                            brukere={this.props.brukere}
-                            sisteBrukerId={forrigeHistorieBrukerId}
-                            scrollTilBunn={() => this.scrollTilBunn()}
-                            skjulIndikator={(melding: MessageWithIndicator) =>
-                                this.props.skjulIndikator(melding)
-                            }
-                            hentBrukerType={(brukerId: number) =>
-                                this.hentBrukerType(brukerId)
-                            }
-                            skriveindikatorTid={this.props.skriveindikatorTid}
-                        />
-                        <div
-                            key={`scroll-el-${message.id}`}
-                            ref={(element) => {
-                                this.scrollElement = element;
-                            }}
-                            aria-hidden='true'
-                        />
-                    </div>
+                    <Kommunikasjon
+                        key={`el-${message.id}`}
+                        beskjed={message}
+                        brukere={brukere}
+                        sisteBrukerId={forrigeHistorieBrukerId}
+                        skjulIndikator={(melding: MessageWithIndicator) =>
+                            properties.skjulIndikator(melding)
+                        }
+                        hentBrukerType={getUserType}
+                        skriveindikatorTid={properties.skriveindikatorTid}
+                    />
                 );
 
             case 'Event':
                 return (
-                    <div key={`el-${message.id}`}>
-                        <Eventviser
-                            beskjed={message}
-                            skriveindikatorTid={this.props.skriveindikatorTid}
-                            brukere={this.props.brukere}
-                            hentBrukerType={(brukerId: number) =>
-                                this.hentBrukerType(brukerId)
-                            }
-                        />
-                        <div
-                            key={`scroll-el-${message.id}`}
-                            ref={(element) => {
-                                this.scrollElement = element;
-                            }}
-                            aria-hidden='true'
-                        />
-                    </div>
+                    <Eventviser
+                        key={message.id}
+                        beskjed={message}
+                        hentBrukerType={getUserType}
+                    />
                 );
 
             case 'Option': {
-                const [lastMessageFromFrida] = this.props.historie
-                    .filter((message_) => message_.role === 1)
+                const [lastMessageFromFrida] = historie
+                    .filter((lastMessage) => lastMessage.role === 1)
                     .slice(-1);
 
                 return (
-                    <div key={`el-${message.id}`}>
-                        <Flervalg
-                            beskjed={message}
-                            harBlittBesvart={
-                                message.content.find(
-                                    (b: {tekst: string; valgt: boolean}) =>
-                                        b.valgt
-                                ) || this.props.avsluttet
-                            }
-                            velg={async (messageId: number, valg: string) =>
-                                this.velg(messageId, valg)
-                            }
-                            sisteBrukerId={forrigeHistorieBrukerId}
-                            scrollTilBunn={() => this.scrollTilBunn()}
-                            fridaHarSvart={
-                                lastMessageFromFrida.id !== message.id
-                            }
-                        />
-                        <div
-                            key={`scroll-el-${message.id}`}
-                            ref={(element) => {
-                                this.scrollElement = element;
-                            }}
-                            aria-hidden='true'
-                        />
-                    </div>
+                    <Flervalg
+                        key={`el-${message.id}`}
+                        beskjed={message}
+                        harBlittBesvart={
+                            message.content.find(
+                                (b: {tekst: string; valgt: boolean}) => b.valgt
+                            ) || avsluttet
+                        }
+                        velg={async (messageId: number, valg: string) =>
+                            handleSelect(messageId, valg)
+                        }
+                        sisteBrukerId={forrigeHistorieBrukerId}
+                        fridaHarSvart={lastMessageFromFrida.id !== message.id}
+                    />
                 );
             }
 
@@ -453,52 +204,231 @@ export default class Interaksjonsvindu extends Component<
         }
     }
 
-    handleChange(event: ChangeEvent<HTMLTextAreaElement>) {
-        this.setState({melding: event.target.value});
+    function handleChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+        setMessage(event.target.value);
     }
 
-    handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
-        if (event.keyCode === 13 && !event.shiftKey && this.formRef) {
+    function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+        if (event.key.toLowerCase() === 'enter' && !event.shiftKey) {
             event.preventDefault();
-            void this.sendMelding();
+            handleSubmit();
         }
     }
 
-    scrollTilBunn(smooth = true) {
-        if (this.scrollElement && !this.props.avsluttet) {
-            this.scrollElement.scrollIntoView({
-                behavior: smooth ? 'smooth' : undefined
-            });
-        }
-    }
+    async function handleSubmit(event?: React.FormEvent<HTMLFormElement>) {
+        event?.preventDefault();
+        const trimmedMessage = message.trim();
 
-    async velg(messageId: number, valg: string) {
-        await axios.post(
-            `${this.props.baseUrl}/sessions/${this.props.config.sessionId}/messages`,
-            {
-                nickName: 'Bruker',
-                type: 'OptionResult',
-                content: {
-                    messageId,
-                    optionChoice: valg,
-                    cancelled: false
-                }
+        if (
+            trimmedMessage &&
+            trimmedMessage.length <= messageMaxLength &&
+            !avsluttet
+        ) {
+            setIsMessageSent(true);
+
+            try {
+                await axios.post(
+                    `${baseUrl}/sessions/${config.sessionId}/messages`,
+                    {
+                        nickName: 'Bruker',
+                        content: trimmedMessage,
+                        type: 'Message'
+                    }
+                );
+
+                setMessage('');
+                properties.hentHistorie();
+                scrollToBottom();
+            } catch (error) {
+                console.error(error.response);
             }
-        );
 
-        updateSelectionState(messageId, valg, this.props.historie);
-        this.scrollTilBunn();
+            setIsMessageSent(false);
+        }
     }
 
-    hentBrukerType(brukerId: number): string | undefined {
-        if (this.props.brukere) {
-            const bruker = this.props.brukere.find(
-                (b: Bruker) => b.userId === brukerId
-            );
+    async function handleSelect(messageId: number, valg: string) {
+        await axios.post(`${baseUrl}/sessions/${config.sessionId}/messages`, {
+            nickName: 'Bruker',
+            type: 'OptionResult',
+            content: {
+                messageId,
+                optionChoice: valg,
+                cancelled: false
+            }
+        });
 
-            return bruker ? bruker.userType : undefined;
+        updateSelectionState(messageId, valg, historie);
+        scrollToBottom();
+    }
+
+    useEffect(() => {
+        if (avsluttet) {
+            const interval = setInterval(() => {
+                setFeedbackTime({
+                    formatert: moment().to(
+                        getCookie(chatStateKeys.MAILTIMEOUT),
+                        true
+                    ),
+                    tid: moment(getCookie(chatStateKeys.MAILTIMEOUT)).diff(
+                        moment()
+                    )
+                });
+            }, 1000);
+
+            return () => {
+                clearTimeout(interval);
+            };
         }
 
         return undefined;
+    }, [avsluttet]);
+
+    const log = useMemo(
+        () =>
+            historie.map((item: MessageWithIndicator, index: number) => {
+                const previousHistory: Message =
+                    historie[index - 1] &&
+                    historie[index - 1].content !== 'TYPE_MSG'
+                        ? historie[index - 1]
+                        : historie[index - 2];
+
+                return getHistory(
+                    item,
+                    previousHistory &&
+                        (previousHistory.type === 'Message' ||
+                        previousHistory.type === 'Option' ||
+                        previousHistory.type === 'Evaluation'
+                            ? previousHistory.userId
+                            : null)
+                );
+            }),
+        [historie, brukere]
+    );
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [log]);
+
+    if (!properties.vis) {
+        return null;
     }
-}
+
+    return (
+        <Interaksjon>
+            {visBekreftelse === 'OMSTART' && (
+                <Bekreftelsesboks
+                    tekst='Er du sikker på at du vil starte samtalen på nytt?'
+                    ja={() => confirmOmstart()}
+                    nei={() => confirmCancel()}
+                />
+            )}
+
+            {visBekreftelse === 'AVSLUTT' && (
+                <Bekreftelsesboks
+                    tekst='Er du sikker på at du vil avslutte samtalen?'
+                    ja={() => confirmAvslutt()}
+                    nei={() => confirmCancel()}
+                />
+            )}
+
+            {iKo && !avsluttet && (
+                <Alertstripe type='info'>
+                    Du blir nå satt over til en veileder.
+                </Alertstripe>
+            )}
+
+            {brukere.length > 0 && !iKo && !harAktiveBrukere && !avsluttet && (
+                <Alertstripe type='advarsel'>
+                    Det er ikke flere aktive brukere i kanalen.
+                </Alertstripe>
+            )}
+
+            {historie.length > 0 &&
+                historie.every(
+                    (historie: MessageWithIndicator) =>
+                        historie.type === 'Intro'
+                ) && (
+                    <KoblerTil type='info' form='inline'>
+                        Kobler til Frida...
+                    </KoblerTil>
+                )}
+
+            {avsluttet && (
+                <Avsluttet>
+                    <AvsluttetHeader type='info' form='inline'>
+                        <Systemtittel>Chatten er avsluttet.</Systemtittel>
+                    </AvsluttetHeader>
+
+                    {analyticsSurvey && (
+                        <Evaluering
+                            analyticsCallback={analyticsCallback}
+                            analyticsSurvey={analyticsSurvey}
+                        />
+                    )}
+
+                    {feedbackTime && feedbackTime.tid >= 0 && (
+                        <EmailFeedback
+                            baseUrl={baseUrl}
+                            config={config}
+                            tidIgjen={feedbackTime}
+                        />
+                    )}
+                </Avsluttet>
+            )}
+
+            {feil && (
+                <Alertstripe type='feil'>En feil har oppstått.</Alertstripe>
+            )}
+
+            {!avsluttet && (
+                <>
+                    <Chatlog
+                        role='log'
+                        aria-live='polite'
+                        aria-atomic='false'
+                        aria-relevant='additions'
+                        onClick={(event) =>
+                            minimizeMobileOnLinkClick(event, lukk)
+                        }
+                    >
+                        {log}
+                        <div ref={reference as any} aria-hidden='true' />
+                    </Chatlog>
+
+                    <Tekstomrade onSubmit={handleSubmit}>
+                        <Tekstfelt
+                            placeholder='Skriv spørsmålet ditt'
+                            disabled={avsluttet}
+                            value={message}
+                            onChange={handleChange}
+                            onKeyDown={handleKeyDown}
+                        />
+
+                        <SendKnappOgTeller>
+                            <Knapp
+                                disabled={
+                                    message.length > messageMaxLength ||
+                                    avsluttet
+                                }
+                                aktiv={isMessageSent}
+                            >
+                                Send
+                            </Knapp>
+
+                            <Teller
+                                aria-hidden
+                                tabIndex={-1}
+                                error={message.length > messageMaxLength}
+                            >
+                                {message.length} / {messageMaxLength}
+                            </Teller>
+                        </SendKnappOgTeller>
+                    </Tekstomrade>
+                </>
+            )}
+        </Interaksjon>
+    );
+};
+
+export default Interaksjonsvindu;

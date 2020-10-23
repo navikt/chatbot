@@ -1,23 +1,23 @@
 import React from 'react';
 import {FridaKnapp, FridaIkon, FridaTekst} from './styles';
 
-type Props = {
+type Properties = {
     onClick: () => void;
     navn: string;
     queueKey: string;
     label?: string;
 };
 
-export const FridaKnappContainer = (props: Props) => {
+export const FridaKnappContainer = (properties: Properties) => {
     return (
         <FridaKnapp
-            onClick={props.onClick}
-            aria-label={`Samtalevindu: ${props.navn}`}
-            lang={'no'}
-            id={'chatbot-frida-knapp'}
+            id='chatbot-frida-knapp'
+            aria-label={`Samtalevindu: ${properties.navn}`}
+            lang='no'
+            onClick={properties.onClick}
         >
-            <FridaTekst>{props.label ?? 'Chatbot Frida'}</FridaTekst>
-            <FridaIkon queueKey={props.queueKey} />
+            <FridaTekst>{properties.label ?? 'Chatbot Frida'}</FridaTekst>
+            <FridaIkon queueKey={properties.queueKey} />
         </FridaKnapp>
     );
 };

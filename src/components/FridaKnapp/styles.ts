@@ -4,15 +4,14 @@ import fridaIkon from '../../assets/frida.svg';
 import defaultIkon from '../../assets/default.svg';
 
 export const ikonSizePx = '64px';
-const tekstHeightPx = '42px';
 export const ikonSizeMobilPx = '48px';
+
+const tekstHeightPx = '42px';
 const tekstHeightMobilPx = '32px';
 const navGra20 = '#c6c2bf';
 const navDypBla = '#005B82';
 
-type Props = {
-    queueKey: string;
-};
+type Properties = {queueKey: string};
 
 export const FridaTekst = styled.span`
     display: flex;
@@ -51,8 +50,8 @@ export const FridaIkon = styled.span`
         border-radius: ${ikonSizeMobilPx};
     }
 
-    background: ${(props: Props) =>
-        props.queueKey === 'Q_CHAT_BOT'
+    background: ${(properties: Properties) =>
+        properties.queueKey === 'Q_CHAT_BOT'
             ? `transparent url('data:image/svg+xml;base64,${window.btoa(
                   fridaIkon
               )}') no-repeat center center`
