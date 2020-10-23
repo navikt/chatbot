@@ -39,7 +39,6 @@ export interface Bruker {
 }
 
 interface Properties extends Omit<ConnectionConfig, 'configId'> {
-    handterMelding: (melding: MessageWithIndicator, oppdater: boolean) => void;
     skjulIndikator: (melding: MessageWithIndicator) => void;
     vis: boolean;
     baseUrl: string;
@@ -107,6 +106,7 @@ const Interaksjonsvindu = (properties: Properties) => {
     const {
         baseUrl,
         config,
+        vis,
         visBekreftelse,
         lukk,
         confirmOmstart,
@@ -134,17 +134,14 @@ const Interaksjonsvindu = (properties: Properties) => {
         }
     }
 
-    const getUserType = useCallback(
-        (userId: number): string | undefined => {
-            if (brukere) {
-                const user = brukere.find((b: Bruker) => b.userId === userId);
-                return user?.userType ? user.userType.toUpperCase() : undefined;
-            }
+    function getUserType(userId: number): string | undefined {
+        if (brukere) {
+            const user = brukere.find((b: Bruker) => b.userId === userId);
+            return user?.userType ? user.userType.toUpperCase() : undefined;
+        }
 
-            return undefined;
-        },
-        [brukere]
-    );
+        return undefined;
+    }
 
     function getHistory(
         message: MessageWithIndicator,
@@ -307,9 +304,9 @@ const Interaksjonsvindu = (properties: Properties) => {
 
     useEffect(() => {
         scrollToBottom();
-    }, [log]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [log, vis]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    if (!properties.vis) {
+    if (!vis) {
         return null;
     }
 

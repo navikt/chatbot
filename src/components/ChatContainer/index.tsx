@@ -181,9 +181,6 @@ export default class ChatContainer extends Component<
                 )}
 
                 <Interaksjonsvindu
-                    handterMelding={(melding, oppdater) =>
-                        this.handterMelding(melding, oppdater)
-                    }
                     skjulIndikator={(melding: MessageWithIndicator) =>
                         this.skjulIndikator(melding)
                     }
@@ -295,8 +292,10 @@ export default class ChatContainer extends Component<
 
     async apne() {
         setCookie(chatStateKeys.APEN, true);
-        this.setState({erApen: true});
-        void this.start(false, true);
+
+        this.setState({erApen: true}, () => {
+            void this.start(false, true);
+        });
     }
 
     async lukk() {
