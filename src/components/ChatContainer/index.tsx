@@ -57,21 +57,16 @@ const defaultState: ChatContainerState = {
     feil: false
 };
 
-export interface ShowIndicator {showIndicator: boolean}
-export interface MessageWithIndicator extends Message, ShowIndicator {}
-
-const baseUrl = 'https://api.puzzel.com/chat/v1';
-const typingIndicatorTime = 1000;
-
-const ChatContainer = (properties: Properties) => {
-
+export interface ShowIndicator {
+    showIndicator: boolean;
 }
+export interface MessageWithIndicator extends Message, ShowIndicator {}
 
 export default class ChatContainer extends Component<
     ConnectionConfig,
     ChatContainerState
 > {
-    baseUrl = ;
+    baseUrl = 'https://api.puzzel.com/chat/v1';
     skriveindikatorTid = 1000;
     hentHistorieIntervall: number;
     lesIkkeLastetHistorieIntervall: number;
