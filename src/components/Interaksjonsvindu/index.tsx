@@ -55,7 +55,6 @@ interface Properties extends Omit<ConnectionConfig, 'configId'> {
     confirmCancel: () => void;
     confirmOmstart: () => void;
     lukk: () => void;
-    lukkOgAvslutt: () => void;
     feil: boolean;
     analyticsCallback?: AnalyticsCallback;
     analyticsSurvey?: SurveyQuestion[];
@@ -211,7 +210,7 @@ const Interaksjonsvindu = (properties: Properties) => {
     function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
         if (event.key.toLowerCase() === 'enter' && !event.shiftKey) {
             event.preventDefault();
-            handleSubmit();
+            void handleSubmit();
         }
     }
 

@@ -25,10 +25,10 @@ type Properties = {
     analyticsSurvey: SurveyQuestion[];
 };
 
-const findInvalidInput = (
+function findInvalidInput(
     questions: SurveyQuestion[],
     answers: SurveyAnswers
-): string[] => {
+): string[] {
     const invalidFields: string[] = [];
 
     questions.forEach((question) => {
@@ -40,7 +40,7 @@ const findInvalidInput = (
     });
 
     return invalidFields;
-};
+}
 
 const toggleArrayValue = (array: string[], value: string) =>
     array.includes(value)
@@ -52,7 +52,7 @@ const Evaluering = ({analyticsCallback, analyticsSurvey}: Properties) => {
     const [invalidInput, setInvalidInput] = useState<string[]>([]);
     const [surveySent, setSurveySent] = useState(getEvalState().sent);
 
-    const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const _invalidInput = findInvalidInput(analyticsSurvey, surveyInput);
 
@@ -82,7 +82,7 @@ const Evaluering = ({analyticsCallback, analyticsSurvey}: Properties) => {
                 })
             );
         }
-    };
+    }
 
     return (
         <Boks>
@@ -107,8 +107,8 @@ const Evaluering = ({analyticsCallback, analyticsSurvey}: Properties) => {
                 </Topp>
 
                 {!surveySent && (
-                    <Skjema onSubmit={onSubmit}>
-                        {analyticsSurvey.map((question, index) => {
+                    <Skjema onSubmit={handleSubmit}>
+                        {analyticsSurvey.map((question) => {
                             if (question.type === 'radio') {
                                 return (
                                     <RadioGruppe
