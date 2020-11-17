@@ -12,13 +12,13 @@ type EvalState = {
 
 // TODO: This is a very non-robust way to detect these selections, which will break if these strings
 // are changed on the backend!
-const englishPreamble =
-    '<a class="bbcode-link" href="https://www.nav.no/en/home" target="_blank">Nav.no in English</a>';
+const englishPreamble = 'To chat with a human, please select a subject:';
 
 const rollePreamble =
-    'Vi kan hjelpe deg med regelverk og informasjon, men ikke sjekke saken din.';
+    'Gjelder det privatperson, eller tar du kontakt som arbeidsgiver?';
 
-const temaPreamble = 'Velg chatten du vil bli satt over til:';
+const temaPreamble =
+    'Velg et tema du vil chatte med oss om, så setter jeg deg over:';
 
 const findMessageIndexById = (id: number, messages: MessageWithIndicator[]) =>
     messages.findIndex((message) => message.id === id);
