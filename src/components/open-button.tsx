@@ -174,7 +174,10 @@ const OpenButton = ({
             tabIndex={isOpen ? -1 : 0}
             {...{onClick}}
         >
-            <TextElement>{label}</TextElement>
+            <TextElement>
+                {label}
+                <AriaLabelElement>.</AriaLabelElement>
+            </TextElement>
 
             <AvatarElement
                 dangerouslySetInnerHTML={{

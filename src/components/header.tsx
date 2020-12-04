@@ -124,7 +124,11 @@ const Header = ({
     const isHumanChat = conversation?.state.chat_status === 'assigned_to_human';
 
     return (
-        <HeaderElement {...{isHumanChat}} {...properties}>
+        <HeaderElement
+            {...{isHumanChat}}
+            aria-hidden={isObscured}
+            {...properties}
+        >
             {isHumanChat ? (
                 <TitleElement>{localizations.chat_with_nav}</TitleElement>
             ) : (

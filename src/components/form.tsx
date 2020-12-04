@@ -103,7 +103,7 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
     );
 
     return (
-        <FormElement onSubmit={handleSubmit}>
+        <FormElement aria-hidden={isObscured} onSubmit={handleSubmit}>
             <PaddingElement>
                 <Textarea
                     name='message'

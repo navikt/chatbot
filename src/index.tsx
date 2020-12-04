@@ -338,7 +338,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
                         onFinish={handleFinish}
                     />
 
-                    <ConversationElement>
+                    <ConversationElement aria-hidden={isModalOpen}>
                         <PaddingElement>
                             {(status === 'connecting' ||
                                 status === 'restarting') && <FillerElement />}
