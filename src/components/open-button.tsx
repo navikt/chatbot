@@ -4,6 +4,7 @@ import {Normaltekst, Undertekst} from 'nav-frontend-typografi';
 import fridaIcon from '../assets/frida.svg';
 import useSession from '../contexts/session';
 import useLanguage from '../contexts/language';
+import AriaLabelElement from './aria-label';
 
 const openButtonAvatarSizeNumber = 60;
 const openButtonAvatarSize = `${openButtonAvatarSizeNumber}px`;
@@ -159,30 +160,21 @@ const OpenButton = ({
     const {language, translate} = useLanguage();
     const {status} = useSession();
     const localizations = useMemo(() => translate(translations), [translate]);
-    const openButtonLabelPrefix =
+    const label =
         status === 'connected'
             ? localizations.open_chat
             : localizations.chat_with_us;
-
-    let openButtonLabel = openButtonLabelPrefix;
-
-    if (unreadCount > 0) {
-        openButtonLabel +=
-            unreadCount > 1
-                ? ` (${unreadCount} ${localizations.unread_messages})`
-                : ` (${unreadCount} ${localizations.unread_message})`;
-    }
 
     return (
         <ButtonElement
             type='button'
             lang={language}
-            aria-label={openButtonLabel}
             isVisible={!isOpen && !isOpening}
+            aria-hidden={isOpen}
             tabIndex={isOpen ? -1 : 0}
             {...{onClick}}
         >
-            <TextElement>{openButtonLabelPrefix}</TextElement>
+            <TextElement>{label}</TextElement>
 
             <AvatarElement
                 dangerouslySetInnerHTML={{
@@ -194,6 +186,12 @@ const OpenButton = ({
                 {unreadCount > 0
                     ? `${unreadCount > 9 ? '9' : unreadCount}`
                     : ''}
+
+                <AriaLabelElement>
+                    {unreadCount === 1
+                        ? localizations.unread_message
+                        : localizations.unread_messages}
+                </AriaLabelElement>
             </UnreadCountElement>
         </ButtonElement>
     );

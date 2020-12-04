@@ -2,6 +2,7 @@ import React, {useRef, useEffect} from 'react';
 import styled, {css} from 'styled-components';
 import {Systemtittel, Normaltekst} from 'nav-frontend-typografi';
 import finishIcon from '../assets/finish.svg';
+import AriaLabelElement from './aria-label';
 
 const Element = styled.dialog`
     background: rgba(255, 255, 255, 0.6);
@@ -57,6 +58,8 @@ const ButtonElement = styled.button`
         border-radius: 7px;
     }
 `;
+
+const Icon = styled.span``;
 
 const ContentsElement = styled.div`
     height: 100%;
@@ -131,14 +134,14 @@ const ActionsElement = styled.div`
 
 interface ModalProperties {
     isOpen?: boolean;
-    'aria-label'?: string;
+    confirmationButtonText?: string;
     children?: React.ReactNode;
     onConfirm?: () => void;
 }
 
 const Modal = ({
     isOpen,
-    'aria-label': ariaLabel,
+    confirmationButtonText,
     onConfirm,
     children
 }: ModalProperties) => {
@@ -155,17 +158,17 @@ const Modal = ({
             ref={reference as any}
             {...{isOpen}}
             aria-modal={isOpen}
+            aria-hidden={!isOpen}
             open={isOpen}
         >
             <ButtonElement
-                aria-label={ariaLabel}
                 type='button'
                 tabIndex={isOpen ? undefined : -1}
-                dangerouslySetInnerHTML={{
-                    __html: finishIcon
-                }}
                 onClick={onConfirm}
-            />
+            >
+                <Icon dangerouslySetInnerHTML={{__html: finishIcon}} />
+                <AriaLabelElement>{confirmationButtonText}</AriaLabelElement>
+            </ButtonElement>
 
             <ContentsElement {...{isOpen}}>{children}</ContentsElement>
         </Element>

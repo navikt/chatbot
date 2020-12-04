@@ -1,6 +1,7 @@
 import React, {useState, useMemo} from 'react';
 import styled from 'styled-components';
 import {Knapp} from 'nav-frontend-knapper';
+
 import {
     Textarea,
     RadioGruppe,
@@ -11,6 +12,7 @@ import {
 
 import useLanguage from '../contexts/language';
 import useSession from '../contexts/session';
+import TextareaCounter from './textarea-counter';
 
 import Modal, {
     ModalProperties,
@@ -285,11 +287,7 @@ const EvaluationModal = ({
     );
 
     return (
-        <Modal
-            aria-label={localizations.chat_evaluation}
-            {...{isOpen, onConfirm}}
-            {...properties}
-        >
+        <Modal {...{isOpen, onConfirm}} {...properties}>
             {isOpen && (
                 <BoxElement>
                     <form onSubmit={handleSubmit}>
@@ -447,9 +445,9 @@ const EvaluationModal = ({
                         <Textarea
                             value={message}
                             label={localizations.your_feedback}
-                            tellerTekst={(count, maxCount) =>
-                                `${count}/${maxCount}`
-                            }
+                            tellerTekst={(count, maxCount) => (
+                                <TextareaCounter {...{count, maxCount}} />
+                            )}
                             onChange={handleMessageChange}
                         />
 

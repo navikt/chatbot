@@ -5,6 +5,8 @@ import {Knapp as Button} from 'nav-frontend-knapper';
 import useDebouncedEffect from '../hooks/use-debounced-effect';
 import useSession from '../contexts/session';
 import useLanguage from '../contexts/language';
+import AriaLabelElement from './aria-label';
+import TextareaCounter from './textarea-counter';
 
 const FormElement = styled.form`
     background: #f4f4f4;
@@ -29,25 +31,6 @@ const RestartButtonElement = styled(Button)`
     margin-right: 10px;
 `;
 
-const CounterOverloadElement = styled.span`
-    color: #c30000;
-`;
-
-interface CounterProperties {
-    count: number;
-    maxCount: number;
-}
-
-const Counter = ({count, maxCount}: CounterProperties) => {
-    const text = `${count}/${maxCount}`;
-
-    if (count <= maxCount) {
-        return <span>{text}</span>;
-    }
-
-    return <CounterOverloadElement>{text}</CounterOverloadElement>;
-};
-
 const translations = {
     your_message: {
         en: 'Your message',
@@ -57,13 +40,9 @@ const translations = {
         en: 'Send',
         no: 'Send'
     },
-    send_message: {
-        en: 'Send message',
-        no: 'Send melding'
-    },
-    restart_chat: {
-        en: 'Restart chat',
-        no: 'Start chat på nytt'
+    _message: {
+        en: 'message',
+        no: 'melding'
     },
     restart: {
         en: 'Restart',
@@ -127,13 +106,12 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
         <FormElement onSubmit={handleSubmit}>
             <PaddingElement>
                 <Textarea
-                    aria-label={localizations.your_message}
                     name='message'
                     value={message}
                     maxLength={messageMaxCharacters}
                     tabIndex={isObscured ? -1 : undefined}
                     tellerTekst={(count, maxCount) => (
-                        <Counter {...{count, maxCount}} />
+                        <TextareaCounter {...{count, maxCount}} />
                     )}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
@@ -141,17 +119,18 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
 
                 <ActionsElement>
                     <Button
-                        aria-label={localizations.send_message}
                         htmlType='submit'
                         tabIndex={isObscured ? -1 : undefined}
                     >
-                        {localizations.send}
+                        {localizations.send}{' '}
+                        <AriaLabelElement>
+                            {localizations._message}
+                        </AriaLabelElement>
                     </Button>
 
                     {conversationStatus === 'virtual_agent' && (
                         <RestartButtonElement
                             mini
-                            aria-label={localizations.restart_chat}
                             htmlType='button'
                             type='flat'
                             tabIndex={isObscured ? -1 : undefined}

@@ -77,11 +77,7 @@ const FinishModal = ({
     }, [download]);
 
     return (
-        <Modal
-            aria-label={localizations.confirm_chat_termination}
-            {...{isOpen, onConfirm}}
-            {...properties}
-        >
+        <Modal {...{isOpen, onConfirm}} {...properties}>
             <ContainerElement>
                 <BoxElement>
                     <TextElement>
@@ -95,7 +91,6 @@ const FinishModal = ({
                             tabIndex={isOpen ? undefined : -1}
                             htmlType='button'
                             type='flat'
-                            aria-label={localizations.cancel_termination}
                             onClick={onCancel}
                         >
                             {localizations.cancel}
@@ -107,7 +102,6 @@ const FinishModal = ({
                             tabIndex={isOpen ? undefined : -1}
                             htmlType='button'
                             type='hoved'
-                            aria-label={localizations.confirm_chat_termination}
                             onClick={onConfirm}
                         >
                             {localizations.yes_end_conversation}
@@ -120,7 +114,6 @@ const FinishModal = ({
                         kompakt
                         tabIndex={isOpen ? undefined : -1}
                         htmlType='button'
-                        aria-label={localizations.download_conversation}
                         onClick={handleDownload}
                     >
                         <DownloadElement

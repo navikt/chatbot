@@ -2,6 +2,7 @@ import React, {useMemo} from 'react';
 import styled, {css} from 'styled-components';
 import {Normaltekst} from 'nav-frontend-typografi';
 import useLanguage from '../contexts/language';
+import AriaLabelElement from './aria-label';
 
 const avatarSize = '36px';
 const conversationSideWidth = '90%';
@@ -169,7 +170,9 @@ const Message = ({
 
     return (
         <ContainerElement {...properties}>
-            <AvatarElement aria-label={label}>
+            <AriaLabelElement>{label}</AriaLabelElement>
+
+            <AvatarElement>
                 {avatarUrl && <img src={avatarUrl} alt='' />}
             </AvatarElement>
 

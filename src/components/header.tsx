@@ -6,8 +6,9 @@ import minimizeIcon from '../assets/minimize.svg';
 import fullscreenIcon from '../assets/maximize.svg';
 import contractIcon from '../assets/contract.svg';
 import useSession from '../contexts/session';
-import {fullscreenMediaQuery} from '../configuration';
 import useLanguage from '../contexts/language';
+import AriaLabelElement from './aria-label';
+import {fullscreenMediaQuery} from '../configuration';
 
 const TitleElement = styled(Innholdstittel)``;
 
@@ -76,6 +77,8 @@ const FullscreenIconButtonElement = styled(IconButtonElement)`
     }
 `;
 
+const IconElement = styled.span``;
+
 const translations = {
     chat_with_nav: {
         en: 'Chat with NAV',
@@ -130,46 +133,58 @@ const Header = ({
 
             <HeaderActionsElement>
                 <IconButtonElement
-                    aria-label={localizations.minimize_chat_window}
                     type='button'
                     tabIndex={isObscured ? -1 : 0}
-                    dangerouslySetInnerHTML={{
-                        __html: minimizeIcon
-                    }}
                     onClick={onClose}
-                />
+                >
+                    <IconElement
+                        dangerouslySetInnerHTML={{__html: minimizeIcon}}
+                    />
+                    <AriaLabelElement>
+                        {localizations.minimize_chat_window}
+                    </AriaLabelElement>
+                </IconButtonElement>
 
                 {isFullscreen ? (
                     <FullscreenIconButtonElement
-                        aria-label={localizations.smaller_chat_window}
                         type='button'
                         tabIndex={isObscured ? -1 : 0}
-                        dangerouslySetInnerHTML={{
-                            __html: contractIcon
-                        }}
                         onClick={onToggleFullscreen}
-                    />
+                    >
+                        <IconElement
+                            dangerouslySetInnerHTML={{__html: contractIcon}}
+                        />
+                        <AriaLabelElement>
+                            {localizations.smaller_chat_window}
+                        </AriaLabelElement>
+                    </FullscreenIconButtonElement>
                 ) : (
                     <FullscreenIconButtonElement
-                        aria-label={localizations.open_in_fullscreen}
                         type='button'
                         tabIndex={isObscured ? -1 : 0}
-                        dangerouslySetInnerHTML={{
-                            __html: fullscreenIcon
-                        }}
                         onClick={onToggleFullscreen}
-                    />
+                    >
+                        <IconElement
+                            dangerouslySetInnerHTML={{__html: fullscreenIcon}}
+                        />
+                        <AriaLabelElement>
+                            {localizations.open_in_fullscreen}
+                        </AriaLabelElement>
+                    </FullscreenIconButtonElement>
                 )}
 
                 <IconButtonElement
-                    aria-label={localizations.end_chat}
                     type='button'
                     tabIndex={isObscured ? -1 : 0}
-                    dangerouslySetInnerHTML={{
-                        __html: finishIcon
-                    }}
                     onClick={onFinish}
-                />
+                >
+                    <IconElement
+                        dangerouslySetInnerHTML={{__html: finishIcon}}
+                    />
+                    <AriaLabelElement>
+                        {localizations.end_chat}
+                    </AriaLabelElement>
+                </IconButtonElement>
             </HeaderActionsElement>
         </HeaderElement>
     );
