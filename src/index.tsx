@@ -237,8 +237,6 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
         if (shouldFinish) {
             await handleClose();
-            // NOTE temporarily send a message to let agents know. cc stian schikora to check if it's still needed
-            await sendMessage!('<<< Brukeren har forlatt samtalen >>>');
             void finish!();
             setIsFinishing(false);
             setIsEvaluating(false);
