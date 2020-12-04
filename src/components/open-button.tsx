@@ -134,11 +134,11 @@ const translations = {
         en: 'Chat with us',
         no: 'Chat med oss'
     },
-    unread_message: {
+    _unread_message: {
         en: 'unread message',
         no: 'ulest melding'
     },
-    unread_messages: {
+    _unread_messages: {
         en: 'unread messages',
         no: 'uleste meldinger'
     }
@@ -183,16 +183,16 @@ const OpenButton = ({
             />
 
             <UnreadCountElement>
-                {unreadCount > 0
-                    ? `${unreadCount > 9 ? '9' : unreadCount}`
-                    : ''}
+                {unreadCount > 0 && `${unreadCount > 9 ? '9' : unreadCount}`}
+            </UnreadCountElement>
 
+            {unreadCount > 0 && (
                 <AriaLabelElement>
                     {unreadCount === 1
-                        ? localizations.unread_message
-                        : localizations.unread_messages}
+                        ? localizations._unread_message
+                        : localizations._unread_messages}
                 </AriaLabelElement>
-            </UnreadCountElement>
+            )}
         </ButtonElement>
     );
 };
