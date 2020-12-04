@@ -554,11 +554,9 @@ const SessionProvider = (properties: SessionProperties) => {
             await postBoostSession(boostApiUrlBase, conversationId, {
                 type: 'text',
                 message: '<<< Brukeren har forlatt samtalen >>>'
-            }).catch(
-                (error) => {
-                    console.error(error);
-                }
-            );
+            }).catch((error) => {
+                console.error(error);
+            });
 
             await stopBoostSession(boostApiUrlBase, conversationId).catch(
                 (error) => {

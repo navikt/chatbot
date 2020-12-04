@@ -245,14 +245,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         } else {
             setIsFinishing(true);
         }
-    }, [
-        isFinishing,
-        isEvaluating,
-        responsesLength,
-        sendMessage,
-        finish,
-        handleClose
-    ]);
+    }, [isFinishing, isEvaluating, responsesLength, finish, handleClose]);
 
     function handleCancelFinish() {
         setIsFinishing(false);
