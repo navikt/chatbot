@@ -684,14 +684,13 @@ const SessionProvider = (properties: SessionProperties) => {
     ]);
 
     useEffect(() => {
+        const options = {domain: cookieDomain};
         setSavedConversationId(conversationId);
 
         if (conversationId) {
-            cookies.set(conversationIdCookieName, conversationId, {
-                domain: cookieDomain
-            });
+            cookies.set(conversationIdCookieName, conversationId, options);
         } else {
-            cookies.remove(conversationIdCookieName, {domain: cookieDomain});
+            cookies.remove(conversationIdCookieName, options);
         }
     }, [conversationId]);
 
