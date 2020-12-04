@@ -691,7 +691,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 domain: cookieDomain
             });
         } else {
-            cookies.remove(conversationIdCookieName);
+            cookies.remove(conversationIdCookieName, {domain: cookieDomain});
         }
     }, [conversationId]);
 
