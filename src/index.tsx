@@ -57,18 +57,19 @@ const ContainerElement = styled.div`
     touch-action: manipulation;
 
     ${(properties: ContainerElement) =>
-        properties.isFullscreen &&
-        css`
-            width: 100%;
-            height: 100%;
-            transform: translate3d(0, 0, 0);
-        `};
-
-    @media ${fullscreenMediaQuery} {
-        width: 100%;
-        height: 100%;
-        transform: translate3d(0, 0, 0);
-    }
+        properties.isFullscreen
+            ? css`
+                  width: 100%;
+                  height: 100%;
+                  transform: translate3d(0, 0, 0);
+              `
+            : css`
+                  @media ${fullscreenMediaQuery} {
+                      width: 100%;
+                      height: 100%;
+                      transform: translate3d(0, 0, 0);
+                  }
+              `};
 
     ${(properties: ContainerElement) =>
         (properties.isClosing || properties.isOpening) &&
