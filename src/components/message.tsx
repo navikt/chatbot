@@ -130,7 +130,9 @@ const BubbleRightElement = styled(MessageBubble)`
     border-radius: 18px 18px 18px 18px;
 `;
 
-const TextElement = styled(Normaltekst)``;
+const TextElement = styled(Normaltekst)`
+    white-space: pre-wrap;
+`;
 
 const translations = {
     you_say: {
