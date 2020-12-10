@@ -64,6 +64,37 @@ const translations = {
     }
 };
 
+interface ContentsProperties {
+    html: string;
+}
+
+const Contents = ({html}: ContentsProperties) => {
+    const output = useMemo(() => {
+        const regexp = /((?:https?:\/\/|www\.)\S+)/gm;
+        const matches = html.match(regexp);
+
+        if (matches) {
+            return html.replace(regexp, (string, match) => {
+                if (match) {
+                    let url = String(match);
+
+                    if (url.startsWith('www.')) {
+                        url = `http://${url}`;
+                    }
+
+                    return `<a href="${url}">${url}</a>`;
+                }
+
+                return string;
+            });
+        }
+
+        return html;
+    }, [html]);
+
+    return <ContentsElement dangerouslySetInnerHTML={{__html: output}} />;
+};
+
 interface ResponseItemProperties extends Omit<ResponseLinkProperties, 'link'> {
     responseIndex?: number;
     element: BoostResponseElement;
@@ -180,7 +211,7 @@ const ResponseItem = ({
                 tabIndex={isObscured ? -1 : 0}
                 avatarUrl={response.avatar_url}
             >
-                <ContentsElement dangerouslySetInnerHTML={{__html: html}} />
+                <Contents {...{html}} />
             </Conversation>
         );
     }
