@@ -3,7 +3,7 @@ const cookieDomain =
 
 let internalClientLanguage = 'no';
 
-if (window.location.href.indexOf('/en/') !== -1) {
+if (window.location.href.includes('/en/')) {
     internalClientLanguage = 'en';
 }
 
