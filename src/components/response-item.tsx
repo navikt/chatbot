@@ -70,14 +70,17 @@ interface ContentsProperties {
 
 const Contents = ({html}: ContentsProperties) => {
     const output = useMemo(() => {
-        const regexp = /(^|\s)((?:https?:\/\/)\S+)($|\s)/gm;
+        const regexp = /(^|\s)(https?:\/\/\S+)($|\s)/gm;
         const matches = html.match(regexp);
 
         if (matches) {
             return html.replace(regexp, (string, prefix, match, suffix) => {
                 if (match) {
                     const url = String(match);
-                    return `${prefix}<a href="${url}">${url}</a>${suffix}`;
+
+                    return `${String(
+                        prefix
+                    )}<a href="${url}">${url}</a>${String(suffix)}`;
                 }
 
                 return string;
