@@ -13,6 +13,7 @@
         "umd"
     ],
     "scripts": {
+        "prepare": "npm run build",
         "publish:beta": "npm run build && npm version prerelease --preid beta && npm publish --access public --tag beta",
         "build": "npm run generate:types && nwb build-react-component --no-demo && import-path --path umd/nav-chatbot.min.js",
         "clean": "nwb clean-module && nwb clean-demo",
