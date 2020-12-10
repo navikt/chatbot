@@ -22,6 +22,8 @@ const ButtonElement = styled.button`
     position: fixed;
     bottom: 25px;
     right: 25px;
+    z-index: 998;
+    z-index: 999998;
     border: 0;
     cursor: pointer;
     border-radius: 30px;
