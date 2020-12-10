@@ -70,19 +70,14 @@ interface ContentsProperties {
 
 const Contents = ({html}: ContentsProperties) => {
     const output = useMemo(() => {
-        const regexp = /((?:https?:\/\/|www\.)\S+)/gm;
+        const regexp = /(^|\s)((?:https?:\/\/)\S+)($|\s)/gm;
         const matches = html.match(regexp);
 
         if (matches) {
-            return html.replace(regexp, (string, match) => {
+            return html.replace(regexp, (string, prefix, match, suffix) => {
                 if (match) {
-                    let url = String(match);
-
-                    if (url.startsWith('www.')) {
-                        url = `http://${url}`;
-                    }
-
-                    return `<a href="${url}">${url}</a>`;
+                    const url = String(match);
+                    return `${prefix}<a href="${url}">${url}</a>${suffix}`;
                 }
 
                 return string;
