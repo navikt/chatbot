@@ -6,17 +6,15 @@ import AriaLabelElement from './aria-label';
 
 const Element = styled.dialog`
     background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     width: 100%;
     height: 100%;
     padding: 20px;
     position: absolute;
     top: 0;
     right: 0;
+    z-index: 10;
     bottom: 0;
     left: 0;
-    z-index: 10;
     border: 0;
     opacity: 0;
     transition: opacity 0.3s;
@@ -27,6 +25,8 @@ const Element = styled.dialog`
     ${(properties: {isOpen?: boolean}) =>
         properties.isOpen &&
         css`
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             opacity: 1;
             pointer-events: all;
         `};
