@@ -14,7 +14,7 @@ const Demo = () => (
         </style>
 
         <Chat
-            boostApiUrlBase='https://nav.boost.ai/api/chat/v2'
+            boostApiUrlBase='https://staging-navtest.boost.ai/api/chat/v2'
             analyticsCallback={console.log}
         />
     </div>
