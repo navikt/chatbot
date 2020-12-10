@@ -13,6 +13,7 @@ const conversationIdCookieName = 'nav-chatbot:conversation';
 const languageCookieName = 'nav-chatbot:language';
 const openCookieName = 'nav-chatbot:open';
 const unreadCookieName = 'nav-chatbot:unread';
+const cacheSessionName = 'nav-chatbot:cache';
 const containerWidthNumber = 400;
 const containerWidth = `${containerWidthNumber}px`;
 const containerHeightNumber = 568;
@@ -38,6 +39,7 @@ export {
     languageCookieName,
     openCookieName,
     unreadCookieName,
+    cacheSessionName,
     containerWidthNumber,
     containerWidth,
     containerHeightNumber,

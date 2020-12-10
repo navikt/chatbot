@@ -13,6 +13,7 @@ import useLoader from '../hooks/use-loader';
 import {
     boostApiUrlBase as defaultBoostApiUrlBase,
     cookieDomain,
+    cacheSessionName,
     clientLanguage,
     conversationIdCookieName,
     minimumPollTimeout,
@@ -248,6 +249,39 @@ type BoostRequestResponse =
     | BoostStartRequestResponse
     | BoostResumeRequestResponse
     | BoostPollRequestResponse;
+
+interface Cache {
+    conversation?: BoostConversation;
+    responses?: BoostResponse[];
+}
+
+function setCache(data: Cache): void {
+    if (window.sessionStorage) {
+        window.sessionStorage.setItem(cacheSessionName, JSON.stringify(data));
+    }
+}
+
+function getCache(): Cache | undefined {
+    if (window.sessionStorage) {
+        const data = window.sessionStorage.getItem(cacheSessionName);
+
+        if (data) {
+            try {
+                return JSON.parse(data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+
+    return undefined;
+}
+
+function removeCache(): void {
+    if (window.sessionStorage) {
+        window.sessionStorage.removeItem(cacheSessionName);
+    }
+}
 
 interface SessionError extends Error {
     code?: string;
@@ -513,6 +547,12 @@ const SessionProvider = (properties: SessionProperties) => {
 
         try {
             if (savedConversationId) {
+                const cache = getCache();
+
+                if (cache) {
+                    update(cache as BoostResumeRequestResponse);
+                }
+
                 const session = await getBoostSession(
                     boostApiUrlBase,
                     savedConversationId,
@@ -548,6 +588,7 @@ const SessionProvider = (properties: SessionProperties) => {
         setConversation(undefined);
         setResponses(undefined);
         setQueue(undefined);
+        removeCache();
 
         if (conversationId) {
             // NOTE temporarily send a message to let agents know. cc stian schikora to check if it's still needed
@@ -692,6 +733,12 @@ const SessionProvider = (properties: SessionProperties) => {
     ]);
 
     useEffect(() => {
+        if (conversation && responses) {
+            setCache({conversation, responses});
+        }
+    }, [conversation, responses]);
+
+    useEffect(() => {
         const options = {domain: cookieDomain};
         setSavedConversationId(conversationId);
 
@@ -699,6 +746,7 @@ const SessionProvider = (properties: SessionProperties) => {
             cookies.set(conversationIdCookieName, conversationId, options);
         } else {
             cookies.remove(conversationIdCookieName, options);
+            removeCache();
         }
     }, [conversationId]);
 
