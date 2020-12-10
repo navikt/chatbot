@@ -56,7 +56,7 @@ const translations = {
     },
     waiting_for_human: {
         en: 'Waiting for an available agent...',
-        no: 'Venter på ledig kundebehandler...'
+        no: 'Venter på ledig veileder...'
     }
 };
 
