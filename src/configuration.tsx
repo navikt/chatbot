@@ -3,7 +3,7 @@ const cookieDomain =
 
 let internalClientLanguage = 'no';
 
-if (window.location.href.startsWith('https://www.nav.no/en/')) {
+if (window.location.href.indexOf('/en/') !== -1) {
     internalClientLanguage = 'en';
 }
 
