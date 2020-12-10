@@ -73,7 +73,7 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
             event?.preventDefault();
 
             if (message) {
-                if (message.length < messageMaxCharacters) {
+                if (message.length <= messageMaxCharacters) {
                     setMessage('');
                     void onSubmit!(message);
                 }
