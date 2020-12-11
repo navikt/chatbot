@@ -16,6 +16,7 @@ const FormElement = styled.form`
 
 const PaddingElement = styled.div`
     padding: 14px 12px;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
     box-sizing: border-box;
 `;
 
