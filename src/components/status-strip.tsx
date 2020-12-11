@@ -10,9 +10,6 @@ const Element = styled(AlertStripe)`
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 
     ${SpinnerElement} {
-        position: relative;
-        top: -3px;
-
         svg circle {
             stroke: rgba(0, 0, 0, 0.1);
         }

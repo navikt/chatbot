@@ -3,16 +3,16 @@ import styled from 'styled-components';
 import NavFrontendSpinner from 'nav-frontend-spinner';
 
 const SpinnerElement = styled.span`
-    width: 0.8em;
-    height: 0.8em;
+    width: 0.75rem;
+    height: 0.75rem;
     margin: auto;
-    margin-left: 4px;
     display: inline-block;
     vertical-align: top;
 
     svg {
         width: 100%;
         height: 100%;
+        vertical-align: top;
     }
 `;
 

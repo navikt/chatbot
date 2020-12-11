@@ -25,10 +25,9 @@ const LinkButtonElement = styled(RadioPanelGruppe)`
     position: relative;
 
     ${SpinnerElement} {
-        transform: translate(0.5px, 0.5px);
         position: absolute;
-        top: 19px;
-        left: 19px;
+        top: 1.5rem;
+        left: 1.5rem;
 
         svg circle {
             stroke: rgba(255, 255, 255, 0.1);

@@ -22,6 +22,12 @@ const SubtextElement = styled(Undertekst)`
     color: #444;
 `;
 
+const SpinnerElement = styled.span`
+    position: relative;
+    margin-left: 4px;
+    top: 4px;
+`;
+
 const LinkPanelElement = styled(LenkepanelBase)`
     margin-top: 15px;
     margin-bottom: 15px;
@@ -137,7 +143,11 @@ const ResponseItem = ({
                     </Conversation>
 
                     <SubtextElement>
-                        {localizations.sending} <Spinner />
+                        {localizations.sending}
+
+                        <SpinnerElement>
+                            <Spinner />
+                        </SpinnerElement>
                     </SubtextElement>
                 </div>
             );
