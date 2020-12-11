@@ -27,9 +27,7 @@ const authenticationPrefix = 'Init:Auth:';
 const englishButtonText = 'For English, click here';
 const englishButtonResponse = 'English, please';
 
-const fullscreenMediaQuery = `(max-width: ${
-    containerWidthNumber + 100
-}px), (max-height: ${containerHeightNumber + 50}px)`;
+const fullscreenMediaQuery = `(max-width: ${containerWidthNumber + 100}px)`;
 
 export {
     cookieDomain,

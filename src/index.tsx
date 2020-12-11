@@ -39,6 +39,7 @@ const ContainerElement = styled.div`
     background-color: #fff;
     width: ${containerWidth};
     height: ${containerHeight};
+    height: min(${containerHeight}, calc(100% - 20px - 20px));
     box-sizing: border-box;
     display: flex;
     flex-flow: column;
