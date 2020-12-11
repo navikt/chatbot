@@ -7,10 +7,14 @@ import React, {
 } from 'react';
 
 import cookies from 'js-cookie';
-import {cookieDomain, languageCookieName} from '../configuration';
+
+import {
+    cookieDomain,
+    clientLanguage,
+    languageCookieName
+} from '../configuration';
 
 type Translations = Record<string, Record<string, string>>;
-
 type Localizations = Record<string, string>;
 
 function getLocalizations(languageKey: string, translations: Translations) {
@@ -44,8 +48,11 @@ const LanguageContext = createContext<LanguageInterface>({
 });
 
 const LanguageProvider = (properties: Record<string, unknown>) => {
-    const [language, setLanguage] = useState<string | undefined>(() =>
-        cookies.get(languageCookieName)
+    const [language, setLanguage] = useState<string | undefined>(
+        () =>
+            cookies.get(languageCookieName) ??
+            clientLanguage ??
+            defaultLanguageKey
     );
 
     const translate = useCallback(
