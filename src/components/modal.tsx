@@ -83,6 +83,7 @@ const BoxElement = styled.div`
     box-sizing: border-box;
     position: relative;
     overflow: auto;
+    scroll-behavior: smooth;
     padding: 0 20px;
     border-radius: 4px;
     margin: auto;

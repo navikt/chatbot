@@ -112,6 +112,7 @@ const StatusContainerElement = styled.div`
 const ConversationElement = styled.div`
     overflow: auto;
     scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
     flex: 1;
     position: relative;
 `;
