@@ -170,7 +170,7 @@ const OpenButton = ({
 
     return (
         <ButtonElement
-            id="chatbot-frida-knapp" {/* required for external onclick */}
+            id='chatbot-frida-knapp' // Required for external onclick
             type='button'
             lang={language}
             isVisible={!isOpen && !isOpening}
