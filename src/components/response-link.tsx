@@ -115,7 +115,7 @@ const ResponseLink = ({
                         disabled: tabIndex === -1,
                         label: (
                             <>
-                                {isLoading && <Spinner />}
+                                {(true || isLoading) && <Spinner />}
                                 {link.text}
                             </>
                         )
