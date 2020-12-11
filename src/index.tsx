@@ -133,6 +133,7 @@ interface ChatProperties {
 
 const Chat = ({analyticsCallback}: ChatProperties) => {
     const {language} = useLanguage();
+
     const {
         status,
         conversation,
@@ -158,7 +159,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
     const [isFinishing, setIsFinishing] = useState<boolean>(false);
     const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
-    const [updateCount, setUpdateCount] = useState<number>(0);
+    const [readCount, setReadCount] = useState<number>(0);
     const [unreadCount, setUnreadCount] = useState<number>(
         () => Number.parseInt(String(cookies.get(unreadCookieName)), 10) || 0
     );
@@ -273,16 +274,16 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     }, [isOpen]);
 
     useEffect(() => {
-        if (status === 'connected') {
-            setUpdateCount((number) => number + 1);
+        if (responsesLength && isOpen) {
+            setReadCount(responsesLength);
         }
-    }, [status, responses]);
+    }, [isOpen, responsesLength]);
 
     useEffect(() => {
-        if (!isOpen && updateCount > 1) {
-            setUnreadCount((number) => number + 1);
+        if (responsesLength && readCount > 0) {
+            setUnreadCount(responsesLength - readCount);
         }
-    }, [isOpen, updateCount]);
+    }, [responsesLength, readCount]);
 
     useEffect(() => {
         scrollToBottom();
