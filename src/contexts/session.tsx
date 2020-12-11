@@ -702,7 +702,7 @@ const SessionProvider = (properties: SessionProperties) => {
                     })
                     .catch((error) => {
                         if (shouldUpdate) {
-                            void handleError(error);
+                            handleError(error);
                         }
                     });
             };
