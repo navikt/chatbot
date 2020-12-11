@@ -588,7 +588,9 @@ const SessionProvider = (properties: SessionProperties) => {
         setConversation(undefined);
         setResponses(undefined);
         setQueue(undefined);
+
         removeCache();
+        cookies.remove(conversationIdCookieName, {domain: cookieDomain});
 
         if (conversationId) {
             // NOTE temporarily send a message to let agents know. cc stian schikora to check if it's still needed
@@ -739,14 +741,11 @@ const SessionProvider = (properties: SessionProperties) => {
     }, [conversation, responses]);
 
     useEffect(() => {
-        const options = {domain: cookieDomain};
-        setSavedConversationId(conversationId);
-
         if (conversationId) {
+            setSavedConversationId(conversationId);
+
+            const options = {domain: cookieDomain};
             cookies.set(conversationIdCookieName, conversationId, options);
-        } else {
-            cookies.remove(conversationIdCookieName, options);
-            removeCache();
         }
     }, [conversationId]);
 
