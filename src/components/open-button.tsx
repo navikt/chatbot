@@ -16,12 +16,12 @@ interface ButtonElementProperties {
 const ButtonElement = styled.button`
     appearance: none;
     background: #fff;
-    padding: 8px 15px;
-    margin-right: ${openButtonAvatarSizeNumber / 2}px;
-    margin-bottom: ${openButtonAvatarSizeNumber / 5}px;
+    padding: 6px 13px;
+    margin-right: ${openButtonAvatarSizeNumber / 3}px;
+    margin-bottom: ${openButtonAvatarSizeNumber / 6}px;
     position: fixed;
-    bottom: 10px;
-    right: 10px;
+    bottom: 8px;
+    right: 8px;
     z-index: 998;
     border: 0;
     cursor: pointer;
@@ -55,6 +55,9 @@ const ButtonElement = styled.button`
     }
 
     @media (min-width: 480px) {
+        margin-right: ${openButtonAvatarSizeNumber / 2}px;
+        margin-bottom: ${openButtonAvatarSizeNumber / 5}px;
+        padding: 8px 15px;
         bottom: 17px;
         right: 17px;
     }
@@ -76,11 +79,11 @@ const TextElement = styled(Normaltekst)`
 `;
 
 const AvatarElement = styled.div`
-    width: ${openButtonAvatarSize};
-    height: ${openButtonAvatarSize};
+    width: ${openButtonAvatarSizeNumber - 10}px;
+    height: ${openButtonAvatarSizeNumber - 10}px;
     position: absolute;
     top: 50%;
-    right: -${openButtonAvatarSizeNumber / 2}px;
+    right: -${openButtonAvatarSizeNumber / 3}px;
     transform: translateY(-50%);
     transition: transform 0.2s;
     display: inline-block;
@@ -113,6 +116,12 @@ const AvatarElement = styled.div`
         box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3),
             0 0 0 2px rgba(255, 255, 255, 1), 0 1px 4px rgba(0, 0, 0, 0.6),
             0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 4px #005b82;
+    }
+
+    @media (min-width: 480px) {
+        width: ${openButtonAvatarSize};
+        height: ${openButtonAvatarSize};
+        right: -${openButtonAvatarSizeNumber / 2}px;
     }
 `;
 
