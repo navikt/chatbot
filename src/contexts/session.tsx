@@ -323,6 +323,7 @@ const SessionProvider = (properties: SessionProperties) => {
 
     const [status, setStatus] = useState<Session['status']>('disconnected');
     const [error, setError] = useState<SessionError>();
+    const [errorCount, setErrorCount] = useState<number>(0);
     const [isLoading, setIsLoading] = useLoader();
     const {language, setLanguage} = useLanguage();
 
@@ -341,22 +342,29 @@ const SessionProvider = (properties: SessionProperties) => {
     const [queue, setQueue] = useState<BoostResponse>();
     const [pollMultiplier, setPollMultiplier] = useState<number>(1);
 
-    function handleError(error: any) {
-        if (error?.response) {
-            if (error.response.data.error === 'session ended') {
-                setStatus('ended');
-                return;
+    const handleError = useCallback(
+        (error: any, isDismissible = false) => {
+            if (error?.response) {
+                if (error.response.data.error === 'session ended') {
+                    setStatus('ended');
+                    return;
+                }
             }
-        }
 
-        if (error.message.toLowerCase() === 'network error') {
-            const error: SessionError = new Error('Network error');
-            error.code = 'network_error';
-            setError(error);
-        }
+            if (isDismissible !== true || errorCount > 1) {
+                if (error.message.toLowerCase() === 'network error') {
+                    const error: SessionError = new Error('Network error');
+                    error.code = 'network_error';
+                    setError(error);
+                }
 
-        setStatus('error');
-    }
+                setStatus('error');
+            } else {
+                setErrorCount((number) => number + 1);
+            }
+        },
+        [errorCount]
+    );
 
     const sendMessage = useCallback(
         async (message: string) => {
@@ -393,7 +401,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 finishLoading();
             }
         },
-        [boostApiUrlBase, conversationId, setIsLoading]
+        [boostApiUrlBase, conversationId, setIsLoading, handleError]
     );
 
     const sendAction = useCallback(
@@ -412,7 +420,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 finishLoading();
             }
         },
-        [boostApiUrlBase, conversationId, setIsLoading]
+        [boostApiUrlBase, conversationId, setIsLoading, handleError]
     );
 
     const sendPing = useCallback(async () => {
@@ -581,7 +589,14 @@ const SessionProvider = (properties: SessionProperties) => {
         }
 
         finishLoading();
-    }, [boostApiUrlBase, savedConversationId, language, setIsLoading, update]);
+    }, [
+        boostApiUrlBase,
+        savedConversationId,
+        language,
+        setIsLoading,
+        update,
+        handleError
+    ]);
 
     const remove = useCallback(async () => {
         setSavedConversationId(undefined);
@@ -624,7 +639,7 @@ const SessionProvider = (properties: SessionProperties) => {
         }
 
         finishLoading();
-    }, [boostApiUrlBase, remove, setIsLoading, update]);
+    }, [boostApiUrlBase, remove, setIsLoading, update, handleError]);
 
     const finish = useCallback(async () => {
         const finishLoading = setIsLoading();
@@ -666,10 +681,11 @@ const SessionProvider = (properties: SessionProperties) => {
                 handleError(error);
             }
         }
-    }, [boostApiUrlBase, conversationId]);
+    }, [boostApiUrlBase, conversationId, handleError]);
 
     useEffect(() => {
         if (conversationId) {
+            let timeout: number;
             let shouldUpdate = true;
 
             const poll = async () => {
@@ -702,12 +718,21 @@ const SessionProvider = (properties: SessionProperties) => {
                     })
                     .catch((error) => {
                         if (shouldUpdate) {
-                            handleError(error);
+                            handleError(error, true);
                         }
+                    })
+                    .then(() => {
+                        timeout = setTimeout(
+                            poll,
+                            Math.min(
+                                maximumPollTimeout,
+                                minimumPollTimeout * pollMultiplier
+                            )
+                        );
                     });
             };
 
-            const timeout = setTimeout(
+            timeout = setTimeout(
                 poll,
                 Math.min(
                     maximumPollTimeout,
@@ -731,7 +756,8 @@ const SessionProvider = (properties: SessionProperties) => {
         conversationId,
         responses,
         pollMultiplier,
-        update
+        update,
+        handleError
     ]);
 
     useEffect(() => {
