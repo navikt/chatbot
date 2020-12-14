@@ -20,10 +20,9 @@ const ButtonElement = styled.button`
     margin-right: ${openButtonAvatarSizeNumber / 2}px;
     margin-bottom: ${openButtonAvatarSizeNumber / 5}px;
     position: fixed;
-    bottom: 25px;
-    right: 25px;
+    bottom: 10px;
+    right: 10px;
     z-index: 998;
-    z-index: 999998;
     border: 0;
     cursor: pointer;
     border-radius: 30px;
@@ -53,6 +52,16 @@ const ButtonElement = styled.button`
         box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4),
             0 0 0 2px rgba(255, 255, 255, 1), 0 1px 4px rgba(0, 0, 0, 0.6),
             0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 4px #005b82;
+    }
+
+    @media (min-width: 480px) {
+        bottom: 17px;
+        right: 17px;
+    }
+
+    @media (min-width: 580px) {
+        bottom: 25px;
+        right: 25px;
     }
 `;
 
