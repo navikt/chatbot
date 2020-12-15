@@ -258,7 +258,6 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
     useEffect(() => {
         if (isOpen && (status === 'disconnected' || status === 'ended')) {
-            void start!();
             setUnreadCount(0);
         }
     }, [start, isOpen, status]);
