@@ -25,6 +25,8 @@ const LinkButtonElement = styled(RadioPanelGruppe)`
     position: relative;
 
     ${SpinnerElement} {
+        width: 12px;
+        height: 12px;
         position: absolute;
         top: 1.5rem;
         left: 1.5rem;
