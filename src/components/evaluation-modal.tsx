@@ -21,6 +21,16 @@ import Modal, {
     TextElement
 } from './modal';
 
+const FormElement = styled.form`
+    .textarea__container {
+        width: auto;
+    }
+
+    textarea {
+        min-height: 0;
+    }
+`;
+
 const ActionsElement = styled.div`
     margin-top: 20px;
     display: flex;
@@ -290,7 +300,7 @@ const EvaluationModal = ({
         <Modal {...{isOpen, onConfirm}} {...properties}>
             {isOpen && (
                 <BoxElement>
-                    <form onSubmit={handleSubmit}>
+                    <FormElement onSubmit={handleSubmit}>
                         <TitleElement>
                             {localizations.chat_has_ended}
                         </TitleElement>
@@ -457,7 +467,7 @@ const EvaluationModal = ({
                                 {localizations.submit}
                             </Knapp>
                         </ActionsElement>
-                    </form>
+                    </FormElement>
                 </BoxElement>
             )}
         </Modal>
