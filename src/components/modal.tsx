@@ -84,6 +84,7 @@ const BoxElement = styled.div`
     position: relative;
     overflow: auto;
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
     padding: 0 20px;
     border-radius: 4px;
     margin: auto;
