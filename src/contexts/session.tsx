@@ -702,6 +702,7 @@ const SessionProvider = (properties: SessionProperties) => {
                     .then((updatedSession) => {
                         if (status !== 'disconnected' && status !== 'ended') {
                             if (shouldUpdate) {
+                                setErrorCount(0);
                                 setStatus('connected');
                             }
                         }
