@@ -27,6 +27,7 @@ interface BoostConversation {
     reference: string;
     state: {
         chat_status: string;
+        poll: boolean;
         human_is_typing: boolean;
         max_input_chars: number;
     };
@@ -708,7 +709,11 @@ const SessionProvider = (properties: SessionProperties) => {
                         }
 
                         if (updatedSession.responses.length === 0) {
-                            setPollMultiplier((number) => number + 0.25);
+                            if (updatedSession.conversation.state.poll) {
+                                setPollMultiplier((number) => number + 0.25);
+                            } else {
+                                setPollMultiplier(30);
+                            }
                         } else {
                             setPollMultiplier(1);
                         }
