@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import {Knapp} from 'nav-frontend-knapper';
 
 import {
-    Textarea,
     RadioGruppe,
     Radio,
     CheckboxGruppe,
@@ -21,16 +20,7 @@ import Modal, {
     TextElement
 } from './modal';
 
-const FormElement = styled.form`
-    .textarea__container {
-        width: auto;
-    }
-
-    textarea {
-        min-height: 0;
-    }
-`;
-
+const FormElement = styled.form``;
 const ActionsElement = styled.div`
     margin-top: 20px;
     display: flex;
@@ -183,7 +173,6 @@ const EvaluationModal = ({
     const [rating, setRating] = useState<string>();
     const [reasons, setReasons] = useState<string[]>([]);
     const [satisfaction, setSatisfaction] = useState<string>();
-    const [message, setMessage] = useState<string>('');
     const localizations = useMemo(() => translate(translations), [translate]);
 
     function handleRatingClick(event: React.MouseEvent) {
@@ -214,19 +203,12 @@ const EvaluationModal = ({
         }
     }
 
-    function handleMessageChange(
-        event: React.ChangeEvent<HTMLTextAreaElement>
-    ) {
-        setMessage(event.target.value);
-    }
-
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
         if (rating) {
             void sendFeedback!(
-                Math.round(Number.parseInt(rating, 10)),
-                message
+                Math.round(Number.parseInt(rating, 10))
             );
         }
 
@@ -451,15 +433,6 @@ const EvaluationModal = ({
                                 />
                             </RadioGruppe>
                         )}
-
-                        <Textarea
-                            value={message}
-                            label={localizations.your_feedback}
-                            tellerTekst={(count, maxCount) => (
-                                <TextareaCounter {...{count, maxCount}} />
-                            )}
-                            onChange={handleMessageChange}
-                        />
 
                         <ActionsElement>
                             <ActionsSpacerElement />
