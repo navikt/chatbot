@@ -425,14 +425,16 @@ const SessionProvider = (properties: SessionProperties) => {
     );
 
     const sendPing = useCallback(async () => {
-        if (conversationId) {
+        const isHumanChat = conversationState?.chat_status === 'assigned_to_human';
+
+        if (conversationId && isHumanChat) {
             await pingBoostSession(boostApiUrlBase, conversationId).catch(
                 (error) => {
                     console.error(error);
                 }
             );
         }
-    }, [boostApiUrlBase, conversationId]);
+    }, [boostApiUrlBase, conversationId, conversationState]);
 
     const sendFeedback = useCallback(
         async (rating: number, message?: string) => {
