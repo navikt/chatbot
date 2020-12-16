@@ -207,9 +207,7 @@ const EvaluationModal = ({
         event.preventDefault();
 
         if (rating) {
-            void sendFeedback!(
-                Math.round(Number.parseInt(rating, 10))
-            );
+            void sendFeedback!(Math.round(Number.parseInt(rating, 10)));
         }
 
         if (onFeedback) {

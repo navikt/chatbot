@@ -425,7 +425,8 @@ const SessionProvider = (properties: SessionProperties) => {
     );
 
     const sendPing = useCallback(async () => {
-        const isHumanChat = conversationState?.chat_status === 'assigned_to_human';
+        const isHumanChat =
+            conversationState?.chat_status === 'assigned_to_human';
 
         if (conversationId && isHumanChat) {
             await pingBoostSession(boostApiUrlBase, conversationId).catch(
