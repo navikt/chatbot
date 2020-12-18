@@ -777,7 +777,7 @@ const SessionProvider = (properties: SessionProperties) => {
 
     useEffect(() => {
         if (conversationId) {
-            const options = {domain: cookieDomain};
+            const options = {domain: cookieDomain, expires: 0.5};
             setSavedConversationId(conversationId);
             cookies.set(conversationIdCookieName, conversationId, options);
         }

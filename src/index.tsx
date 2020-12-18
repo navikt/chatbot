@@ -271,7 +271,10 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     }, [isOpen, isOpening, isClosing]);
 
     useEffect(() => {
-        cookies.set(openCookieName, String(isOpen), {domain: cookieDomain});
+        cookies.set(openCookieName, String(isOpen), {
+            domain: cookieDomain,
+            expires: 0.5
+        });
     }, [isOpen]);
 
     useEffect(() => {
@@ -292,7 +295,8 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
     useEffect(() => {
         cookies.set(unreadCookieName, String(unreadCount), {
-            domain: cookieDomain
+            domain: cookieDomain,
+            expires: 0.5
         });
     }, [unreadCount]);
 

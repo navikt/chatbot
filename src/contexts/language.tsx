@@ -63,7 +63,10 @@ const LanguageProvider = (properties: Record<string, unknown>) => {
 
     useEffect(() => {
         if (language) {
-            cookies.set(languageCookieName, language, {domain: cookieDomain});
+            cookies.set(languageCookieName, language, {
+                domain: cookieDomain,
+                expires: 0.5
+            });
         }
     }, [language]);
 
