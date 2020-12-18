@@ -24,7 +24,7 @@ const PaddingElement = styled.div`
     }
 
     textarea {
-        min-height: 0;
+        min-height: 65px;
     }
 `;
 
