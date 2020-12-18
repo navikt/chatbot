@@ -50,8 +50,8 @@ const LanguageContext = createContext<LanguageInterface>({
 const LanguageProvider = (properties: Record<string, unknown>) => {
     const [language, setLanguage] = useState<string | undefined>(
         () =>
-            cookies.get(languageCookieName) ??
             clientLanguage ??
+            cookies.get(languageCookieName) ??
             defaultLanguageKey
     );
 
