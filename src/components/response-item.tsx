@@ -135,10 +135,7 @@ const ResponseItem = ({
         if (response.source === 'local') {
             return (
                 <div style={{opacity: 0.7}}>
-                    <Conversation
-                        tabIndex={isObscured ? -1 : 0}
-                        alignment='right'
-                    >
+                    <Conversation alignment='right'>
                         {text}
                     </Conversation>
 
@@ -161,10 +158,7 @@ const ResponseItem = ({
 
             return (
                 <>
-                    <Conversation
-                        tabIndex={isObscured ? -1 : 0}
-                        alignment='right'
-                    >
+                    <Conversation alignment='right'>
                         {text}
                     </Conversation>
 
@@ -176,10 +170,7 @@ const ResponseItem = ({
         }
 
         return (
-            <Conversation
-                tabIndex={isObscured ? -1 : 0}
-                avatarUrl={response.avatar_url}
-            >
+            <Conversation avatarUrl={response.avatar_url}>
                 {text}
             </Conversation>
         );
@@ -215,10 +206,7 @@ const ResponseItem = ({
         }
 
         return (
-            <Conversation
-                tabIndex={isObscured ? -1 : 0}
-                avatarUrl={response.avatar_url}
-            >
+            <Conversation avatarUrl={response.avatar_url}>
                 <Contents {...{html}} />
             </Conversation>
         );

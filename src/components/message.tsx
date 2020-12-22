@@ -72,11 +72,6 @@ const MessageBubble = styled.div`
     display: inline-block;
     vertical-align: top;
 
-    &:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px #005b82;
-    }
-
     ${(properties: MessageBubbleProperties) =>
         properties.isThinking &&
         css`
@@ -149,7 +144,6 @@ interface MessageProperties {
     avatarUrl?: string;
     alignment?: 'left' | 'right';
     isThinking?: boolean;
-    tabIndex?: number;
     children?: React.ReactNode;
 }
 
@@ -157,7 +151,6 @@ const Message = ({
     avatarUrl,
     alignment,
     isThinking,
-    tabIndex,
     children,
     ...properties
 }: MessageProperties) => {
@@ -180,9 +173,8 @@ const Message = ({
 
             <BubbleElement
                 {...{isThinking}}
-                tabIndex={isThinking ? undefined : tabIndex ?? 0}
             >
-                <TextElement>{children}</TextElement>
+                <TextElement tag="div">{children}</TextElement>
             </BubbleElement>
         </ContainerElement>
     );

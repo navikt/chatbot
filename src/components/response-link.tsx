@@ -98,7 +98,7 @@ const ResponseLink = ({
 
     if (link.url && link.type === 'external_link') {
         return (
-            <Message tabIndex={-1} avatarUrl={response.avatar_url}>
+            <Message avatarUrl={response.avatar_url}>
                 <a href={link.url} {...{tabIndex}}>
                     {link.text}
                 </a>
