@@ -32,6 +32,10 @@ const DownloadElement = styled.span`
 `;
 
 const translations = {
+    end_conversation: {
+        en: 'End conversation',
+        no: 'Avslutt samtale'
+    },
     confirm_chat_termination: {
         en: 'Confirm chat termination',
         no: 'Bekreft avslutning av chat'
@@ -71,13 +75,16 @@ const FinishModal = ({
     const {translate} = useLanguage();
     const {download} = useSession();
     const localizations = useMemo(() => translate(translations), [translate]);
-
     const handleDownload = useCallback(() => {
         void download!();
     }, [download]);
 
     return (
-        <Modal {...{isOpen, onConfirm}} {...properties}>
+        <Modal
+            {...{isOpen, onConfirm}}
+            confirmationButtonText={localizations.end_conversation}
+            {...properties}
+        >
             <ContainerElement>
                 <BoxElement>
                     <TextElement>

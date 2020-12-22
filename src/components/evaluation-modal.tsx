@@ -31,6 +31,10 @@ const ActionsSpacerElement = styled.div`
 `;
 
 const translations = {
+    close_evaluation: {
+        en: 'Close chat evaluation',
+        no: 'Lukk evaluering av chatt'
+    },
     chat_evaluation: {
         en: 'Chat evaluation',
         no: 'Evaluering av chat'
@@ -277,7 +281,11 @@ const EvaluationModal = ({
     );
 
     return (
-        <Modal {...{isOpen, onConfirm}} {...properties}>
+        <Modal
+            {...{isOpen, onConfirm}}
+            confirmationButtonText={localizations.close_evaluation}
+            {...properties}
+        >
             {isOpen && (
                 <BoxElement>
                     <FormElement onSubmit={handleSubmit}>

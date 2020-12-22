@@ -1,7 +1,8 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useEffect, useMemo} from 'react';
 import styled, {css} from 'styled-components';
 import {Systemtittel, Normaltekst} from 'nav-frontend-typografi';
 import finishIcon from '../assets/finish.svg';
+import useLanguage from '../contexts/language';
 import AriaLabelElement from './aria-label';
 
 const Element = styled.dialog`
@@ -141,6 +142,13 @@ interface ModalProperties {
     onConfirm?: () => void;
 }
 
+const translations = {
+    close: {
+        en: 'Close',
+        no: 'Lukk'
+    }
+};
+
 const Modal = ({
     isOpen,
     confirmationButtonText,
@@ -148,6 +156,8 @@ const Modal = ({
     children
 }: ModalProperties) => {
     const reference = useRef<HTMLDivElement>();
+    const {translate} = useLanguage();
+    const localizations = useMemo(() => translate(translations), [translate]);
 
     useEffect(() => {
         if (isOpen && reference.current) {
@@ -169,7 +179,9 @@ const Modal = ({
                 onClick={onConfirm}
             >
                 <Icon dangerouslySetInnerHTML={{__html: finishIcon}} />
-                <AriaLabelElement>{confirmationButtonText}</AriaLabelElement>
+                <AriaLabelElement>
+                    {confirmationButtonText ?? localizations.close}
+                </AriaLabelElement>
             </ButtonElement>
 
             <ContentsElement {...{isOpen}}>{children}</ContentsElement>
