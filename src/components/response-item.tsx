@@ -96,7 +96,7 @@ const Contents = ({html}: ContentsProperties) => {
         return html;
     }, [html]);
 
-    return <ContentsElement dangerouslySetInnerHTML={{__html: output}} />;
+    return <ContentsElement role="text" dangerouslySetInnerHTML={{__html: output}} />;
 };
 
 interface ResponseItemProperties extends Omit<ResponseLinkProperties, 'link'> {
