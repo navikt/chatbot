@@ -96,7 +96,12 @@ const Contents = ({html}: ContentsProperties) => {
         return html;
     }, [html]);
 
-    return <ContentsElement role="text" dangerouslySetInnerHTML={{__html: output}} />;
+    return (
+        <ContentsElement
+            role='text'
+            dangerouslySetInnerHTML={{__html: output}}
+        />
+    );
 };
 
 interface ResponseItemProperties extends Omit<ResponseLinkProperties, 'link'> {
@@ -135,9 +140,7 @@ const ResponseItem = ({
         if (response.source === 'local') {
             return (
                 <div style={{opacity: 0.7}}>
-                    <Conversation alignment='right'>
-                        {text}
-                    </Conversation>
+                    <Conversation alignment='right'>{text}</Conversation>
 
                     <SubtextElement>
                         {localizations.sending}
@@ -158,9 +161,7 @@ const ResponseItem = ({
 
             return (
                 <>
-                    <Conversation alignment='right'>
-                        {text}
-                    </Conversation>
+                    <Conversation alignment='right'>{text}</Conversation>
 
                     {displaySentIndicator && (
                         <SubtextElement>{localizations.sent}</SubtextElement>
@@ -170,9 +171,7 @@ const ResponseItem = ({
         }
 
         return (
-            <Conversation avatarUrl={response.avatar_url}>
-                {text}
-            </Conversation>
+            <Conversation avatarUrl={response.avatar_url}>{text}</Conversation>
         );
     }
 

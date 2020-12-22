@@ -171,10 +171,8 @@ const Message = ({
                 {avatarUrl && <img src={avatarUrl} alt='' />}
             </AvatarElement>
 
-            <BubbleElement
-                {...{isThinking}}
-            >
-                <TextElement tag="div">{children}</TextElement>
+            <BubbleElement {...{isThinking}}>
+                <TextElement tag='div'>{children}</TextElement>
             </BubbleElement>
         </ContainerElement>
     );
