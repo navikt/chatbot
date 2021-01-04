@@ -2,7 +2,7 @@ import {useRef, useCallback, useState, useMemo} from 'react';
 
 export default function useLoader() {
     const [loaders, setLoaders] = useState<number[]>([]);
-    const isLoading = useMemo<boolean>(() => loaders.length !== 0, [
+    const isLoading = useMemo<boolean>(() => loaders.length > 0, [
         loaders.length
     ]);
 
@@ -14,7 +14,7 @@ export default function useLoader() {
         setLoaders((previousState) => previousState.concat(currentIteration));
 
         return () => {
-            return setLoaders((previousState) => {
+            setLoaders((previousState) => {
                 previousState.splice(
                     previousState.indexOf(currentIteration),
                     1

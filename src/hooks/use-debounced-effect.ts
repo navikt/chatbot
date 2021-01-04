@@ -7,7 +7,7 @@ export default function useDebouncedEffect(
 ) {
     const [previousTimestamp, setPreviousTimestamp] = useState(0);
 
-    return useEffect(() => {
+    useEffect(() => {
         const currentTimestamp = Date.now();
 
         if (previousTimestamp + timeout < currentTimestamp) {

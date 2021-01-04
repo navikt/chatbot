@@ -68,20 +68,16 @@ const Response = ({
                     let elementTypingRevealTimestamp = 0;
                     let elementRevealTimestamp = 0;
 
-                    if (shouldObscure) {
-                        if (index !== 0) {
-                            elementTypingRevealTimestamp =
-                                revealTimestamp +
-                                botResponseRevealDelay * index;
+                    if (shouldObscure && index !== 0) {
+                        elementTypingRevealTimestamp =
+                            revealTimestamp + botResponseRevealDelay * index;
 
-                            elementRevealTimestamp =
-                                element.type === 'links'
-                                    ? 0
-                                    : elementTypingRevealTimestamp +
-                                      botResponseRevealDelayBuffer +
-                                      botResponseRevealDelayBuffer *
-                                          Math.random();
-                        }
+                        elementRevealTimestamp =
+                            element.type === 'links'
+                                ? 0
+                                : elementTypingRevealTimestamp +
+                                  botResponseRevealDelayBuffer +
+                                  botResponseRevealDelayBuffer * Math.random();
                     }
 
                     return (

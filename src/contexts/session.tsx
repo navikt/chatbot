@@ -345,11 +345,12 @@ const SessionProvider = (properties: SessionProperties) => {
 
     const handleError = useCallback(
         (error: any, isDismissible = false) => {
-            if (error?.response) {
-                if (error.response.data.error === 'session ended') {
-                    setStatus('ended');
-                    return;
-                }
+            if (
+                error?.response &&
+                error.response.data.error === 'session ended'
+            ) {
+                setStatus('ended');
+                return;
             }
 
             if (isDismissible !== true || errorCount > 1) {
@@ -572,10 +573,11 @@ const SessionProvider = (properties: SessionProperties) => {
                         language
                     }
                 ).catch(async (error) => {
-                    if (error?.response) {
-                        if (error.response.data.error === 'session ended') {
-                            return createBoostSession(boostApiUrlBase);
-                        }
+                    if (
+                        error?.response &&
+                        error.response.data.error === 'session ended'
+                    ) {
+                        return createBoostSession(boostApiUrlBase);
                     }
 
                     throw error;
@@ -667,7 +669,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 anchor.setAttribute('href', url);
                 anchor.setAttribute(
                     'download',
-                    `nav-chatlog-${new Date().getTime()}.txt`
+                    `nav-chatlog-${Date.now()}.txt`
                 );
 
                 if (typeof anchor.download === undefined) {
@@ -678,7 +680,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 anchor.click();
                 anchor.remove();
 
-                setTimeout(() => {
+                window.setTimeout(() => {
                     URL.revokeObjectURL(url);
                 }, 250);
             } catch (error) {
@@ -704,11 +706,13 @@ const SessionProvider = (properties: SessionProperties) => {
                     mostRecentResponseId
                 })
                     .then((updatedSession) => {
-                        if (status !== 'disconnected' && status !== 'ended') {
-                            if (shouldUpdate) {
-                                setErrorCount(0);
-                                setStatus('connected');
-                            }
+                        if (
+                            status !== 'disconnected' &&
+                            status !== 'ended' &&
+                            shouldUpdate
+                        ) {
+                            setErrorCount(0);
+                            setStatus('connected');
                         }
 
                         if (updatedSession.responses.length === 0) {
@@ -731,7 +735,7 @@ const SessionProvider = (properties: SessionProperties) => {
                         }
                     })
                     .then(() => {
-                        timeout = setTimeout(
+                        timeout = window.setTimeout(
                             poll,
                             Math.min(
                                 maximumPollTimeout,
@@ -741,7 +745,7 @@ const SessionProvider = (properties: SessionProperties) => {
                     });
             };
 
-            timeout = setTimeout(
+            timeout = window.setTimeout(
                 poll,
                 Math.min(
                     maximumPollTimeout,

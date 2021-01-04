@@ -81,11 +81,9 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
         (event?: React.FormEvent<HTMLFormElement>) => {
             event?.preventDefault();
 
-            if (message) {
-                if (message.length <= messageMaxCharacters) {
-                    setMessage('');
-                    void onSubmit!(message);
-                }
+            if (message && message.length <= messageMaxCharacters) {
+                setMessage('');
+                onSubmit!(message);
             }
         },
         [message, messageMaxCharacters, onSubmit]

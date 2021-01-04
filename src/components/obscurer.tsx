@@ -27,7 +27,7 @@ const Obscured = ({
         const currentTimestamp = Date.now();
 
         if (untilTimestamp && currentTimestamp < untilTimestamp) {
-            const timeout = setTimeout(() => {
+            const timeout = window.setTimeout(() => {
                 setIsVisible(true);
             }, untilTimestamp - currentTimestamp);
 

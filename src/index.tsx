@@ -218,7 +218,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         setIsClosing(true);
 
         await new Promise((resolve) => {
-            setTimeout(resolve, 370);
+            window.setTimeout(resolve, 370);
         });
 
         setIsOpen(false);
@@ -306,7 +306,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         if (isHumanTyping) {
             setIsAgentTyping(isHumanTyping);
         } else {
-            const timeout = setTimeout(() => {
+            const timeout = window.setTimeout(() => {
                 setIsAgentTyping(isHumanTyping);
             }, 1000);
 
