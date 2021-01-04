@@ -15,6 +15,22 @@ const ContentsElement = styled.span`
         margin: 0;
         padding: 0;
     }
+
+    ul {
+        white-space: normal;
+        margin: 0;
+        padding: 0;
+        padding-left: 20px;
+    }
+
+    li {
+        margin: 0;
+        padding: 0;
+
+        & p {
+            white-space: pre-wrap;
+        }
+    }
 `;
 
 const SubtextElement = styled(Undertekst)`
