@@ -33,7 +33,7 @@ const ActionsSpacerElement = styled.div`
 const translations = {
     close_evaluation: {
         en: 'Close chat evaluation',
-        no: 'Lukk evaluering av chatt'
+        no: 'Lukk evaluering av chat'
     },
     chat_evaluation: {
         en: 'Chat evaluation',
