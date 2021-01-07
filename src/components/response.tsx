@@ -1,14 +1,15 @@
 import React, {useCallback} from 'react';
 import {BoostConversation, BoostResponse} from '../contexts/session';
-import Obscured from './obscurer';
-import TypingIndicator from './typing-indicator';
-import ResponseItem, {ResponseItemProperties} from './response-item';
-import Message, {GroupElement} from './message';
 
 import {
     botResponseRevealDelay,
     botResponseRevealDelayBuffer
 } from '../configuration';
+
+import Obscured from './obscurer';
+import TypingIndicator from './typing-indicator';
+import ResponseItem, {ResponseItemProperties} from './response-item';
+import Message, {GroupElement} from './message';
 
 const BotTypingIndicator = (properties: {response?: BoostResponse}) => (
     <Message isThinking avatarUrl={properties.response?.avatar_url}>

@@ -5,10 +5,10 @@ import {Ingress, Normaltekst, Undertekst} from 'nav-frontend-typografi';
 import idPortenIcon from '../assets/id-porten.svg';
 import useLanguage from '../contexts/language';
 import {BoostResponse, BoostResponseElement} from '../contexts/session';
+import {authenticationPrefix} from '../configuration';
 import Spinner from './spinner';
 import Conversation, {GroupElement} from './message';
 import ResponseLink, {ResponseLinkProperties} from './response-link';
-import {authenticationPrefix} from '../configuration';
 
 const ContentsElement = styled.span`
     p {

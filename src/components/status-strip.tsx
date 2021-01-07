@@ -1,9 +1,9 @@
 import React, {useMemo} from 'react';
 import styled from 'styled-components';
 import AlertStripe from 'nav-frontend-alertstriper';
+import useLanguage from '../contexts/language';
 import useSession from '../contexts/session';
 import Spinner, {SpinnerElement} from './spinner';
-import useLanguage from '../contexts/language';
 
 const Element = styled(AlertStripe)`
     backdrop-filter: blur(2px);
