@@ -20,36 +20,40 @@ const ButtonElement = styled(Knapp)`
 `;
 
 const translations = {
-    revoke_consent: {
-        en: 'Revoke consent',
-        no: ''
+    deny_data_processing_consent: {
+        en: 'Deny data processing consent',
+        no: 'Benekt behandling av data'
     },
     processing_of_personal_data: {
         en: 'Processing of personal data',
         no: 'Behandling av personopplysninger'
     },
     consent_text_1: {
-        en: '',
+        en:
+            'Before we can start chatting, please read about our processing of personal data.',
         no:
             'Før vi kan chatte ber vi deg lese om vår behandling av personopplysninger.'
     },
     consent_text_2: {
-        en: '',
+        en:
+            'The conversation is saved to improve our chatbot. This is an anonymous chat where you can ask general questions about NAV’s services. We can’t follow up on specific cases.',
         no:
             'Dialogen lagres for å lære chatboten å bli bedre. Dette er en anonym chat hvor du kan få svar på generelle spørsmål om NAV sine ytelser og tjenester. Vi kan ikke svare på spørsmål om konkrete saker.'
     },
     consent_text_3: {
-        en: '',
+        en:
+            'For your safety, please do not write sensitive information such as name, social security number, or case numbers.',
         no:
             'Av hensyn til din sikkerhet ber vi deg om å ikke skrive sensitive opplysninger, som for eksempel navn, fødselsnummer eller saksnummer.'
     },
     consent_text_4: {
-        en: '',
+        en:
+            'You can <a href="https://www.nav.no/en/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">read more about how we process personal data here.</a>',
         no:
-            'Du kan lese <a href="https://www.nav.no/no/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">mer om hvordan NAV behandler personopplysninger her.</a>'
+            'Du kan <a href="https://www.nav.no/no/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">lese mer om hvordan NAV behandler personopplysninger her.</a>'
     },
     consent_text_5: {
-        en: '',
+        en: 'Have you read and understood this?',
         no: 'Har du lest og forstått dette?'
     },
     cancel: {
@@ -78,7 +82,7 @@ const ConsentModal = ({
     return (
         <Modal
             {...{isOpen, onConfirm}}
-            confirmationButtonText={localizations.revoke_consent}
+            confirmationButtonText={localizations.deny_data_processing_consent}
             {...properties}
         >
             <ContainerElement>
@@ -86,6 +90,7 @@ const ConsentModal = ({
                     <TitleElement>
                         {localizations.processing_of_personal_data}
                     </TitleElement>
+
                     <TextElement>{localizations.consent_text_1}</TextElement>
                     <TextElement>{localizations.consent_text_2}</TextElement>
                     <TextElement>{localizations.consent_text_3}</TextElement>
