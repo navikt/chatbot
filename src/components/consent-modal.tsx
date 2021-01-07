@@ -86,48 +86,58 @@ const ConsentModal = ({
             {...properties}
         >
             <ContainerElement>
-                <BoxElement>
-                    <TitleElement>
-                        {localizations.processing_of_personal_data}
-                    </TitleElement>
+                {isOpen && (
+                    <BoxElement>
+                        <TitleElement>
+                            {localizations.processing_of_personal_data}
+                        </TitleElement>
 
-                    <TextElement>{localizations.consent_text_1}</TextElement>
-                    <TextElement>{localizations.consent_text_2}</TextElement>
-                    <TextElement>{localizations.consent_text_3}</TextElement>
-                    <TextElement>
-                        <span
-                            // eslint-disable-next-line react/no-danger
-                            dangerouslySetInnerHTML={{
-                                __html: localizations.consent_text_4
-                            }}
-                        />
-                    </TextElement>
-                    <TextElement>{localizations.consent_text_5}</TextElement>
+                        <TextElement>
+                            {localizations.consent_text_1}
+                        </TextElement>
+                        <TextElement>
+                            {localizations.consent_text_2}
+                        </TextElement>
+                        <TextElement>
+                            {localizations.consent_text_3}
+                        </TextElement>
+                        <TextElement>
+                            <span
+                                // eslint-disable-next-line react/no-danger
+                                dangerouslySetInnerHTML={{
+                                    __html: localizations.consent_text_4
+                                }}
+                            />
+                        </TextElement>
+                        <TextElement>
+                            {localizations.consent_text_5}
+                        </TextElement>
 
-                    <ActionsElement>
-                        <ButtonElement
-                            mini
-                            kompakt
-                            tabIndex={isOpen ? undefined : -1}
-                            htmlType='button'
-                            type='flat'
-                            onClick={onConfirm}
-                        >
-                            {localizations.cancel}
-                        </ButtonElement>
+                        <ActionsElement>
+                            <ButtonElement
+                                mini
+                                kompakt
+                                tabIndex={isOpen ? undefined : -1}
+                                htmlType='button'
+                                type='flat'
+                                onClick={onConfirm}
+                            >
+                                {localizations.cancel}
+                            </ButtonElement>
 
-                        <ButtonElement
-                            mini
-                            kompakt
-                            tabIndex={isOpen ? undefined : -1}
-                            htmlType='button'
-                            type='hoved'
-                            onClick={onCancel}
-                        >
-                            {localizations.yes_i_understand}
-                        </ButtonElement>
-                    </ActionsElement>
-                </BoxElement>
+                            <ButtonElement
+                                mini
+                                kompakt
+                                tabIndex={isOpen ? undefined : -1}
+                                htmlType='button'
+                                type='hoved'
+                                onClick={onCancel}
+                            >
+                                {localizations.yes_i_understand}
+                            </ButtonElement>
+                        </ActionsElement>
+                    </BoxElement>
+                )}
             </ContainerElement>
         </Modal>
     );
