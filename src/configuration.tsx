@@ -12,6 +12,7 @@ const boostApiUrlBase = 'https://navtest.boost.ai/api/chat/v2';
 const conversationIdCookieName = 'nav-chatbot:conversation';
 const languageCookieName = 'nav-chatbot:language';
 const openCookieName = 'nav-chatbot:open';
+const consentCookieName = 'nav-chatbot:consent';
 const unreadCookieName = 'nav-chatbot:unread';
 const cacheSessionName = 'nav-chatbot:cache';
 const containerWidthNumber = 400;
@@ -36,6 +37,7 @@ export {
     conversationIdCookieName,
     languageCookieName,
     openCookieName,
+    consentCookieName,
     unreadCookieName,
     cacheSessionName,
     containerWidthNumber,

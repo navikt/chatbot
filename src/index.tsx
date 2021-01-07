@@ -15,6 +15,7 @@ import StatusStrip from './components/status-strip';
 import Message, {GroupElement} from './components/message';
 import Form from './components/form';
 import Response from './components/response';
+import ConsentModal from './components/consent-modal';
 import FinishModal from './components/finish-modal';
 import EvaluationModal from './components/evaluation-modal';
 
@@ -26,6 +27,7 @@ import {
     fullscreenMediaQuery,
     cookieDomain,
     openCookieName,
+    consentCookieName,
     unreadCookieName
 } from './configuration';
 
@@ -135,7 +137,6 @@ interface ChatProperties {
 
 const Chat = ({analyticsCallback}: ChatProperties) => {
     const {language} = useLanguage();
-
     const {
         status,
         conversation,
@@ -151,16 +152,21 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     const responsesLength = responses?.length;
     const reference = useRef<HTMLDivElement>();
     const anchor = useRef<HTMLDivElement>();
-    const [isClosing, setIsClosing] = useState<boolean>(false);
-    const [isOpening, setIsOpening] = useState<boolean>(false);
-    const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-    const [isAgentTyping, setIsAgentTyping] = useState<boolean>(false);
     const [isOpen, setIsOpen] = useState<boolean>(
         () => cookies.get(openCookieName) === 'true'
     );
 
+    const [isClosing, setIsClosing] = useState<boolean>(false);
+    const [isOpening, setIsOpening] = useState<boolean>(false);
+    const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+    const [isAgentTyping, setIsAgentTyping] = useState<boolean>(false);
     const [isFinishing, setIsFinishing] = useState<boolean>(false);
     const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
+
+    const [isConsented, setIsConsented] = useState<boolean>(
+        () => cookies.get(consentCookieName) === 'true'
+    );
+
     const [readCount, setReadCount] = useState<number>(0);
     const [unreadCount, setUnreadCount] = useState<number>(
         () => Number.parseInt(String(cookies.get(unreadCookieName)), 10) || 0
@@ -197,18 +203,18 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     const handleOpen = useCallback(async () => {
         setIsOpening(true);
         setIsOpen(true);
-
-        if (status === 'disconnected' || status === 'ended') {
-            void start!();
-        }
-
         setUnreadCount(0);
         scrollToBottom({behavior: 'auto'});
 
         if (reference.current) {
             reference.current.focus();
         }
-    }, [status, start, scrollToBottom]);
+    }, [scrollToBottom]);
+
+    const handleConsent = useCallback(async () => {
+        setIsConsented(true);
+        scrollToBottom({behavior: 'auto'});
+    }, [scrollToBottom]);
 
     function toggleFullscreen() {
         setIsFullscreen((previousState) => !previousState);
@@ -232,6 +238,11 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     }, [restart]);
 
     const handleFinish = useCallback(async () => {
+        if (!isConsented) {
+            void finish!();
+            return handleClose();
+        }
+
         let shouldFinish = false;
 
         if ((responsesLength || 0) < 2) {
@@ -250,7 +261,14 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         } else {
             setIsFinishing(true);
         }
-    }, [isFinishing, isEvaluating, responsesLength, finish, handleClose]);
+    }, [
+        responsesLength,
+        isConsented,
+        isFinishing,
+        isEvaluating,
+        finish,
+        handleClose
+    ]);
 
     function handleCancelFinish() {
         setIsFinishing(false);
@@ -276,6 +294,15 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
             expires: 0.5
         });
     }, [isOpen]);
+
+    useEffect(() => {
+        if (isConsented) {
+            cookies.set(consentCookieName, String(isConsented), {
+                domain: cookieDomain,
+                expires: 0.5
+            });
+        }
+    }, [isConsented]);
 
     useEffect(() => {
         if (responsesLength && isOpen) {
@@ -321,6 +348,16 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     useEffect(() => {
         setIsAgentTyping(false);
     }, [responses]);
+
+    useEffect(() => {
+        if (
+            isOpen &&
+            isConsented &&
+            (status === 'disconnected' || status === 'ended')
+        ) {
+            void start!();
+        }
+    }, [isOpen, isConsented, status, start]);
 
     const isConsideredOpen = isOpen || isOpening;
     const isModalOpen = isFinishing || isEvaluating;
@@ -387,6 +424,12 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
                         isObscured={isModalOpen}
                         onSubmit={handleSubmit}
                         onRestart={handleRestart}
+                    />
+
+                    <ConsentModal
+                        isOpen={!isConsented}
+                        onCancel={handleConsent}
+                        onConfirm={handleFinish}
                     />
 
                     <FinishModal

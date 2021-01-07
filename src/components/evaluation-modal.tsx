@@ -11,7 +11,6 @@ import {
 
 import useLanguage from '../contexts/language';
 import useSession from '../contexts/session';
-import TextareaCounter from './textarea-counter';
 
 import Modal, {
     ModalProperties,

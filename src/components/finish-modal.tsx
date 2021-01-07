@@ -3,13 +3,14 @@ import styled from 'styled-components';
 import {Knapp} from 'nav-frontend-knapper';
 import downloadIcon from '../assets/file-download.svg';
 import useLanguage from '../contexts/language';
+import useSession from '../contexts/session';
+
 import Modal, {
     ModalProperties,
     BoxElement,
     TextElement,
     ActionsElement
 } from './modal';
-import useSession from '../contexts/session';
 
 const ContainerElement = styled.div`
     margin: auto;
