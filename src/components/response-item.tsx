@@ -99,10 +99,9 @@ const Contents = ({html}: ContentsProperties) => {
             return html.replace(regexp, (string, prefix, match, suffix) => {
                 if (match) {
                     const url = String(match);
+                    const href = `<a href="${url}">${url}</a>`;
 
-                    return `${String(
-                        prefix
-                    )}<a href="${url}">${url}</a>${String(suffix)}`;
+                    return `${String(prefix)}${href}${String(suffix)}`;
                 }
 
                 return string;
