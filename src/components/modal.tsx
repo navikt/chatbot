@@ -126,6 +126,10 @@ const HeadingElement = styled(Systemtittel)`
 const TextElement = styled(Normaltekst)`
     font-size: 17px;
     margin-bottom: 18px;
+
+    ${TitleElement} + & {
+        margin-top: 4px;
+    }
 `;
 
 const ActionsElement = styled.div`
