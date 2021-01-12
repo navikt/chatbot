@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import styled from 'styled-components';
 import {Knapp} from 'nav-frontend-knapper';
 import useLanguage from '../contexts/language';
@@ -63,6 +63,18 @@ const translations = {
     yes_i_understand: {
         en: 'Yes, I understand',
         no: 'Ja, jeg forstår'
+    },
+    chat_aborted: {
+        en: 'Chat aborted',
+        no: 'Chat avbrutt'
+    },
+    you_can_find_other_ways_to_contact_us_here: {
+        en: 'You can find other ways to <a href="https://www.nav.no/person/kontakt-oss/en">contact us here.</a>',
+        no: 'Du kan se andre måter å <a href="https://www.nav.no/person/kontakt-oss">kontakte oss på her.</a>'
+    },
+    close: {
+        en: 'Close',
+        no: 'Lukk'
     }
 };
 
@@ -78,68 +90,117 @@ const ConsentModal = ({
 }: ConsentModalProperties) => {
     const {translate} = useLanguage();
     const localizations = useMemo(() => translate(translations), [translate]);
+    const [isDenied, setIsDenied] = useState(false);
+
+    function handleDeny() {
+        setIsDenied(true);
+    }
+
+    function handleDenyConfirm() {
+        setIsDenied(false);
+        onConfirm!();
+    }
 
     return (
-        <Modal
-            {...{isOpen, onConfirm}}
-            confirmationButtonText={localizations.deny_data_processing_consent}
-            {...properties}
-        >
-            <ContainerElement>
-                {isOpen && (
-                    <BoxElement>
-                        <TitleElement>
-                            {localizations.processing_of_personal_data}
-                        </TitleElement>
+        <>
+            <Modal
+                {...properties}
+                {...{onConfirm}}
+                isOpen={isOpen && !isDenied}
+                confirmationButtonText={localizations.deny_data_processing_consent}
+            >
+                <ContainerElement>
+                    {isOpen && !isDenied && (
+                        <BoxElement>
+                            <TitleElement>
+                                {localizations.processing_of_personal_data}
+                            </TitleElement>
 
-                        <TextElement>
-                            {localizations.consent_text_1}
-                        </TextElement>
-                        <TextElement>
-                            {localizations.consent_text_2}
-                        </TextElement>
-                        <TextElement>
-                            {localizations.consent_text_3}
-                        </TextElement>
-                        <TextElement>
-                            <span
-                                // eslint-disable-next-line react/no-danger
-                                dangerouslySetInnerHTML={{
-                                    __html: localizations.consent_text_4
-                                }}
-                            />
-                        </TextElement>
-                        <TextElement>
-                            {localizations.consent_text_5}
-                        </TextElement>
+                            <TextElement>
+                                {localizations.consent_text_1}
+                            </TextElement>
+                            <TextElement>
+                                {localizations.consent_text_2}
+                            </TextElement>
+                            <TextElement>
+                                {localizations.consent_text_3}
+                            </TextElement>
+                            <TextElement>
+                                <span
+                                    // eslint-disable-next-line react/no-danger
+                                    dangerouslySetInnerHTML={{
+                                        __html: localizations.consent_text_4
+                                    }}
+                                />
+                            </TextElement>
+                            <TextElement>
+                                {localizations.consent_text_5}
+                            </TextElement>
 
-                        <ActionsElement>
-                            <ButtonElement
-                                mini
-                                kompakt
-                                tabIndex={isOpen ? undefined : -1}
-                                htmlType='button'
-                                type='flat'
-                                onClick={onConfirm}
-                            >
-                                {localizations.cancel}
-                            </ButtonElement>
+                            <ActionsElement>
+                                <ButtonElement
+                                    mini
+                                    kompakt
+                                    tabIndex={isOpen ? undefined : -1}
+                                    htmlType='button'
+                                    type='flat'
+                                    onClick={handleDeny}
+                                >
+                                    {localizations.cancel}
+                                </ButtonElement>
 
-                            <ButtonElement
-                                mini
-                                kompakt
-                                tabIndex={isOpen ? undefined : -1}
-                                htmlType='button'
-                                type='hoved'
-                                onClick={onCancel}
-                            >
-                                {localizations.yes_i_understand}
-                            </ButtonElement>
-                        </ActionsElement>
-                    </BoxElement>
-                )}
-            </ContainerElement>
-        </Modal>
+                                <ButtonElement
+                                    mini
+                                    kompakt
+                                    tabIndex={isOpen ? undefined : -1}
+                                    htmlType='button'
+                                    type='hoved'
+                                    onClick={onCancel}
+                                >
+                                    {localizations.yes_i_understand}
+                                </ButtonElement>
+                            </ActionsElement>
+                        </BoxElement>
+                    )}
+                </ContainerElement>
+            </Modal>
+
+            <Modal
+                {...properties}
+                {...{onConfirm}}
+                isOpen={isOpen && isDenied}
+                confirmationButtonText={localizations.deny_data_processing_consent}
+            >
+                <ContainerElement>
+                    {isOpen && isDenied && (
+                        <BoxElement>
+                            <TitleElement>{localizations.chat_aborted}</TitleElement>
+                            <TextElement>
+                                <span
+                                    // eslint-disable-next-line react/no-danger
+                                    dangerouslySetInnerHTML={{
+                                        __html: localizations.you_can_find_other_ways_to_contact_us_here
+                                    }}
+                                />
+                            </TextElement>
+
+                            <ActionsElement>
+                                <ButtonElement
+                                    mini
+                                    kompakt
+                                    tabIndex={isDenied ? undefined : -1}
+                                    htmlType='button'
+                                    type='hoved'
+                                    onClick={handleDenyConfirm}
+                                >
+                                    {localizations.close}
+                                </ButtonElement>
+                            </ActionsElement>
+                        </BoxElement>
+                    )}
+                </ContainerElement>
+            </Modal>
+        </>
     );
 };
 
