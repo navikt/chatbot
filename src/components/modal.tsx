@@ -135,19 +135,19 @@ const ActionsElement = styled.div`
     justify-content: flex-end;
 `;
 
-interface ModalProperties {
-    isOpen?: boolean;
-    confirmationButtonText?: string;
-    children?: React.ReactNode;
-    onConfirm?: () => void;
-}
-
 const translations = {
     close: {
         en: 'Close',
         no: 'Lukk'
     }
 };
+
+interface ModalProperties {
+    isOpen?: boolean;
+    confirmationButtonText?: string;
+    children?: React.ReactNode;
+    onConfirm?: () => void;
+}
 
 const Modal = ({
     isOpen,
@@ -176,6 +176,7 @@ const Modal = ({
             <ButtonElement
                 type='button'
                 tabIndex={isOpen ? undefined : -1}
+                disabled={!isOpen}
                 onClick={onConfirm}
             >
                 <Icon dangerouslySetInnerHTML={{__html: finishIcon}} />
