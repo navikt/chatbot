@@ -360,7 +360,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     }, [isOpen, isConsented, status, start]);
 
     const isConsideredOpen = isOpen || isOpening;
-    const isModalOpen = isFinishing || isEvaluating;
+    const isModalOpen = !isConsented || isFinishing || isEvaluating;
 
     return (
         <div id='nav-chatbot'>
