@@ -299,7 +299,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         if (isConsented) {
             cookies.set(consentCookieName, String(isConsented), {
                 domain: cookieDomain,
-                expires: 0.5
+                expires: 7
             });
         }
     }, [isConsented]);
