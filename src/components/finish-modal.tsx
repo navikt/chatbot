@@ -82,9 +82,9 @@ const FinishModal = ({
 
     return (
         <Modal
+            {...properties}
             {...{isOpen, onConfirm}}
             confirmationButtonText={localizations.end_conversation}
-            {...properties}
         >
             <ContainerElement>
                 <BoxElement>
