@@ -614,6 +614,14 @@ const SessionProvider = (properties: SessionProperties) => {
         cookies.remove(conversationIdCookieName, {domain: cookieDomain});
 
         if (conversationId) {
+            // NOTE temporarily send a message to let agents know. cc stian schikora to check if it's still needed
+            await postBoostSession(boostApiUrlBase, conversationId, {
+                type: 'text',
+                message: '<<< Brukeren har forlatt samtalen >>>'
+            }).catch((error) => {
+                console.error(error);
+            });
+
             await stopBoostSession(boostApiUrlBase, conversationId).catch(
                 (error) => {
                     console.error(error);
