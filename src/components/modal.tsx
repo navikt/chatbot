@@ -1,4 +1,4 @@
-import React, {useRef, useEffect, useMemo} from 'react';
+import React, {useRef, useEffect, useMemo, useState} from 'react';
 import styled, {css} from 'styled-components';
 import {Systemtittel, Normaltekst} from 'nav-frontend-typografi';
 import finishIcon from '../assets/finish.svg';
@@ -23,8 +23,8 @@ const Element = styled.dialog`
     box-sizing: border-box;
     display: flex;
 
-    ${(properties: {isOpen?: boolean}) =>
-        properties.isOpen &&
+    ${(properties: {internalIsOpen?: boolean}) =>
+        properties.internalIsOpen &&
         css`
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -162,6 +162,7 @@ const Modal = ({
     const reference = useRef<HTMLDivElement>();
     const {translate} = useLanguage();
     const localizations = useMemo(() => translate(translations), [translate]);
+    const [internalIsOpen, setInternalIsOpen] = useState(isOpen);
 
     useEffect(() => {
         if (isOpen && reference.current) {
@@ -169,10 +170,26 @@ const Modal = ({
         }
     }, [isOpen]);
 
+    useEffect(() => {
+        if (isOpen) {
+            setInternalIsOpen(true);
+        } else {
+            const timeout = window.setTimeout(() => {
+                setInternalIsOpen(false);
+            }, 125);
+
+            return () => {
+                clearTimeout(timeout);
+            };
+        }
+
+        return undefined;
+    }, [isOpen]);
+
     return (
         <Element
             ref={reference as any}
-            {...{isOpen}}
+            {...{isOpen, internalIsOpen}}
             aria-modal={isOpen}
             aria-hidden={!isOpen}
             open={isOpen}
