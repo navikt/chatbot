@@ -146,7 +146,8 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         restart,
         finish,
         sendMessage,
-        sendAction
+        sendAction,
+        sendLink
     } = useSession();
 
     const responsesLength = responses?.length;
@@ -231,6 +232,21 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         setIsFullscreen(false);
         setUnreadCount(0);
     }, [setIsClosing]);
+
+    const handleLink = useCallback(
+        async (link: BoostResponseElementLinksItem) => {
+            if (link.url) {
+                await Promise.all([sendLink!(link.id), handleClose()]);
+
+                if (link.link_target === '_blank') {
+                    window.open(link.url, link.link_target);
+                } else {
+                    window.location.href = link.url;
+                }
+            }
+        },
+        [sendLink, handleClose]
+    );
 
     const handleRestart = useCallback(() => {
         void restart!();
@@ -397,6 +413,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
                                     responsesLength={responsesLength}
                                     isObscured={isModalOpen}
                                     onAction={handleAction}
+                                    onLink={handleLink}
                                     onReveal={scrollToBottom}
                                 />
                             ))}

@@ -51,6 +51,7 @@ interface BoostResponseElementLinksItem {
     id: string;
     text: string;
     type: string;
+    link_target: string;
     url?: string;
 }
 
@@ -149,7 +150,7 @@ interface BoostPostRequestOptionsText {
 }
 
 interface BoostPostRequestOptionsLink {
-    type: 'action_link';
+    type: 'action_link' | 'external_link';
     id: string;
 }
 
@@ -169,6 +170,8 @@ async function postBoostSession(
     if (options.type === 'text') {
         requestOptions.value = options.message;
     } else if (options.type === 'action_link') {
+        requestOptions.id = options.id;
+    } else if (options.type === 'external_link') {
         requestOptions.id = options.id;
     }
 
@@ -308,6 +311,7 @@ interface Session {
     download?: () => Promise<void>;
     sendMessage?: (message: string) => Promise<void>;
     sendAction?: (actionId: string) => Promise<void>;
+    sendLink?: (linkId: string) => Promise<void>;
     sendPing?: () => Promise<void>;
     sendFeedback?: (rating: number, message?: string) => Promise<void>;
 }
@@ -419,6 +423,24 @@ const SessionProvider = (properties: SessionProperties) => {
                 });
 
                 setPollMultiplier(0.1);
+                finishLoading();
+            }
+        },
+        [boostApiUrlBase, conversationId, setIsLoading, handleError]
+    );
+
+    const sendLink = useCallback(
+        async (id: string) => {
+            if (conversationId) {
+                const finishLoading = setIsLoading();
+
+                await postBoostSession(boostApiUrlBase, conversationId, {
+                    type: 'external_link',
+                    id
+                }).catch((error) => {
+                    handleError(error);
+                });
+
                 finishLoading();
             }
         },
@@ -806,6 +828,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 isLoading,
                 sendMessage,
                 sendAction,
+                sendLink,
                 sendPing,
                 sendFeedback,
                 start,

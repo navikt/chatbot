@@ -50,13 +50,15 @@ interface ResponseLinkProperties {
     link: BoostResponseElementLinksItem;
     tabIndex?: number;
     onAction?: (link: BoostResponseElementLinksItem) => Promise<void>;
+    onLink?: (link: BoostResponseElementLinksItem) => Promise<void>;
 }
 
 const ResponseLink = ({
     response,
     link,
     tabIndex,
-    onAction
+    onAction,
+    onLink
 }: ResponseLinkProperties) => {
     const [isSelected, setIsSelected] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
@@ -71,7 +73,7 @@ const ResponseLink = ({
             setIsSelected(true);
             setIsDisabled(true);
         }
-    }, [link, isLoading, onAction, setIsLoading]);
+    }, [link, isLoading, setIsLoading, onAction]);
 
     const handleKeyPress = useCallback(
         (event) => {
@@ -80,6 +82,21 @@ const ResponseLink = ({
             }
         },
         [handleAction]
+    );
+
+    const handleLinkClick = useCallback(
+        async (event) => {
+            if (onLink) {
+                event.preventDefault();
+
+                if (!isLoading) {
+                    const finishLoading = setIsLoading();
+                    await onLink(link);
+                    finishLoading();
+                }
+            }
+        },
+        [link, isLoading, setIsLoading, onLink]
     );
 
     useEffect(() => {
@@ -99,7 +116,12 @@ const ResponseLink = ({
     if (link.url && link.type === 'external_link') {
         return (
             <Message avatarUrl={response.avatar_url}>
-                <a href={link.url} {...{tabIndex}}>
+                <a
+                    href={link.url}
+                    target={link.link_target}
+                    {...{tabIndex}}
+                    onClick={handleLinkClick}
+                >
                     {link.text}
                 </a>
             </Message>
