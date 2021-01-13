@@ -69,8 +69,10 @@ const translations = {
         no: 'Chat avbrutt'
     },
     you_can_find_other_ways_to_contact_us_here: {
-        en: 'You can find other ways to <a href="https://www.nav.no/person/kontakt-oss/en">contact us here.</a>',
-        no: 'Du kan se andre måter å <a href="https://www.nav.no/person/kontakt-oss">kontakte oss på her.</a>'
+        en:
+            'You can find other ways to <a href="https://www.nav.no/person/kontakt-oss/en">contact us here.</a>',
+        no:
+            'Du kan se andre måter å <a href="https://www.nav.no/person/kontakt-oss">kontakte oss på her.</a>'
     },
     close: {
         en: 'Close',
@@ -107,7 +109,9 @@ const ConsentModal = ({
                 {...properties}
                 {...{onConfirm}}
                 isOpen={isOpen && !isDenied}
-                confirmationButtonText={localizations.deny_data_processing_consent}
+                confirmationButtonText={
+                    localizations.deny_data_processing_consent
+                }
             >
                 <ContainerElement>
                     {isOpen && !isDenied && (
@@ -169,17 +173,22 @@ const ConsentModal = ({
                 {...properties}
                 {...{onConfirm}}
                 isOpen={isOpen && isDenied}
-                confirmationButtonText={localizations.deny_data_processing_consent}
+                confirmationButtonText={
+                    localizations.deny_data_processing_consent
+                }
             >
                 <ContainerElement>
                     {isOpen && isDenied && (
                         <BoxElement>
-                            <TitleElement>{localizations.chat_aborted}</TitleElement>
+                            <TitleElement>
+                                {localizations.chat_aborted}
+                            </TitleElement>
                             <TextElement>
                                 <span
                                     // eslint-disable-next-line react/no-danger
                                     dangerouslySetInnerHTML={{
-                                        __html: localizations.you_can_find_other_ways_to_contact_us_here
+                                        __html:
+                                            localizations.you_can_find_other_ways_to_contact_us_here
                                     }}
                                 />
                             </TextElement>
