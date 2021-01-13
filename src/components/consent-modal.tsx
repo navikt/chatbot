@@ -48,9 +48,9 @@ const translations = {
     },
     consent_text_4: {
         en:
-            'You can <a href="https://www.nav.no/en/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">read more about how we process personal data here.</a>',
+            'Read <a href="https://www.nav.no/en/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">more about how we process personal data here.</a>',
         no:
-            'Du kan <a href="https://www.nav.no/no/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">lese mer om hvordan NAV behandler personopplysninger her.</a>'
+            'Les <a href="https://www.nav.no/no/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">mer om hvordan NAV behandler personopplysninger her.</a>'
     },
     consent_text_5: {
         en: 'Have you read and understood this?',
