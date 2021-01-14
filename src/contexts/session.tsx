@@ -17,7 +17,8 @@ import {
     clientLanguage,
     conversationIdCookieName,
     minimumPollTimeout,
-    maximumPollTimeout
+    agentMaximumPollTimeout,
+    botMaximumPollTimeout
 } from '../configuration';
 
 import useLanguage from './language';
@@ -706,6 +707,11 @@ const SessionProvider = (properties: SessionProperties) => {
 
     useEffect(() => {
         if (conversationId) {
+            const isHumanChat =
+                conversationState?.chat_status === 'assigned_to_human';
+            const maximumPollTimeout = isHumanChat
+                ? agentMaximumPollTimeout
+                : botMaximumPollTimeout;
             let timeout: number;
             let shouldUpdate = true;
 
@@ -734,7 +740,7 @@ const SessionProvider = (properties: SessionProperties) => {
                             if (updatedSession.conversation.state.poll) {
                                 setPollMultiplier((number) => number + 0.25);
                             } else {
-                                setPollMultiplier(30);
+                                setPollMultiplier(Number.POSITIVE_INFINITY);
                             }
                         } else {
                             setPollMultiplier(1);
@@ -782,6 +788,7 @@ const SessionProvider = (properties: SessionProperties) => {
         boostApiUrlBase,
         status,
         conversationId,
+        conversationState,
         responses,
         pollMultiplier,
         update,

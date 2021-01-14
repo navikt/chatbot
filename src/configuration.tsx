@@ -23,7 +23,8 @@ const linkDisableTimeout = 1000 * 10;
 const botResponseRevealDelay = 1250;
 const botResponseRevealDelayBuffer = botResponseRevealDelay / 2;
 const minimumPollTimeout = 1000;
-const maximumPollTimeout = 30000;
+const agentMaximumPollTimeout = 4000;
+const botMaximumPollTimeout = 30000;
 const authenticationPrefix = 'Init:Auth:';
 const englishButtonText = 'For English, click here';
 const englishButtonResponse = 'English, please';
@@ -48,7 +49,8 @@ export {
     botResponseRevealDelay,
     botResponseRevealDelayBuffer,
     minimumPollTimeout,
-    maximumPollTimeout,
+    agentMaximumPollTimeout,
+    botMaximumPollTimeout,
     authenticationPrefix,
     englishButtonText,
     englishButtonResponse,
