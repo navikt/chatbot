@@ -151,7 +151,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     } = useSession();
 
     const responsesLength = responses?.length;
-    const reference = useRef<HTMLDivElement>();
+    const [reference, setReference] = useState<HTMLDivElement>();
     const anchor = useRef<HTMLDivElement>();
     const [isOpen, setIsOpen] = useState<boolean>(
         () => cookies.get(openCookieName) === 'true'
@@ -183,6 +183,12 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         }
     }, []);
 
+    const handleMount = useCallback((node) => {
+        if (node) {
+            setReference(node);
+        }
+    }, []);
+
     const handleAction = useCallback(
         async (link: BoostResponseElementLinksItem) => {
             await (link?.text === englishButtonText
@@ -207,10 +213,10 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         setUnreadCount(0);
         scrollToBottom({behavior: 'auto'});
 
-        if (reference.current) {
-            reference.current.focus();
+        if (reference) {
+            reference.focus();
         }
-    }, [scrollToBottom]);
+    }, [reference, scrollToBottom]);
 
     const handleConsent = useCallback(async () => {
         setIsConsented(true);
@@ -292,7 +298,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     }
 
     useEffect(() => {
-        if (reference.current) {
+        if (reference) {
             const listener = async (event: MouseEvent) => {
                 const target = event.target as HTMLElement;
 
@@ -325,16 +331,15 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
                 }
             };
 
-            const element = reference.current;
-            element.addEventListener('click', listener);
+            reference.addEventListener('click', listener);
 
             return () => {
-                element.removeEventListener('click', listener);
+                reference.removeEventListener('click', listener);
             };
         }
 
         return undefined;
-    }, [handleClose]);
+    }, [reference, handleClose]);
 
     useEffect(() => {
         if (isOpen && (status === 'disconnected' || status === 'ended')) {
@@ -433,7 +438,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
             {isConsideredOpen && (
                 <ContainerElement
-                    ref={reference as any}
+                    ref={handleMount}
                     lang={language}
                     {...{isFullscreen, isClosing, isOpening}}
                 >
