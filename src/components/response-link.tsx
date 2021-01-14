@@ -120,6 +120,7 @@ const ResponseLink = ({
                     href={link.url}
                     target={link.link_target}
                     {...{tabIndex}}
+                    data-internal
                     onClick={handleLinkClick}
                 >
                     {link.text}

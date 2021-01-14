@@ -292,6 +292,51 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     }
 
     useEffect(() => {
+        if (reference.current) {
+            const listener = async (event: MouseEvent) => {
+                const target = event.target as HTMLElement;
+
+                if (target) {
+                    let href;
+
+                    try {
+                        const link = target.closest('a');
+
+                        if (
+                            link &&
+                            link?.getAttribute('data-internal') !== 'true'
+                        ) {
+                            href = link.getAttribute('href');
+                        }
+                    } catch {
+                        if (
+                            target.getAttribute('data-internal') !== 'true' &&
+                            target.tagName.toLowerCase() === 'a'
+                        ) {
+                            href = target.getAttribute('href');
+                        }
+                    }
+
+                    if (href) {
+                        event.preventDefault();
+                        await handleClose();
+                        window.location.href = href;
+                    }
+                }
+            };
+
+            const element = reference.current;
+            element.addEventListener('click', listener);
+
+            return () => {
+                element.removeEventListener('click', listener);
+            };
+        }
+
+        return undefined;
+    }, [handleClose]);
+
+    useEffect(() => {
         if (isOpen && (status === 'disconnected' || status === 'ended')) {
             setUnreadCount(0);
         }
