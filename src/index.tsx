@@ -446,7 +446,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     const isModalOpen = !isConsented || isFinishing || isEvaluating;
 
     return (
-        <div id='nav-chatbot'>
+        <div id='nav-chatbot' ref={handleMount}>
             <OpenButton
                 {...{isOpen, isOpening, unreadCount}}
                 onClick={handleOpen}
@@ -454,7 +454,6 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
             {isConsideredOpen && (
                 <ContainerElement
-                    ref={handleMount}
                     lang={language}
                     {...{isFullscreen, isClosing, isOpening}}
                 >
