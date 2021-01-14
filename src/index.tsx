@@ -257,14 +257,12 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     const handleLink = useCallback(
         async (link: BoostResponseElementLinksItem) => {
             if (link.url) {
-                await Promise.all([
-                    sendLink!(link.id),
-                    handleConditionalFullscreenClose()
-                ]);
+                await sendLink!(link.id);
 
                 if (link.link_target === '_blank') {
                     window.open(link.url, link.link_target);
                 } else {
+                    await handleConditionalFullscreenClose();
                     window.location.href = link.url;
                 }
             }
@@ -320,7 +318,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
             const listener = async (event: MouseEvent) => {
                 const target = event.target as HTMLElement;
 
-                if (target) {
+                if (target && !target.getAttribute('target')) {
                     let href;
 
                     try {
