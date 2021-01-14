@@ -30,6 +30,9 @@ const englishButtonText = 'For English, click here';
 const englishButtonResponse = 'English, please';
 
 const fullscreenMediaQuery = `(max-width: ${containerWidthNumber + 100}px)`;
+const clickMinimizeMediaQuery = `(max-width: ${
+    containerWidthNumber + 150
+}px), (max-height: ${containerHeightNumber + 150}px)`;
 
 export {
     cookieDomain,
@@ -54,5 +57,6 @@ export {
     authenticationPrefix,
     englishButtonText,
     englishButtonResponse,
-    fullscreenMediaQuery
+    fullscreenMediaQuery,
+    clickMinimizeMediaQuery
 };

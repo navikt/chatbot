@@ -25,6 +25,7 @@ import {
     containerWidth,
     containerHeight,
     fullscreenMediaQuery,
+    clickMinimizeMediaQuery,
     cookieDomain,
     openCookieName,
     consentCookieName,
@@ -239,10 +240,26 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         setUnreadCount(0);
     }, [setIsClosing]);
 
+    const handleConditionalFullscreenClose = useCallback(async () => {
+        try {
+            if (window.matchMedia(clickMinimizeMediaQuery).matches) {
+                await handleClose();
+                return;
+            }
+
+            return undefined;
+        } catch {
+            return handleClose();
+        }
+    }, [handleClose]);
+
     const handleLink = useCallback(
         async (link: BoostResponseElementLinksItem) => {
             if (link.url) {
-                await Promise.all([sendLink!(link.id), handleClose()]);
+                await Promise.all([
+                    sendLink!(link.id),
+                    handleConditionalFullscreenClose()
+                ]);
 
                 if (link.link_target === '_blank') {
                     window.open(link.url, link.link_target);
@@ -251,7 +268,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
                 }
             }
         },
-        [sendLink, handleClose]
+        [sendLink, handleConditionalFullscreenClose]
     );
 
     const handleRestart = useCallback(() => {
@@ -325,7 +342,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
                     if (href) {
                         event.preventDefault();
-                        await handleClose();
+                        await handleConditionalFullscreenClose();
                         window.location.href = href;
                     }
                 }
@@ -339,7 +356,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         }
 
         return undefined;
-    }, [reference, handleClose]);
+    }, [reference, handleConditionalFullscreenClose]);
 
     useEffect(() => {
         if (isOpen && (status === 'disconnected' || status === 'ended')) {
