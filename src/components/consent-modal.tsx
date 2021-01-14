@@ -11,10 +11,6 @@ import Modal, {
     ActionsElement
 } from './modal';
 
-const ContainerElement = styled.div`
-    margin: auto;
-`;
-
 const ButtonElement = styled(Knapp)`
     margin-left: 5px;
 `;
@@ -113,60 +109,58 @@ const ConsentModal = ({
                     localizations.deny_data_processing_consent
                 }
             >
-                <ContainerElement>
-                    {isOpen && !isDenied && (
-                        <BoxElement>
-                            <TitleElement>
-                                {localizations.processing_of_personal_data}
-                            </TitleElement>
+                {isOpen && !isDenied && (
+                    <BoxElement>
+                        <TitleElement>
+                            {localizations.processing_of_personal_data}
+                        </TitleElement>
 
-                            <TextElement>
-                                {localizations.consent_text_1}
-                            </TextElement>
-                            <TextElement>
-                                {localizations.consent_text_2}
-                            </TextElement>
-                            <TextElement>
-                                {localizations.consent_text_3}
-                            </TextElement>
-                            <TextElement>
-                                <span
-                                    // eslint-disable-next-line react/no-danger
-                                    dangerouslySetInnerHTML={{
-                                        __html: localizations.consent_text_4
-                                    }}
-                                />
-                            </TextElement>
-                            <TextElement>
-                                {localizations.consent_text_5}
-                            </TextElement>
+                        <TextElement>
+                            {localizations.consent_text_1}
+                        </TextElement>
+                        <TextElement>
+                            {localizations.consent_text_2}
+                        </TextElement>
+                        <TextElement>
+                            {localizations.consent_text_3}
+                        </TextElement>
+                        <TextElement>
+                            <span
+                                // eslint-disable-next-line react/no-danger
+                                dangerouslySetInnerHTML={{
+                                    __html: localizations.consent_text_4
+                                }}
+                            />
+                        </TextElement>
+                        <TextElement>
+                            {localizations.consent_text_5}
+                        </TextElement>
 
-                            <ActionsElement>
-                                <ButtonElement
-                                    mini
-                                    kompakt
-                                    tabIndex={isOpen ? undefined : -1}
-                                    htmlType='button'
-                                    type='flat'
-                                    onClick={handleDeny}
-                                >
-                                    {localizations.cancel}
-                                </ButtonElement>
+                        <ActionsElement>
+                            <ButtonElement
+                                mini
+                                kompakt
+                                tabIndex={isOpen ? undefined : -1}
+                                htmlType='button'
+                                type='flat'
+                                onClick={handleDeny}
+                            >
+                                {localizations.cancel}
+                            </ButtonElement>
 
-                                <ButtonElement
-                                    mini
-                                    kompakt
-                                    tabIndex={isOpen ? undefined : -1}
-                                    htmlType='button'
-                                    type='hoved'
-                                    onClick={onCancel}
-                                >
-                                    {localizations.yes_i_understand}
-                                </ButtonElement>
-                            </ActionsElement>
-                        </BoxElement>
-                    )}
-                </ContainerElement>
+                            <ButtonElement
+                                mini
+                                kompakt
+                                tabIndex={isOpen ? undefined : -1}
+                                htmlType='button'
+                                type='hoved'
+                                onClick={onCancel}
+                            >
+                                {localizations.yes_i_understand}
+                            </ButtonElement>
+                        </ActionsElement>
+                    </BoxElement>
+                )}
             </Modal>
 
             <Modal
@@ -177,37 +171,35 @@ const ConsentModal = ({
                     localizations.deny_data_processing_consent
                 }
             >
-                <ContainerElement>
-                    {isOpen && isDenied && (
-                        <BoxElement>
-                            <TitleElement>
-                                {localizations.chat_aborted}
-                            </TitleElement>
-                            <TextElement>
-                                <span
-                                    // eslint-disable-next-line react/no-danger
-                                    dangerouslySetInnerHTML={{
-                                        __html:
-                                            localizations.find_other_ways_to_contact_us
-                                    }}
-                                />
-                            </TextElement>
+                {isOpen && isDenied && (
+                    <BoxElement>
+                        <TitleElement>
+                            {localizations.chat_aborted}
+                        </TitleElement>
+                        <TextElement>
+                            <span
+                                // eslint-disable-next-line react/no-danger
+                                dangerouslySetInnerHTML={{
+                                    __html:
+                                        localizations.find_other_ways_to_contact_us
+                                }}
+                            />
+                        </TextElement>
 
-                            <ActionsElement>
-                                <ButtonElement
-                                    mini
-                                    kompakt
-                                    tabIndex={isDenied ? undefined : -1}
-                                    htmlType='button'
-                                    type='hoved'
-                                    onClick={handleDenyConfirm}
-                                >
-                                    {localizations.close}
-                                </ButtonElement>
-                            </ActionsElement>
-                        </BoxElement>
-                    )}
-                </ContainerElement>
+                        <ActionsElement>
+                            <ButtonElement
+                                mini
+                                kompakt
+                                tabIndex={isDenied ? undefined : -1}
+                                htmlType='button'
+                                type='hoved'
+                                onClick={handleDenyConfirm}
+                            >
+                                {localizations.close}
+                            </ButtonElement>
+                        </ActionsElement>
+                    </BoxElement>
+                )}
             </Modal>
         </>
     );
