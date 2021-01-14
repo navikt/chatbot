@@ -241,17 +241,18 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     }, [setIsClosing]);
 
     const handleConditionalFullscreenClose = useCallback(async () => {
-        try {
-            if (window.matchMedia(clickMinimizeMediaQuery).matches) {
+        if (isFullscreen) {
+            await handleClose();
+        } else {
+            try {
+                if (window.matchMedia(clickMinimizeMediaQuery).matches) {
+                    await handleClose();
+                }
+            } catch {
                 await handleClose();
-                return;
             }
-
-            return undefined;
-        } catch {
-            return handleClose();
         }
-    }, [handleClose]);
+    }, [isFullscreen, handleClose]);
 
     const handleLink = useCallback(
         async (link: BoostResponseElementLinksItem) => {
