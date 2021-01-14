@@ -70,6 +70,7 @@ type BoostResponseElement =
 interface BoostResponse {
     id: string;
     language?: string;
+    is_human_agent?: boolean;
     source: string;
     avatar_url?: string;
     date_created: string;
