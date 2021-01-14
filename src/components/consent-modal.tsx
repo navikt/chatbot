@@ -36,9 +36,9 @@ const translations = {
     },
     consent_text_2: {
         en:
-            'The conversation is saved to improve our chatbot. This is an anonymous chat where you can ask general questions about NAV’s services. We can’t follow up on specific cases.',
+            'The conversation is saved to improve our chatbot. This is an anonymous chat where you can ask general questions about NAV’s services. For questions on a specific case, ask to speak with an agent and identify yourself with BankID.',
         no:
-            'Dialogen lagres for å lære chatboten å bli bedre. Dette er en anonym chat hvor du kan få svar på generelle spørsmål om NAV sine ytelser og tjenester. Vi kan ikke svare på spørsmål om konkrete saker.'
+            'Dialogen lagres for å lære chatboten å bli bedre. Dette er en anonym chat hvor du kan få svar på generelle spørsmål om NAV sine ytelser og tjenester. For spørsmål om en konkret sak må du be om å bli satt over til en veileder og identifisere deg med BankID.'
     },
     consent_text_3: {
         en:
@@ -48,9 +48,9 @@ const translations = {
     },
     consent_text_4: {
         en:
-            'Read <a href="https://www.nav.no/en/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">more about how we process personal data here.</a>',
+            'Read more about <a href="https://www.nav.no/en/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">how we process personal data</a>.',
         no:
-            'Les <a href="https://www.nav.no/no/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">mer om hvordan NAV behandler personopplysninger her.</a>'
+            'Les mer om <a href="https://www.nav.no/no/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">hvordan NAV behandler personopplysninger</a>.'
     },
     consent_text_5: {
         en: 'Have you read and understood this?',
@@ -68,11 +68,11 @@ const translations = {
         en: 'Chat aborted',
         no: 'Chat avbrutt'
     },
-    you_can_find_other_ways_to_contact_us_here: {
+    find_other_ways_to_contact_us: {
         en:
-            'You can find other ways to <a href="https://www.nav.no/person/kontakt-oss/en">contact us here.</a>',
+            'Find <a href="https://www.nav.no/person/kontakt-oss/en">other ways to contact us</a>.',
         no:
-            'Du kan se andre måter å <a href="https://www.nav.no/person/kontakt-oss">kontakte oss på her.</a>'
+            'Se <a href="https://www.nav.no/person/kontakt-oss">andre måter å kontakte oss på</a>.'
     },
     close: {
         en: 'Close',
@@ -188,7 +188,7 @@ const ConsentModal = ({
                                     // eslint-disable-next-line react/no-danger
                                     dangerouslySetInnerHTML={{
                                         __html:
-                                            localizations.you_can_find_other_ways_to_contact_us_here
+                                            localizations.find_other_ways_to_contact_us
                                     }}
                                 />
                             </TextElement>
