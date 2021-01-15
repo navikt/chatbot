@@ -66,9 +66,9 @@ const translations = {
     },
     find_other_ways_to_contact_us: {
         en:
-            'Find <a href="https://www.nav.no/person/kontakt-oss/en">other ways to contact us</a>.',
+            'Find <a href="https://www.nav.no/person/kontakt-oss/en" data-minimize="true">other ways to contact us</a>.',
         no:
-            'Se <a href="https://www.nav.no/person/kontakt-oss">andre måter å kontakte oss på</a>.'
+            'Se <a href="https://www.nav.no/person/kontakt-oss" data-minimize="true">andre måter å kontakte oss på</a>.'
     },
     close: {
         en: 'Close',

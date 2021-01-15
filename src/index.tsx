@@ -341,7 +341,11 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
                     if (href) {
                         event.preventDefault();
-                        await handleConditionalFullscreenClose();
+
+                        await (target.getAttribute('data-minimize') === 'true'
+                            ? handleClose()
+                            : handleConditionalFullscreenClose());
+
                         window.location.href = href;
                     }
                 }
@@ -446,7 +450,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     const isModalOpen = !isConsented || isFinishing || isEvaluating;
 
     return (
-        <div id='nav-chatbot' ref={handleMount}>
+        <div ref={handleMount} id='nav-chatbot'>
             <OpenButton
                 {...{isOpen, isOpening, unreadCount}}
                 onClick={handleOpen}
