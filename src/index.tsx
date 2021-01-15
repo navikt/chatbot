@@ -90,6 +90,18 @@ const ContainerElement = styled.div`
                 transform: translate3d(0, 220px, 0);
             }
         `};
+
+    a {
+        color: #0067c5;
+        text-decoration: underline;
+    }
+
+    @media (hover: hover) {
+        a:hover {
+            color: #0074df;
+            text-decoration: none;
+        }
+    }
 `;
 
 const PaddingElement = styled.div`
