@@ -344,8 +344,8 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
                         }
                     } catch {
                         if (
-                            target.getAttribute('data-internal') !== 'true' &&
-                            target.tagName.toLowerCase() === 'a'
+                            target.tagName.toLowerCase() === 'a' &&
+                            target.getAttribute('data-internal') !== 'true'
                         ) {
                             href = target.getAttribute('href');
                         }
@@ -353,6 +353,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
                     if (href) {
                         event.preventDefault();
+                        event.stopPropagation();
 
                         await (target.getAttribute('data-minimize') === 'true'
                             ? handleClose()
@@ -371,7 +372,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         }
 
         return undefined;
-    }, [reference, handleConditionalFullscreenClose]);
+    }, [reference, handleClose, handleConditionalFullscreenClose]);
 
     useEffect(() => {
         if (isOpen && (status === 'disconnected' || status === 'ended')) {

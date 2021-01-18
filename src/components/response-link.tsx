@@ -88,6 +88,7 @@ const ResponseLink = ({
         async (event) => {
             if (onLink) {
                 event.preventDefault();
+                event.stopPropagation();
 
                 if (!isLoading) {
                     const finishLoading = setIsLoading();
