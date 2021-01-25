@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import styled from 'styled-components';
-import {RadioPanelGruppe} from 'nav-frontend-skjema';
+import {RadioPanel} from 'nav-frontend-skjema';
 import useLoader from '../hooks/use-loader';
 
 import {
@@ -18,7 +18,7 @@ import Message, {
     AvatarElement
 } from './message';
 
-const LinkButtonElement = styled(RadioPanelGruppe)`
+const LinkButtonElement = styled.div`
     max-width: ${conversationSideWidth};
     max-width: calc(${conversationSideWidth} - ${avatarSize} - 8px);
     margin-top: 3px;
@@ -47,6 +47,7 @@ const LinkButtonElement = styled(RadioPanelGruppe)`
 
 interface ResponseLinkProperties {
     response: BoostResponse;
+    elementIndex?: number;
     link: BoostResponseElementLinksItem;
     tabIndex?: number;
     onAction?: (link: BoostResponseElementLinksItem) => Promise<void>;
@@ -55,6 +56,7 @@ interface ResponseLinkProperties {
 
 const ResponseLink = ({
     response,
+    elementIndex,
     link,
     tabIndex,
     onAction,
@@ -114,9 +116,14 @@ const ResponseLink = ({
         return undefined;
     }, [isDisabled]);
 
+    const [responseLanguage] = (response.language ?? 'no').split('-');
+
     if (link.url && link.type === 'external_link') {
         return (
-            <Message avatarUrl={response.avatar_url}>
+            <Message
+                avatarUrl={elementIndex === 0 ? response.avatar_url : undefined}
+                lang={responseLanguage}
+            >
                 <a
                     href={link.url}
                     target={link.link_target}
@@ -132,27 +139,23 @@ const ResponseLink = ({
 
     return (
         <ContainerElement
-            lang={link.text === englishButtonText ? 'en-US' : undefined}
+            lang={link.text === englishButtonText ? 'en' : responseLanguage}
             onKeyPress={handleKeyPress}
         >
             <AvatarElement />
-            <LinkButtonElement
-                name={link.text}
-                radios={[
-                    {
-                        value: link.text,
-                        disabled: tabIndex === -1,
-                        label: (
-                            <>
-                                {isLoading && <Spinner />}
-                                {link.text}
-                            </>
-                        )
+            <LinkButtonElement>
+                <RadioPanel
+                    label={
+                        <>
+                            {isLoading && <Spinner />}
+                            {link.text}
+                        </>
                     }
-                ]}
-                checked={isSelected || isLoading ? link.text : undefined}
-                onChange={handleAction}
-            />
+                    checked={isSelected || isLoading}
+                    disabled={tabIndex === -1}
+                    onChange={handleAction}
+                />
+            </LinkButtonElement>
         </ContainerElement>
     );
 };

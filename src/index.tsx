@@ -1,4 +1,4 @@
-import React, {useRef, useState, useEffect, useCallback} from 'react';
+import React, {useRef, useState, useMemo, useEffect, useCallback} from 'react';
 import styled, {css} from 'styled-components';
 import cookies from 'js-cookie';
 import useLanguage, {LanguageProvider} from './contexts/language';
@@ -18,6 +18,7 @@ import Response from './components/response';
 import ConsentModal from './components/consent-modal';
 import FinishModal from './components/finish-modal';
 import EvaluationModal from './components/evaluation-modal';
+import AriaLabelElement from './components/aria-label';
 
 import {
     englishButtonText,
@@ -144,12 +145,19 @@ const AnchorElement = styled.div`
     scroll-snap-align: start;
 `;
 
+const translations = {
+    nav_is_typing: {
+        en: 'NAV is typing...',
+        no: 'NAV skriver...'
+    }
+};
+
 interface ChatProperties {
     analyticsCallback?: () => void;
 }
 
 const Chat = ({analyticsCallback}: ChatProperties) => {
-    const {language} = useLanguage();
+    const {translate, language} = useLanguage();
     const {
         status,
         conversation,
@@ -163,6 +171,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         sendLink
     } = useSession();
 
+    const localizations = useMemo(() => translate(translations), [translate]);
     const responsesLength = responses?.length;
     const [reference, setReference] = useState<HTMLDivElement>();
     const anchor = useRef<HTMLDivElement>();
@@ -269,12 +278,15 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     const handleLink = useCallback(
         async (link: BoostResponseElementLinksItem) => {
             if (link.url) {
-                await sendLink!(link.id);
-
                 if (link.link_target === '_blank') {
+                    void sendLink!(link.id);
                     window.open(link.url, link.link_target);
                 } else {
-                    await handleConditionalFullscreenClose();
+                    await Promise.all([
+                        sendLink!(link.id),
+                        handleConditionalFullscreenClose()
+                    ]);
+
                     window.location.href = link.url;
                 }
             }
@@ -482,35 +494,54 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
                         onFinish={handleFinish}
                     />
 
-                    <ConversationElement aria-hidden={isModalOpen} role='log'>
+                    <ConversationElement aria-hidden={isModalOpen}>
                         <PaddingElement>
                             {(status === 'connecting' ||
                                 status === 'restarting') && <FillerElement />}
 
-                            {responses?.map((response, index) => (
-                                <Response
-                                    key={response.id}
-                                    {...{conversation, response, responses}}
-                                    responseIndex={index}
-                                    responsesLength={responsesLength}
-                                    isObscured={isModalOpen}
-                                    onAction={handleAction}
-                                    onLink={handleLink}
-                                    onReveal={scrollToBottom}
-                                />
-                            ))}
+                            <div role='log'>
+                                {responses?.map((response, index) => (
+                                    <div
+                                        key={response.id}
+                                        aria-live='assertive'
+                                    >
+                                        <Response
+                                            isObscured={isModalOpen}
+                                            {...{
+                                                conversation,
+                                                response,
+                                                responses
+                                            }}
+                                            responseIndex={index}
+                                            responsesLength={responsesLength}
+                                            onAction={handleAction}
+                                            onLink={handleLink}
+                                            onReveal={scrollToBottom}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
 
-                            {isAgentTyping && (
-                                <GroupElement>
-                                    <Message isThinking>
-                                        <TypingIndicator />
-                                    </Message>
-                                </GroupElement>
-                            )}
+                            <div aria-live='assertive' role='alert'>
+                                {isAgentTyping && (
+                                    <GroupElement>
+                                        <AriaLabelElement>
+                                            {localizations.nav_is_typing}
+                                        </AriaLabelElement>
+
+                                        <Message isThinking>
+                                            <TypingIndicator />
+                                        </Message>
+                                    </GroupElement>
+                                )}
+                            </div>
 
                             {queue && <Response response={queue} />}
 
-                            <StatusContainerElement>
+                            <StatusContainerElement
+                                aria-live='assertive'
+                                role='alert'
+                            >
                                 <StatusElement>
                                     <StatusStrip />
                                 </StatusElement>

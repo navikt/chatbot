@@ -32,9 +32,9 @@ const translations = {
     },
     consent_text_2: {
         en:
-            'The conversation is saved to improve our chatbot. This is an anonymous chat where you can ask general questions about NAV’s services. For questions on a specific case, ask to speak with an agent and identify yourself with BankID.',
+            'The conversation is saved to improve our chatbot. This is an anonymous chat where you can ask general questions about NAV’s services.',
         no:
-            'Dialogen lagres for å lære chatboten å bli bedre. Dette er en anonym chat hvor du kan få svar på generelle spørsmål om NAV sine ytelser og tjenester. For spørsmål om en konkret sak må du be om å bli satt over til en veileder og identifisere deg med BankID.'
+            'Dialogen lagres for å lære chatboten å bli bedre. Dette er en anonym chat hvor du kan få svar på generelle spørsmål om NAV sine ytelser og tjenester.'
     },
     consent_text_3: {
         en:
@@ -140,7 +140,6 @@ const ConsentModal = ({
                             <ButtonElement
                                 mini
                                 kompakt
-                                tabIndex={isOpen ? undefined : -1}
                                 htmlType='button'
                                 type='flat'
                                 onClick={handleDeny}
@@ -151,7 +150,6 @@ const ConsentModal = ({
                             <ButtonElement
                                 mini
                                 kompakt
-                                tabIndex={isOpen ? undefined : -1}
                                 htmlType='button'
                                 type='hoved'
                                 onClick={onCancel}
@@ -190,7 +188,6 @@ const ConsentModal = ({
                             <ButtonElement
                                 mini
                                 kompakt
-                                tabIndex={isDenied ? undefined : -1}
                                 htmlType='button'
                                 type='hoved'
                                 onClick={handleDenyConfirm}

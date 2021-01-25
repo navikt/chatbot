@@ -1,18 +1,12 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import styled, {css} from 'styled-components';
 import {Normaltekst} from 'nav-frontend-typografi';
-import useLanguage from '../contexts/language';
-import AriaLabelElement from './aria-label';
 
 const avatarSize = '36px';
 const conversationSideWidth = '90%';
 
 const GroupElement = styled.div`
     margin-top: 10px;
-
-    &:first-child {
-        margin-top: 0;
-    }
 `;
 
 const ContainerElement = styled.div`
@@ -29,14 +23,9 @@ const AvatarElement = styled.div`
     position: relative;
     top: 1px;
     overflow: hidden;
-    visibility: hidden;
 
-    ${GroupElement} ${ContainerElement}:first-child & {
-        visibility: visible;
-
-        &:empty {
-            visibility: hidden;
-        }
+    &:empty {
+        visibility: hidden;
     }
 
     img {
@@ -104,16 +93,16 @@ const BubbleLeftElement = styled(MessageBubble)`
     margin-left: 0;
     border-radius: 4px 18px 18px 4px;
 
-    ${GroupElement} ${ContainerElement}:first-child & {
+    ${GroupElement} ${ContainerElement}:first-of-type & {
         margin-top: 0;
         border-radius: 18px 18px 18px 4px;
     }
 
-    ${GroupElement} ${ContainerElement}:last-child & {
+    ${GroupElement} ${ContainerElement}:last-of-type & {
         border-radius: 4px 18px 18px 18px;
     }
 
-    ${GroupElement} ${ContainerElement}:first-child:last-child & {
+    ${GroupElement} ${ContainerElement}:first-of-type:last-of-type & {
         border-radius: 18px 18px 18px 18px;
     }
 `;
@@ -129,20 +118,10 @@ const TextElement = styled(Normaltekst)`
     white-space: pre-wrap;
 `;
 
-const translations = {
-    you_say: {
-        en: 'You say',
-        no: 'Du sier'
-    },
-    nav_says: {
-        en: 'NAV says',
-        no: 'NAV sier'
-    }
-};
-
 interface MessageProperties {
     avatarUrl?: string;
     alignment?: 'left' | 'right';
+    lang?: string;
     isThinking?: boolean;
     children?: React.ReactNode;
 }
@@ -150,29 +129,24 @@ interface MessageProperties {
 const Message = ({
     avatarUrl,
     alignment,
+    lang,
     isThinking,
     children,
     ...properties
 }: MessageProperties) => {
-    const {translate} = useLanguage();
-    const localizations = useMemo(() => translate(translations), [translate]);
     const BubbleElement =
         alignment === 'right' ? BubbleRightElement : BubbleLeftElement;
-    const label =
-        alignment === 'right'
-            ? `${localizations.you_say}:`
-            : `${localizations.nav_says}:`;
 
     return (
         <ContainerElement {...properties}>
-            <AriaLabelElement>{label}</AriaLabelElement>
-
             <AvatarElement>
                 {avatarUrl && <img src={avatarUrl} alt='' />}
             </AvatarElement>
 
             <BubbleElement {...{isThinking}}>
-                <TextElement tag='div'>{children}</TextElement>
+                <TextElement tag='div' {...{lang}}>
+                    {children}
+                </TextElement>
             </BubbleElement>
         </ContainerElement>
     );

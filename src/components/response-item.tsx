@@ -7,8 +7,9 @@ import useLanguage from '../contexts/language';
 import {BoostResponse, BoostResponseElement} from '../contexts/session';
 import {authenticationPrefix} from '../configuration';
 import Spinner from './spinner';
-import Conversation, {GroupElement} from './message';
+import Message, {GroupElement} from './message';
 import ResponseLink, {ResponseLinkProperties} from './response-link';
+import AriaLabelElement from './aria-label';
 
 const ContentsElement = styled.span`
     p {
@@ -16,11 +17,20 @@ const ContentsElement = styled.span`
         padding: 0;
     }
 
-    ul {
+    ul,
+    ol {
         white-space: normal;
         margin: 0;
         padding: 0;
         padding-left: 20px;
+    }
+
+    ul {
+        list-style: disc;
+    }
+
+    ol {
+        list-style: decimal;
     }
 
     li {
@@ -68,6 +78,18 @@ const LinkPanelTextElement = styled.div`
 `;
 
 const translations = {
+    you_say: {
+        en: 'You say',
+        no: 'Du sier'
+    },
+    chatbot_frida_says: {
+        en: 'Chatbot Frida says',
+        no: 'Chatbot Frida sier'
+    },
+    nav_says: {
+        en: 'NAV says',
+        no: 'NAV sier'
+    },
     sending: {
         en: 'Sending...',
         no: 'Sender...'
@@ -88,55 +110,72 @@ const translations = {
 
 interface ContentsProperties {
     html: string;
+    lang?: string;
 }
 
-const Contents = ({html}: ContentsProperties) => {
+const Contents = ({html, lang}: ContentsProperties) => {
     const output = useMemo(() => {
-        const regexp = /(^|\s)(https?:\/\/\S+)($|\s)/gm;
-        const matches = html.match(regexp);
+        let result = html;
 
-        if (matches) {
-            return html.replace(regexp, (string, prefix, match, suffix) => {
-                if (match) {
-                    const url = String(match);
-                    const href = `<a href="${url}">${url}</a>`;
+        if (lang) {
+            const paragraphRegexp = /<p>/gm;
+            const paragraphMatches = result.match(paragraphRegexp);
 
-                    return `${String(prefix)}${href}${String(suffix)}`;
-                }
-
-                return string;
-            });
+            if (paragraphMatches) {
+                result = result.replace(paragraphRegexp, `<p lang="${lang}">`);
+            }
         }
 
-        return html;
-    }, [html]);
+        const linkRegexp = /(^|\s)(https?:\/\/\S+)($|\s)/gm;
+        const linkMatches = result.match(linkRegexp);
+
+        if (linkMatches) {
+            result = result.replace(
+                linkRegexp,
+                (string, prefix, match, suffix) => {
+                    if (match) {
+                        const url = String(match);
+                        const href = `<a href="${url}">${url}</a>`;
+
+                        return `${String(prefix)}${href}${String(suffix)}`;
+                    }
+
+                    return string;
+                }
+            );
+        }
+
+        return result;
+    }, [html, lang]);
 
     return (
         <ContentsElement
             role='text'
+            {...{lang}}
             dangerouslySetInnerHTML={{__html: output}}
         />
     );
 };
 
 interface ResponseItemProperties extends Omit<ResponseLinkProperties, 'link'> {
+    isObscured?: boolean;
     responseIndex?: number;
     element: BoostResponseElement;
     responses?: BoostResponse[];
     responsesLength?: number;
-    isObscured?: boolean;
 }
 
 const ResponseItem = ({
+    isObscured,
     response,
     responseIndex,
     element,
+    elementIndex,
     responses,
     responsesLength,
-    isObscured,
     ...properties
 }: ResponseItemProperties) => {
-    const {translate} = useLanguage();
+    const {translate, language} = useLanguage();
     const localizations = useMemo(() => translate(translations), [translate]);
     const mostRecentClientMessageIndex = useMemo(
         () =>
@@ -149,15 +188,23 @@ const ResponseItem = ({
         [responses, responsesLength]
     );
 
+    const [responseLanguage] = (response.language ?? 'no').split('-');
+
     if (element.type === 'text') {
         const {text} = element.payload;
 
         if (response.source === 'local') {
             return (
                 <div style={{opacity: 0.7}}>
-                    <Conversation alignment='right'>{text}</Conversation>
+                    <AriaLabelElement lang={language}>
+                        {`${localizations.you_say}:`}
+                    </AriaLabelElement>
 
-                    <SubtextElement>
+                    <Message alignment='right' lang={responseLanguage}>
+                        {text}
+                    </Message>
+
+                    <SubtextElement lang={language}>
                         {localizations.sending}
 
                         <SpinnerElement>
@@ -176,17 +223,42 @@ const ResponseItem = ({
 
             return (
                 <>
-                    <Conversation alignment='right'>{text}</Conversation>
+                    <AriaLabelElement lang={language}>
+                        {`${localizations.you_say}:`}
+                    </AriaLabelElement>
+
+                    <Message alignment='right' lang={responseLanguage}>
+                        {text}
+                    </Message>
 
                     {displaySentIndicator && (
-                        <SubtextElement>{localizations.sent}</SubtextElement>
+                        <SubtextElement lang={language}>
+                            {localizations.sent}
+                        </SubtextElement>
                     )}
                 </>
             );
         }
 
         return (
-            <Conversation avatarUrl={response.avatar_url}>{text}</Conversation>
+            <>
+                <AriaLabelElement lang={language}>
+                    {`${
+                        response.is_human_agent
+                            ? localizations.nav_says
+                            : localizations.chatbot_frida_says
+                    }:`}
+                </AriaLabelElement>
+
+                <Message
+                    avatarUrl={
+                        elementIndex === 0 ? response.avatar_url : undefined
+                    }
+                    lang={responseLanguage}
+                >
+                    {text}
+                </Message>
+            </>
         );
     }
 
@@ -210,19 +282,36 @@ const ResponseItem = ({
                     />
 
                     <LinkPanelTextElement>
-                        <Ingress>
+                        <Ingress lang={responseLanguage}>
                             {localizations.electronic_authentication}
                         </Ingress>
-                        <Normaltekst>{localizations.please_log_in}</Normaltekst>
+                        <Normaltekst lang={responseLanguage}>
+                            {localizations.please_log_in}
+                        </Normaltekst>
                     </LinkPanelTextElement>
                 </LinkPanelElement>
             );
         }
 
         return (
-            <Conversation avatarUrl={response.avatar_url}>
-                <Contents {...{html}} />
-            </Conversation>
+            <>
+                <AriaLabelElement lang={language}>
+                    {`${
+                        response.is_human_agent
+                            ? localizations.nav_says
+                            : localizations.chatbot_frida_says
+                    }:`}
+                </AriaLabelElement>
+
+                <Message
+                    avatarUrl={
+                        elementIndex === 0 ? response.avatar_url : undefined
+                    }
+                    lang={responseLanguage}
+                >
+                    <Contents {...{html}} lang={responseLanguage} />
+                </Message>
+            </>
         );
     }
 
@@ -235,7 +324,7 @@ const ResponseItem = ({
                         key={index}
                         tabIndex={isObscured ? -1 : 0}
                         {...properties}
-                        {...{response, link}}
+                        {...{response, elementIndex, link}}
                     />
                 ))}
             </>

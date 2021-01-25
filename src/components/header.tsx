@@ -139,6 +139,7 @@ const Header = ({
                 <IconButtonElement
                     type='button'
                     tabIndex={isObscured ? -1 : 0}
+                    disabled={isObscured}
                     onClick={onClose}
                 >
                     <IconElement
@@ -153,6 +154,7 @@ const Header = ({
                     <FullscreenIconButtonElement
                         type='button'
                         tabIndex={isObscured ? -1 : 0}
+                        disabled={isObscured}
                         onClick={onToggleFullscreen}
                     >
                         <IconElement
@@ -166,6 +168,7 @@ const Header = ({
                     <FullscreenIconButtonElement
                         type='button'
                         tabIndex={isObscured ? -1 : 0}
+                        disabled={isObscured}
                         onClick={onToggleFullscreen}
                     >
                         <IconElement
@@ -180,6 +183,7 @@ const Header = ({
                 <IconButtonElement
                     type='button'
                     tabIndex={isObscured ? -1 : 0}
+                    disabled={isObscured}
                     onClick={onFinish}
                 >
                     <IconElement

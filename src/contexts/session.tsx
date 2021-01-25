@@ -736,14 +736,14 @@ const SessionProvider = (properties: SessionProperties) => {
                             setStatus('connected');
                         }
 
-                        if (updatedSession.responses.length === 0) {
-                            if (updatedSession.conversation.state.poll) {
+                        if (updatedSession.conversation.state.poll) {
+                            if (updatedSession.responses.length === 0) {
                                 setPollMultiplier((number) => number + 0.25);
                             } else {
-                                setPollMultiplier(Number.POSITIVE_INFINITY);
+                                setPollMultiplier(1);
                             }
                         } else {
-                            setPollMultiplier(1);
+                            setPollMultiplier(Number.POSITIVE_INFINITY);
                         }
 
                         if (shouldUpdate) {

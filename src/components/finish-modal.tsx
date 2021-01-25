@@ -96,9 +96,10 @@ const FinishModal = ({
                         <ButtonElement
                             mini
                             kompakt
-                            tabIndex={isOpen ? undefined : -1}
                             htmlType='button'
                             type='flat'
+                            tabIndex={isOpen ? undefined : -1}
+                            disabled={!isOpen}
                             onClick={onCancel}
                         >
                             {localizations.cancel}
@@ -107,9 +108,10 @@ const FinishModal = ({
                         <ButtonElement
                             mini
                             kompakt
-                            tabIndex={isOpen ? undefined : -1}
                             htmlType='button'
                             type='hoved'
+                            tabIndex={isOpen ? undefined : -1}
+                            disabled={!isOpen}
                             onClick={onConfirm}
                         >
                             {localizations.yes_end_conversation}
@@ -120,8 +122,9 @@ const FinishModal = ({
                 <SecondaryActions>
                     <ButtonElement
                         kompakt
-                        tabIndex={isOpen ? undefined : -1}
                         htmlType='button'
+                        tabIndex={isOpen ? undefined : -1}
+                        disabled={!isOpen}
                         onClick={handleDownload}
                     >
                         <DownloadElement

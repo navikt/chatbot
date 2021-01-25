@@ -59,7 +59,7 @@ const Response = ({
     }, [onReveal]);
 
     return (
-        <GroupElement lang={response.language}>
+        <GroupElement role='document'>
             <Obscured
                 untilTimestamp={revealTimestamp}
                 by={<BotTypingIndicator {...{response}} />}
@@ -101,6 +101,7 @@ const Response = ({
                                         responsesLength,
                                         element
                                     }}
+                                    elementIndex={index}
                                 />
                             </Obscured>
                         </Obscured>
