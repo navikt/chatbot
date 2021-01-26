@@ -279,6 +279,11 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         async (link: BoostResponseElementLinksItem) => {
             if (link.url) {
                 if (link.link_target === '_blank') {
+                    cookies.set(openCookieName, String(false), {
+                        domain: cookieDomain,
+                        expires: 0.5
+                    });
+
                     void sendLink!(link.id);
                     window.open(link.url, link.link_target);
                 } else {
