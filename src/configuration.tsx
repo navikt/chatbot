@@ -30,7 +30,7 @@ const englishButtonText = 'For English, click here';
 const englishButtonResponse = 'English, please';
 
 const fullscreenMediaQuery = `(max-width: ${containerWidthNumber + 100}px)`;
-const clickMinimizeMediaQuery = `(max-width: ${
+const navigationMinimizationMediaQuery = `(max-width: ${
     containerWidthNumber + 150
 }px), (max-height: ${containerHeightNumber + 150}px)`;
 
@@ -58,5 +58,5 @@ export {
     englishButtonText,
     englishButtonResponse,
     fullscreenMediaQuery,
-    clickMinimizeMediaQuery
+    navigationMinimizationMediaQuery
 };

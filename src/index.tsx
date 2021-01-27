@@ -26,7 +26,7 @@ import {
     containerWidth,
     containerHeight,
     fullscreenMediaQuery,
-    clickMinimizeMediaQuery,
+    navigationMinimizationMediaQuery,
     cookieDomain,
     openCookieName,
     consentCookieName,
@@ -152,6 +152,31 @@ const translations = {
     }
 };
 
+function setWindowOpenCookie(isOpen = true) {
+    return cookies.set(openCookieName, String(isOpen), {
+        domain: cookieDomain,
+        expires: 0.5
+    });
+}
+
+function setConsentCookie(isConsented = true) {
+    return cookies.set(consentCookieName, String(isConsented), {
+        domain: cookieDomain,
+        expires: 7
+    });
+}
+
+function setUnreadCookie(unreadCount = 0) {
+    return cookies.set(unreadCookieName, String(unreadCount), {
+        domain: cookieDomain,
+        expires: 0.5
+    });
+}
+
+function shouldMinimizeOnNavigation() {
+    return window.matchMedia(navigationMinimizationMediaQuery).matches;
+}
+
 interface ChatProperties {
     analyticsCallback?: () => void;
 }
@@ -266,7 +291,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
             await handleClose();
         } else {
             try {
-                if (window.matchMedia(clickMinimizeMediaQuery).matches) {
+                if (shouldMinimizeOnNavigation()) {
                     await handleClose();
                 }
             } catch {
@@ -279,10 +304,13 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         async (link: BoostResponseElementLinksItem) => {
             if (link.url) {
                 if (link.link_target === '_blank') {
-                    cookies.set(openCookieName, String(false), {
-                        domain: cookieDomain,
-                        expires: 0.5
-                    });
+                    try {
+                        if (shouldMinimizeOnNavigation()) {
+                            setWindowOpenCookie(false);
+                        }
+                    } catch {
+                        setWindowOpenCookie(false);
+                    }
 
                     void sendLink!(link.id);
                     window.open(link.url, link.link_target);
@@ -406,18 +434,12 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     }, [isOpen, isOpening, isClosing]);
 
     useEffect(() => {
-        cookies.set(openCookieName, String(isOpen), {
-            domain: cookieDomain,
-            expires: 0.5
-        });
+        setWindowOpenCookie(isOpen);
     }, [isOpen]);
 
     useEffect(() => {
         if (isConsented) {
-            cookies.set(consentCookieName, String(isConsented), {
-                domain: cookieDomain,
-                expires: 7
-            });
+            setConsentCookie(isConsented);
         }
     }, [isConsented]);
 
@@ -438,10 +460,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     }, [status, queue, scrollToBottom]);
 
     useEffect(() => {
-        cookies.set(unreadCookieName, String(unreadCount), {
-            domain: cookieDomain,
-            expires: 0.5
-        });
+        setUnreadCookie(unreadCount);
     }, [unreadCount]);
 
     useEffect(() => {
