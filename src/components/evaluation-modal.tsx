@@ -296,7 +296,12 @@ const EvaluationModal = ({
             onFeedback('tilbakemelding', {
                 komponent: 'chatbot-test',
                 isEnglish: language === 'en',
-                responses: {rating, area, reasons, satisfaction}
+                responses: {
+                    svar: rating,
+                    hyggelig: satisfaction,
+                    omrade: area,
+                    omrade_spesifisering: reasons
+                }
             });
         }
 
