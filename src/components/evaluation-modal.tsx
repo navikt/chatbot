@@ -66,85 +66,149 @@ const translations = {
         en: 'What did you come here to do?',
         no: 'Hva kom du hit for å gjøre?'
     },
-    submit_sick_leave: {
-        en: 'Submit sick leave',
-        no: 'Levere sykemelding'
+    work: {
+        en: 'Work',
+        no: 'Arbeid'
     },
-    check_or_update_sick_leave: {
-        en: 'Check or update sick leave',
-        no: 'Sjekke status eller følge opp sykemelding'
+    family: {
+        en: 'Family',
+        no: 'Familie'
     },
-    check_or_update_activity_plan: {
-        en: 'Check or update activity plan',
-        no: 'Sjekke eller oppdatere aktivitetsplanen'
+    financial_social_assistance: {
+        en: 'Financial social assistance',
+        no: 'Økonomisk sosialhjelp'
     },
-    check_application_or_case_status: {
-        en: 'Check the status of my case/application',
-        no: 'Sjekke status på søknad eller sak'
+    health: {
+        en: 'Health',
+        no: 'Helse'
     },
-    check_payout_status: {
-        en: 'Check the status of my payouts',
-        no: 'Sjekke status på utbetalinger'
+    disability_benefits: {
+        en: 'Disability benefits',
+        no: 'Uføretrygd'
     },
-    submit_report_card: {
-        en: 'Submit report card',
+    pensions: {
+        en: 'Pensions',
+        no: 'Pensjon'
+    },
+    employer_or_coworker: {
+        en: 'Employer or co-worker',
+        no: 'Arbeidsgiver eller samhandler'
+    },
+    more_specifically: {
+        en: 'More specifically...',
+        no: 'Nærmere bestemt...'
+    },
+    find_information_about_job_seeking: {
+        en: 'Find information about job seeking',
+        no: 'Finne informasjon om jobbsøking'
+    },
+    find_vacancies: {
+        en: 'Find vacancies',
+        no: 'Finne ledige stillinger'
+    },
+    send_report_card: {
+        en: 'Send report card',
         no: 'Sende meldekort'
     },
-    submit_form_or_application: {
-        en: 'Submit form or application',
-        no: 'Sende skjema eller søknad'
+    check_payouts: {
+        en: 'Check payouts',
+        no: 'Sjekke utbetalinger'
     },
-    contact_or_respond_to_nav: {
-        en: 'Contact or respond to NAV',
-        no: 'Sende melding eller svar til NAV'
+    send_application: {
+        en: 'Send application',
+        no: 'Sende søknad'
+    },
+    check_status_of_my_case: {
+        en: 'Check the status of my case',
+        no: 'Sjekke status i saken min'
+    },
+    find_information_on_layoffs: {
+        en: 'Find information on layoffs',
+        no: 'Finne informasjon om permittering'
+    },
+    find_information_on_unemployment_benefits: {
+        en: 'Find information on unemployment benefits',
+        no: 'Finne informasjon om dagpenger'
+    },
+    find_information_on_work_clearance_allowance: {
+        en: 'Find information on work clearance allowance',
+        no: 'Finne informasjon om arbeidsavklaringspenger'
+    },
+    find_information_on_initiative_money: {
+        en: 'Find information on initiative money',
+        no: 'Finne informasjon om tiltakspenger'
+    },
+    check_or_update_activity_plan: {
+        en: 'Check or update aktivity plan',
+        no: 'Sjekke eller oppdatere aktivitetsplanen'
+    },
+    send_message_to_nav: {
+        en: 'Send a message to NAV',
+        no: 'Sende melding til NAV'
     },
     read_messages_from_nav: {
         en: 'Read messages from NAV',
         no: 'Lese meldinger fra NAV'
     },
-    find_information_and_understand_rights: {
-        en: 'Find information and understand my rights',
-        no: 'Finne informasjon og forstå mine rettigheter'
-    },
-    look_for_or_apply_to_jobs: {
-        en: 'Look for or apply to jobs',
-        no: 'Finne ledige stillinger eller søke jobb'
-    },
-    find_statistics_analyses_or_research: {
-        en: 'Find statistics, analyses, or research',
-        no: 'Finne statistikk, analyse, eller forskning'
-    },
-    check_or_update_follow_up_plan: {
-        en: 'Check or update follow up-plan',
-        no: 'Sjekke eller oppdatere oppfølgningsplanen'
-    },
     something_else: {
         en: 'Something else',
         no: 'Annet'
     },
-    are_you_satisfied: {
-        en: 'Are you satisfied with the help you recieved?',
-        no: 'Er du fornøyd med hjelpen du fikk?'
+    find_information_on_family_benefits: {
+        en: 'Find information on family benefits',
+        no: 'Finne informasjon om familieytelser'
     },
-    very_satisfied: {
-        en: 'I am very satisfied',
-        no: 'Jeg er veldig fornøyd'
+    find_information_on_financial_social_assistance: {
+        en: 'Find information on financial social assistance',
+        no: 'Finne informasjon om økonomisk sosialhjelp'
     },
-    satisfied: {
-        en: 'I am satisfied',
-        no: 'Jeg er fornøyd'
+    find_information_on_financial_counseling: {
+        en: 'Find information on financial counseling',
+        no: 'Finne informasjon om økonomisk rådgivning'
     },
-    dissatisfied: {
-        en: 'I am dissatisfied',
-        no: 'Jeg er misfornøyd'
+    check_or_update_follow_up_plan: {
+        en: 'Check or update the follow-up plan',
+        no: 'Sjekke eller oppdatere oppfølgingsplanen'
     },
-    very_dissatisfied: {
-        en: 'I am very dissatisfied',
-        no: 'Jeg er veldig misfornøyd'
+    find_information_on_sick_leave: {
+        en: 'Find information on sick leave',
+        no: 'Finne informasjon om sykemelding/-fravær'
     },
-    your_feedback: {
-        en: 'Your feedback',
-        no: 'Din tilbakemelding'
+    find_information_on_salute_card: {
+        en: 'Find information on salute cards',
+        no: 'Finne informasjon om honnørkort'
+    },
+    find_information_on_disability_benefits: {
+        en: 'Find information on disability benefits',
+        no: 'Finne informasjon om uføretrygd'
+    },
+    find_information_on_pensions: {
+        en: 'Find information on pensions',
+        no: 'Finne informasjon om alderspensjon'
+    },
+    find_information_on_pension_benefits: {
+        en: 'Find information on pension benefits',
+        no: 'Finne informasjon om pensjonsytelser'
+    },
+    find_information_on_recruitment: {
+        en: 'Find information on recruitment',
+        no: 'Finne informasjon om rekruttering'
+    },
+    find_information_on_refunds_and_settlements: {
+        en: 'Find information on refunds and settlements',
+        no: 'Finne informasjon om refusjoner og oppgjør'
+    },
+    find_information_on_a_benefit_or_scheme: {
+        en: 'Find information on a benefit or scheme',
+        no: 'Finne informasjon om en stønad eller ordning'
+    },
+    find_news_or_statistics: {
+        en: 'Find news or statistics',
+        no: 'Finne nyheter eller statistikk'
+    },
+    was_the_interaction_pleasant: {
+        en: 'Did you find your interaction with us pleasant?',
+        no: 'Ble du møtt på en hyggelig måte i kontakt med oss?'
     },
     submit: {
         en: 'Submit',
@@ -157,11 +221,11 @@ interface EvaluationModalProperties extends ModalProperties {
 }
 
 interface InputProperties {
-    label: string;
-    value: string;
+    localizationId: string;
 }
 
 interface RatingRadioProperties extends InputProperties {}
+interface AreaRadioProperties extends InputProperties {}
 interface ReasonCheckboxProperties extends InputProperties {}
 interface SatisfactionRadioProperties extends InputProperties {}
 
@@ -174,8 +238,9 @@ const EvaluationModal = ({
     const {language, translate} = useLanguage();
     const {sendFeedback} = useSession();
     const [rating, setRating] = useState<string>();
-    const [reasons, setReasons] = useState<string[]>([]);
     const [satisfaction, setSatisfaction] = useState<string>();
+    const [area, setArea] = useState<string>();
+    const [reasons, setReasons] = useState<string[]>([]);
     const localizations = useMemo(() => translate(translations), [translate]);
 
     function handleRatingClick(event: React.MouseEvent) {
@@ -183,6 +248,20 @@ const EvaluationModal = ({
 
         if (target.checked) {
             setRating(target.value);
+        }
+    }
+
+    function handleAreaClick(event: React.MouseEvent) {
+        const target = event.target as HTMLInputElement;
+
+        if (target.checked) {
+            setArea((previousArea) => {
+                if (previousArea !== target.value) {
+                    setReasons([]);
+                }
+
+                return target.value;
+            });
         }
     }
 
@@ -215,75 +294,218 @@ const EvaluationModal = ({
 
         if (onFeedback) {
             onFeedback('tilbakemelding', {
-                komponent: 'frida',
-                english: language === 'en'
+                komponent: 'chatbot-test',
+                isEnglish: language === 'en',
+                responses: {rating, area, reasons, satisfaction}
             });
-
-            if (rating) {
-                onFeedback('tilbakemelding', {
-                    komponent: 'frida',
-                    spørsmål: 'Fikk du svar på det du lurte på?',
-                    svar: rating
-                        .replace('1', translations.yes.no)
-                        .replace('0.5', translations.partly.no)
-                        .replace('0', translations.no.no)
-                });
-            }
-
-            if (reasons) {
-                onFeedback('tilbakemelding', {
-                    komponent: 'frida',
-                    spørsmål: 'Hva kom du hit for å gjøre?',
-                    svar: reasons
-                });
-            }
-
-            if (satisfaction) {
-                onFeedback('tilbakemelding', {
-                    komponent: 'frida',
-                    spørsmål: 'Er du fornøyd med hjelpen du fikk?',
-                    svar: satisfaction
-                });
-            }
         }
 
         onConfirm!();
     }
 
-    const RatingRadio = ({label, value}: RatingRadioProperties) => (
+    const RatingRadio = ({localizationId}: RatingRadioProperties) => (
         <Radio
             readOnly
-            {...{label, value}}
-            name={label}
-            checked={rating === value}
+            name={localizations[localizationId]}
+            label={localizations[localizationId]}
+            value={translations[localizationId].no}
+            checked={rating === translations[localizationId].no}
             onClick={handleRatingClick}
         />
     );
 
-    const ReasonCheckbox = ({label, value}: ReasonCheckboxProperties) => (
+    const AreaRadio = ({localizationId}: AreaRadioProperties) => (
+        <Radio
+            readOnly
+            label={localizations[localizationId]}
+            value={translations[localizationId].no}
+            name={`area-${String(translations[localizationId].no)}`}
+            checked={area === translations[localizationId].no}
+            onClick={handleAreaClick}
+        />
+    );
+
+    const ReasonCheckbox = ({localizationId}: ReasonCheckboxProperties) => (
         <Checkbox
             readOnly
-            {...{label, value}}
-            checked={reasons.includes(value)}
+            label={localizations[localizationId]}
+            value={translations[localizationId].no}
+            checked={reasons.includes(translations[localizationId].no)}
             onClick={handleReasonClick}
         />
     );
 
-    const SatisfactionRadio = ({label, value}: SatisfactionRadioProperties) => (
+    const ReasonCheckboxGroup = () => {
+        if (!area) {
+            return null;
+        }
+
+        let checkboxes;
+
+        switch (area) {
+            case translations.work.no: {
+                checkboxes = (
+                    <>
+                        <ReasonCheckbox localizationId='find_information_about_job_seeking' />
+                        <ReasonCheckbox localizationId='find_vacancies' />
+                        <ReasonCheckbox localizationId='send_report_card' />
+                        <ReasonCheckbox localizationId='check_payouts' />
+                        <ReasonCheckbox localizationId='send_application' />
+                        <ReasonCheckbox localizationId='check_status_of_my_case' />
+                        <ReasonCheckbox localizationId='find_information_on_layoffs' />
+                        <ReasonCheckbox localizationId='find_information_on_unemployment_benefits' />
+                        <ReasonCheckbox localizationId='find_information_on_work_clearance_allowance' />
+                        <ReasonCheckbox localizationId='find_information_on_initiative_money' />
+                        <ReasonCheckbox localizationId='check_or_update_activity_plan' />
+                        <ReasonCheckbox localizationId='send_message_to_nav' />
+                        <ReasonCheckbox localizationId='read_messages_from_nav' />
+                        <ReasonCheckbox localizationId='something_else' />
+                    </>
+                );
+
+                break;
+            }
+
+            case translations.family.no: {
+                checkboxes = (
+                    <>
+                        <ReasonCheckbox localizationId='send_application' />
+                        <ReasonCheckbox localizationId='check_payouts' />
+                        <ReasonCheckbox localizationId='check_status_of_my_case' />
+                        <ReasonCheckbox localizationId='find_information_on_family_benefits' />
+                        <ReasonCheckbox localizationId='send_message_to_nav' />
+                        <ReasonCheckbox localizationId='read_messages_from_nav' />
+                        <ReasonCheckbox localizationId='something_else' />
+                    </>
+                );
+
+                break;
+            }
+
+            case translations.financial_social_assistance.no: {
+                checkboxes = (
+                    <>
+                        <ReasonCheckbox localizationId='send_application' />
+                        <ReasonCheckbox localizationId='find_information_on_financial_social_assistance' />
+                        <ReasonCheckbox localizationId='find_information_on_financial_counseling' />
+                        <ReasonCheckbox localizationId='something_else' />
+                    </>
+                );
+
+                break;
+            }
+
+            case translations.health.no: {
+                checkboxes = (
+                    <>
+                        <ReasonCheckbox localizationId='send_report_card' />
+                        <ReasonCheckbox localizationId='send_application' />
+                        <ReasonCheckbox localizationId='check_status_of_my_case' />
+                        <ReasonCheckbox localizationId='check_payouts' />
+                        <ReasonCheckbox localizationId='check_or_update_follow_up_plan' />
+                        <ReasonCheckbox localizationId='find_information_on_sick_leave' />
+                        <ReasonCheckbox localizationId='find_information_on_work_clearance_allowance' />
+                        <ReasonCheckbox localizationId='send_message_to_nav' />
+                        <ReasonCheckbox localizationId='read_messages_from_nav' />
+                        <ReasonCheckbox localizationId='something_else' />
+                    </>
+                );
+
+                break;
+            }
+
+            case translations.disability_benefits.no: {
+                checkboxes = (
+                    <>
+                        <ReasonCheckbox localizationId='send_application' />
+                        <ReasonCheckbox localizationId='check_status_of_my_case' />
+                        <ReasonCheckbox localizationId='check_payouts' />
+                        <ReasonCheckbox localizationId='find_information_on_salute_card' />
+                        <ReasonCheckbox localizationId='find_information_on_disability_benefits' />
+                        <ReasonCheckbox localizationId='send_message_to_nav' />
+                        <ReasonCheckbox localizationId='read_messages_from_nav' />
+                        <ReasonCheckbox localizationId='something_else' />
+                    </>
+                );
+
+                break;
+            }
+
+            case translations.pensions.no: {
+                checkboxes = (
+                    <>
+                        <ReasonCheckbox localizationId='send_application' />
+                        <ReasonCheckbox localizationId='check_status_of_my_case' />
+                        <ReasonCheckbox localizationId='check_payouts' />
+                        <ReasonCheckbox localizationId='find_information_on_pensions' />
+                        <ReasonCheckbox localizationId='find_information_on_pension_benefits' />
+                        <ReasonCheckbox localizationId='send_message_to_nav' />
+                        <ReasonCheckbox localizationId='read_messages_from_nav' />
+                        <ReasonCheckbox localizationId='something_else' />
+                    </>
+                );
+
+                break;
+            }
+
+            case translations.employer_or_coworker.no: {
+                checkboxes = (
+                    <>
+                        <ReasonCheckbox localizationId='send_application' />
+                        <ReasonCheckbox localizationId='find_information_on_layoffs' />
+                        <ReasonCheckbox localizationId='find_information_on_sick_leave' />
+                        <ReasonCheckbox localizationId='find_information_on_recruitment' />
+                        <ReasonCheckbox localizationId='find_information_on_refunds_and_settlements' />
+                        <ReasonCheckbox localizationId='something_else' />
+                    </>
+                );
+
+                break;
+            }
+
+            case translations.something_else.no: {
+                checkboxes = (
+                    <>
+                        <ReasonCheckbox localizationId='send_application' />
+                        <ReasonCheckbox localizationId='find_news_or_statistics' />
+                        <ReasonCheckbox localizationId='find_news_or_statistics' />
+                        <ReasonCheckbox localizationId='something_else' />
+                    </>
+                );
+
+                break;
+            }
+
+            default: {
+                return null;
+            }
+        }
+
+        return (
+            <CheckboxGruppe legend={localizations.more_specifically}>
+                {checkboxes}
+            </CheckboxGruppe>
+        );
+    };
+
+    const SatisfactionRadio = ({
+        localizationId
+    }: SatisfactionRadioProperties) => (
         <Radio
             readOnly
-            {...{label, value}}
-            name={label}
-            checked={satisfaction === value}
+            label={localizations[localizationId]}
+            value={translations[localizationId].no}
+            name={`satisfaction-${String(translations[localizationId].no)}`}
+            checked={satisfaction === translations[localizationId].no}
             onClick={handleSatisfactionClick}
         />
     );
 
     return (
         <Modal
+            {...properties}
             {...{isOpen, onConfirm}}
             confirmationButtonText={localizations.close_evaluation}
-            {...properties}
         >
             {isOpen && (
                 <BoxElement>
@@ -296,148 +518,39 @@ const EvaluationModal = ({
                         </TextElement>
 
                         <RadioGruppe legend={localizations.your_rating}>
-                            <RatingRadio label={localizations.yes} value='1' />
-                            <RatingRadio label={localizations.no} value='0' />
-                            <RatingRadio
-                                label={localizations.partly}
-                                value='0.5'
-                            />
+                            <RatingRadio localizationId='yes' />
+                            <RatingRadio localizationId='partly' />
+                            <RatingRadio localizationId='no' />
                         </RadioGruppe>
 
                         {onFeedback && (
-                            <CheckboxGruppe
-                                legend={localizations.what_did_you_come_to_do}
+                            <RadioGruppe
+                                legend={
+                                    localizations.was_the_interaction_pleasant
+                                }
                             >
-                                <ReasonCheckbox
-                                    label={localizations.submit_sick_leave}
-                                    value={translations.submit_sick_leave.no}
-                                />
-                                <ReasonCheckbox
-                                    label={
-                                        localizations.check_or_update_sick_leave
-                                    }
-                                    value={
-                                        translations.check_or_update_sick_leave
-                                            .no
-                                    }
-                                />
-                                <ReasonCheckbox
-                                    label={
-                                        localizations.check_or_update_activity_plan
-                                    }
-                                    value={
-                                        translations
-                                            .check_or_update_activity_plan.no
-                                    }
-                                />
-                                <ReasonCheckbox
-                                    label={
-                                        localizations.check_application_or_case_status
-                                    }
-                                    value={
-                                        translations
-                                            .check_application_or_case_status.no
-                                    }
-                                />
-                                <ReasonCheckbox
-                                    label={localizations.check_payout_status}
-                                    value={translations.check_payout_status.no}
-                                />
-                                <ReasonCheckbox
-                                    label={localizations.submit_report_card}
-                                    value={translations.submit_report_card.no}
-                                />
-                                <ReasonCheckbox
-                                    label={
-                                        localizations.submit_form_or_application
-                                    }
-                                    value={
-                                        translations.submit_form_or_application
-                                            .no
-                                    }
-                                />
-                                <ReasonCheckbox
-                                    label={
-                                        localizations.contact_or_respond_to_nav
-                                    }
-                                    value={
-                                        translations.contact_or_respond_to_nav
-                                            .no
-                                    }
-                                />
-                                <ReasonCheckbox
-                                    label={localizations.read_messages_from_nav}
-                                    value={
-                                        translations.read_messages_from_nav.no
-                                    }
-                                />
-                                <ReasonCheckbox
-                                    label={
-                                        localizations.find_information_and_understand_rights
-                                    }
-                                    value={
-                                        translations
-                                            .find_information_and_understand_rights
-                                            .no
-                                    }
-                                />
-                                <ReasonCheckbox
-                                    label={
-                                        localizations.look_for_or_apply_to_jobs
-                                    }
-                                    value={
-                                        translations.look_for_or_apply_to_jobs
-                                            .no
-                                    }
-                                />
-                                <ReasonCheckbox
-                                    label={
-                                        localizations.find_statistics_analyses_or_research
-                                    }
-                                    value={
-                                        translations
-                                            .find_statistics_analyses_or_research
-                                            .no
-                                    }
-                                />
-                                <ReasonCheckbox
-                                    label={
-                                        localizations.check_or_update_follow_up_plan
-                                    }
-                                    value={
-                                        translations
-                                            .check_or_update_follow_up_plan.no
-                                    }
-                                />
-                                <ReasonCheckbox
-                                    label={localizations.something_else}
-                                    value={translations.something_else.no}
-                                />
-                            </CheckboxGruppe>
+                                <SatisfactionRadio localizationId='yes' />
+                                <SatisfactionRadio localizationId='partly' />
+                                <SatisfactionRadio localizationId='no' />
+                            </RadioGruppe>
                         )}
 
                         {onFeedback && (
                             <RadioGruppe
-                                legend={localizations.are_you_satisfied}
+                                legend={localizations.what_did_you_come_to_do}
                             >
-                                <SatisfactionRadio
-                                    label={localizations.very_satisfied}
-                                    value={translations.very_satisfied.no}
-                                />
-                                <SatisfactionRadio
-                                    label={localizations.satisfied}
-                                    value={translations.satisfied.no}
-                                />
-                                <SatisfactionRadio
-                                    label={localizations.dissatisfied}
-                                    value={translations.dissatisfied.no}
-                                />
-                                <SatisfactionRadio
-                                    label={localizations.very_dissatisfied}
-                                    value={translations.very_dissatisfied.no}
-                                />
+                                <AreaRadio localizationId='work' />
+                                <AreaRadio localizationId='family' />
+                                <AreaRadio localizationId='financial_social_assistance' />
+                                <AreaRadio localizationId='health' />
+                                <AreaRadio localizationId='disability_benefits' />
+                                <AreaRadio localizationId='pensions' />
+                                <AreaRadio localizationId='employer_or_coworker' />
+                                <AreaRadio localizationId='something_else' />
                             </RadioGruppe>
                         )}
+
+                        {onFeedback && <ReasonCheckboxGroup />}
 
                         <ActionsElement>
                             <ActionsSpacerElement />
