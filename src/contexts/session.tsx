@@ -142,8 +142,9 @@ async function pollBoostSession(
 }
 
 interface BoostPostRequestResponse {
+    posted_id: number;
     conversation: BoostConversation;
-    responses: BoostResponse[];
+    response: BoostResponse;
 }
 
 interface BoostPostRequestOptionsText {
@@ -374,108 +375,6 @@ const SessionProvider = (properties: SessionProperties) => {
         [errorCount]
     );
 
-    const sendMessage = useCallback(
-        async (message: string) => {
-            if (conversationId) {
-                const finishLoading = setIsLoading();
-
-                setQueue((previousQueue) => {
-                    if (!previousQueue) {
-                        previousQueue = {
-                            id: 'local',
-                            source: 'local',
-                            date_created: new Date().toISOString(),
-                            elements: []
-                        };
-                    }
-
-                    return {
-                        ...previousQueue,
-                        elements: previousQueue.elements.concat({
-                            type: 'text',
-                            payload: {text: message}
-                        })
-                    };
-                });
-
-                await postBoostSession(boostApiUrlBase, conversationId, {
-                    type: 'text',
-                    message
-                }).catch((error) => {
-                    handleError(error);
-                });
-
-                setPollMultiplier(0.1);
-                finishLoading();
-            }
-        },
-        [boostApiUrlBase, conversationId, setIsLoading, handleError]
-    );
-
-    const sendAction = useCallback(
-        async (id: string) => {
-            if (conversationId) {
-                const finishLoading = setIsLoading();
-
-                await postBoostSession(boostApiUrlBase, conversationId, {
-                    type: 'action_link',
-                    id
-                }).catch((error) => {
-                    handleError(error);
-                });
-
-                setPollMultiplier(0.1);
-                finishLoading();
-            }
-        },
-        [boostApiUrlBase, conversationId, setIsLoading, handleError]
-    );
-
-    const sendLink = useCallback(
-        async (id: string) => {
-            if (conversationId) {
-                const finishLoading = setIsLoading();
-
-                await postBoostSession(boostApiUrlBase, conversationId, {
-                    type: 'external_link',
-                    id
-                }).catch((error) => {
-                    handleError(error);
-                });
-
-                finishLoading();
-            }
-        },
-        [boostApiUrlBase, conversationId, setIsLoading, handleError]
-    );
-
-    const sendPing = useCallback(async () => {
-        const isHumanChat =
-            conversationState?.chat_status === 'assigned_to_human';
-
-        if (conversationId && isHumanChat) {
-            await pingBoostSession(boostApiUrlBase, conversationId).catch(
-                (error) => {
-                    console.error(error);
-                }
-            );
-        }
-    }, [boostApiUrlBase, conversationId, conversationState]);
-
-    const sendFeedback = useCallback(
-        async (rating: number, message?: string) => {
-            if (conversationId) {
-                await rateBoostSession(boostApiUrlBase, conversationId, {
-                    rating,
-                    message
-                }).catch((error) => {
-                    console.error(error);
-                });
-            }
-        },
-        [boostApiUrlBase, conversationId]
-    );
-
     const update = useCallback(
         (updates: BoostRequestResponse) => {
             if (conversation) {
@@ -543,6 +442,10 @@ const SessionProvider = (properties: SessionProperties) => {
                 return previousQueue;
             });
 
+            if (!responses) {
+                return;
+            }
+
             setResponses((previousResponses) => {
                 if (previousResponses) {
                     const currentResponseIds = new Set(
@@ -557,8 +460,8 @@ const SessionProvider = (properties: SessionProperties) => {
 
                     previousResponses.sort(
                         (a, b) =>
-                            new Date(a.date_created).getTime() -
-                            new Date(b.date_created).getTime()
+                            Number.parseInt(a.id, 10) -
+                            Number.parseInt(b.id, 10)
                     );
 
                     return previousResponses.slice();
@@ -576,6 +479,176 @@ const SessionProvider = (properties: SessionProperties) => {
             });
         },
         [conversation, conversationId, conversationState, setLanguage]
+    );
+
+    const sendMessage = useCallback(
+        async (message: string) => {
+            if (conversationId) {
+                const finishLoading = setIsLoading();
+
+                setQueue((previousQueue) => {
+                    if (!previousQueue) {
+                        previousQueue = {
+                            id: 'local',
+                            source: 'local',
+                            date_created: new Date().toISOString(),
+                            elements: []
+                        };
+                    }
+
+                    return {
+                        ...previousQueue,
+                        elements: previousQueue.elements.concat({
+                            type: 'text',
+                            payload: {text: message}
+                        })
+                    };
+                });
+
+                const response = await postBoostSession(
+                    boostApiUrlBase,
+                    conversationId,
+                    {
+                        type: 'text',
+                        message
+                    }
+                ).catch((error) => {
+                    handleError(error);
+                });
+
+                if (response && response.response) {
+                    update({
+                        conversation: response.conversation,
+                        responses: [
+                            {
+                                id: String(response.posted_id),
+                                date_created: new Date().toISOString(),
+                                source: 'client',
+                                language,
+                                elements: [
+                                    {
+                                        type: 'text',
+                                        payload: {text: message}
+                                    }
+                                ]
+                            },
+                            {
+                                ...response.response,
+                                // NOTE: 'POST' request returns wrong creation date (shifted one hour back)
+                                date_created: new Date().toISOString()
+                            }
+                        ]
+                    });
+                }
+
+                setPollMultiplier(0.1);
+                finishLoading();
+            }
+        },
+        [
+            boostApiUrlBase,
+            conversationId,
+            update,
+            language,
+            setIsLoading,
+            handleError
+        ]
+    );
+
+    const sendAction = useCallback(
+        async (id: string) => {
+            if (conversationId) {
+                const finishLoading = setIsLoading();
+                const response = await postBoostSession(
+                    boostApiUrlBase,
+                    conversationId,
+                    {
+                        type: 'action_link',
+                        id
+                    }
+                ).catch((error) => {
+                    handleError(error);
+                });
+
+                if (response) {
+                    update({
+                        conversation: response.conversation,
+                        responses: [
+                            {
+                                ...response.response,
+                                // NOTE: 'POST' request returns wrong creation date (shifted one hour back)
+                                date_created: new Date().toISOString()
+                            }
+                        ]
+                    });
+                }
+
+                setPollMultiplier(0.1);
+                finishLoading();
+            }
+        },
+        [boostApiUrlBase, conversationId, update, setIsLoading, handleError]
+    );
+
+    const sendLink = useCallback(
+        async (id: string) => {
+            if (conversationId) {
+                const finishLoading = setIsLoading();
+                const response = await postBoostSession(
+                    boostApiUrlBase,
+                    conversationId,
+                    {
+                        type: 'external_link',
+                        id
+                    }
+                ).catch((error) => {
+                    handleError(error);
+                });
+
+                if (response) {
+                    update({
+                        conversation: response.conversation,
+                        responses: [
+                            {
+                                ...response.response,
+                                // NOTE: 'POST' request returns wrong creation date (shifted one hour back)
+                                date_created: new Date().toISOString()
+                            }
+                        ]
+                    });
+                }
+
+                finishLoading();
+            }
+        },
+        [boostApiUrlBase, conversationId, update, setIsLoading, handleError]
+    );
+
+    const sendPing = useCallback(async () => {
+        const isHumanChat =
+            conversationState?.chat_status === 'assigned_to_human';
+
+        if (conversationId && isHumanChat) {
+            await pingBoostSession(boostApiUrlBase, conversationId).catch(
+                (error) => {
+                    console.error(error);
+                }
+            );
+        }
+    }, [boostApiUrlBase, conversationId, conversationState]);
+
+    const sendFeedback = useCallback(
+        async (rating: number, message?: string) => {
+            if (conversationId) {
+                await rateBoostSession(boostApiUrlBase, conversationId, {
+                    rating,
+                    message
+                }).catch((error) => {
+                    console.error(error);
+                });
+            }
+        },
+        [boostApiUrlBase, conversationId]
     );
 
     const start = useCallback(async () => {
@@ -722,6 +795,11 @@ const SessionProvider = (properties: SessionProperties) => {
 
                 const [mostRecentResponse] = (responses ?? []).slice(-1);
                 const mostRecentResponseId = mostRecentResponse.id;
+
+                if (!conversationState?.poll) {
+                    timeout = window.setTimeout(poll, minimumPollTimeout);
+                    return;
+                }
 
                 await pollBoostSession(boostApiUrlBase, conversationId, {
                     mostRecentResponseId
