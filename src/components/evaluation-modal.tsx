@@ -294,7 +294,7 @@ const EvaluationModal = ({
 
         if (onFeedback) {
             onFeedback('tilbakemelding', {
-                komponent: 'chatbot-test',
+                komponent: 'chatbot',
                 isEnglish: language === 'en',
                 responses: {
                     svar: rating,
