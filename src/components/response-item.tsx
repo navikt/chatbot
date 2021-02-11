@@ -290,7 +290,12 @@ const ResponseItem = ({
                     border
                     href={authenticationUrl}
                     linkCreator={(properties) => (
-                        <a {...properties} data-internal target="_blank" tabIndex={isObscured ? -1 : 0}/>
+                        <a
+                            {...properties}
+                            data-internal
+                            target='_blank'
+                            tabIndex={isObscured ? -1 : 0}
+                        />
                     )}
                 >
                     <LinkPanelIconElement

@@ -296,7 +296,7 @@ const EvaluationModal = ({
             onFeedback('tilbakemelding', {
                 komponent: 'chatbot',
                 isEnglish: language === 'en',
-                type: (hasSpokenToAgent) ? 'veileder' : 'frida',
+                type: hasSpokenToAgent ? 'veileder' : 'frida',
                 responses: {
                     svar: rating,
                     hyggelig: satisfaction,
