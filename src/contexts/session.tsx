@@ -308,6 +308,7 @@ interface Session {
     responses?: BoostResponse[];
     queue?: BoostResponse;
     isLoading?: boolean;
+    hasSpokenToAgent?: boolean;
     start?: () => Promise<void>;
     restart?: () => Promise<void>;
     finish?: () => Promise<void>;
@@ -349,6 +350,7 @@ const SessionProvider = (properties: SessionProperties) => {
     const [responses, setResponses] = useState<BoostResponse[] | undefined>();
     const [queue, setQueue] = useState<BoostResponse>();
     const [pollMultiplier, setPollMultiplier] = useState<number>(1);
+    const [hasSpokenToAgent, setHasSpokenToAgent] = useState<boolean>(false);
 
     const handleError = useCallback(
         (error: any, isDismissible = false) => {
@@ -788,6 +790,10 @@ const SessionProvider = (properties: SessionProperties) => {
             let timeout: number;
             let shouldUpdate = true;
 
+            if (isHumanChat && !hasSpokenToAgent) {
+                setHasSpokenToAgent(true);
+            }
+
             const poll = async () => {
                 if (!conversationId || !shouldUpdate) {
                     return;
@@ -865,6 +871,7 @@ const SessionProvider = (properties: SessionProperties) => {
     }, [
         boostApiUrlBase,
         status,
+        hasSpokenToAgent,
         conversationId,
         conversationState,
         responses,
@@ -904,6 +911,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 responses,
                 queue,
                 isLoading,
+                hasSpokenToAgent,
                 sendMessage,
                 sendAction,
                 sendLink,

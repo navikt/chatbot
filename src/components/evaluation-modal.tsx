@@ -236,7 +236,7 @@ const EvaluationModal = ({
     ...properties
 }: EvaluationModalProperties) => {
     const {language, translate} = useLanguage();
-    const {sendFeedback} = useSession();
+    const {hasSpokenToAgent, sendFeedback} = useSession();
     const [rating, setRating] = useState<string>();
     const [satisfaction, setSatisfaction] = useState<string>();
     const [area, setArea] = useState<string>();
@@ -296,6 +296,7 @@ const EvaluationModal = ({
             onFeedback('tilbakemelding', {
                 komponent: 'chatbot',
                 isEnglish: language === 'en',
+                type: (hasSpokenToAgent) ? 'veileder' : 'frida',
                 responses: {
                     svar: rating,
                     hyggelig: satisfaction,
