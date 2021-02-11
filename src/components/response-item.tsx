@@ -58,6 +58,10 @@ const LinkPanelElement = styled(LenkepanelBase)`
     margin-top: 15px;
     margin-bottom: 15px;
 
+    && {
+        text-decoration: none;
+    }
+
     ${GroupElement}:nth-last-child(3) & {
         margin-bottom: 0;
     }
@@ -75,6 +79,19 @@ const LinkPanelIconElement = styled.div`
 const LinkPanelTextElement = styled.div`
     margin-left: 20px;
     flex: 1;
+`;
+
+const LinkPanelTextTitle = styled(Ingress)`
+    color: #3e3832;
+
+    ${LinkPanelElement}:hover & {
+        color: #0067c5;
+        text-decoration: underline;
+    }
+`;
+
+const LinkPanelTextBody = styled(Normaltekst)`
+    color: #3e3832;
 `;
 
 const translations = {
@@ -272,8 +289,9 @@ const ResponseItem = ({
                 <LinkPanelElement
                     border
                     href={authenticationUrl}
-                    tabIndex={isObscured ? -1 : 0}
-                    target='_blank'
+                    linkCreator={(properties) => (
+                        <a {...properties} data-internal target="_blank" tabIndex={isObscured ? -1 : 0}/>
+                    )}
                 >
                     <LinkPanelIconElement
                         dangerouslySetInnerHTML={{
@@ -282,12 +300,12 @@ const ResponseItem = ({
                     />
 
                     <LinkPanelTextElement>
-                        <Ingress lang={responseLanguage}>
+                        <LinkPanelTextTitle lang={responseLanguage}>
                             {localizations.electronic_authentication}
-                        </Ingress>
-                        <Normaltekst lang={responseLanguage}>
+                        </LinkPanelTextTitle>
+                        <LinkPanelTextBody lang={responseLanguage}>
                             {localizations.please_log_in}
-                        </Normaltekst>
+                        </LinkPanelTextBody>
                     </LinkPanelTextElement>
                 </LinkPanelElement>
             );
