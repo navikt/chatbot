@@ -62,9 +62,9 @@ const translations = {
         en: 'Partly',
         no: 'Delvis'
     },
-    what_did_you_come_to_do: {
-        en: 'What did you come here to do?',
-        no: 'Hva kom du hit for å gjøre?'
+    what_did_you_want_information_about: {
+        en: 'What did you want information about?',
+        no: 'Hva ønsket du informasjon om?'
     },
     work: {
         en: 'Work',
@@ -473,7 +473,7 @@ const EvaluationModal = ({
                 checkboxes = (
                     <>
                         <ReasonCheckbox localizationId='send_application' />
-                        <ReasonCheckbox localizationId='find_news_or_statistics' />
+                        <ReasonCheckbox localizationId='find_information_on_a_benefit_or_scheme' />
                         <ReasonCheckbox localizationId='find_news_or_statistics' />
                         <ReasonCheckbox localizationId='something_else' />
                     </>
@@ -543,7 +543,7 @@ const EvaluationModal = ({
 
                         {onFeedback && (
                             <RadioGruppe
-                                legend={localizations.what_did_you_come_to_do}
+                                legend={localizations.what_did_you_want_information_about}
                             >
                                 <AreaRadio localizationId='work' />
                                 <AreaRadio localizationId='family' />
