@@ -4,6 +4,7 @@ import cookies from 'js-cookie';
 import useLanguage, {LanguageProvider} from './contexts/language';
 
 import useSession, {
+    SessionProperties,
     SessionProvider,
     BoostResponseElementLinksItem
 } from './contexts/session';
@@ -604,13 +605,15 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     );
 };
 
-interface ChatbotProperties extends ChatProperties {
-    boostApiUrlBase?: string;
-}
+interface ChatbotProperties extends SessionProperties, ChatProperties {}
 
-const Chatbot = ({boostApiUrlBase, ...properties}: ChatbotProperties) => (
+const Chatbot = ({
+    boostApiUrlBase,
+    actionFilters,
+    ...properties
+}: ChatbotProperties) => (
     <LanguageProvider>
-        <SessionProvider {...{boostApiUrlBase}}>
+        <SessionProvider {...{boostApiUrlBase, actionFilters}}>
             <Chat {...properties} />
         </SessionProvider>
     </LanguageProvider>

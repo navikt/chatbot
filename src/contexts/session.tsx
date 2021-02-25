@@ -85,11 +85,13 @@ interface BoostStartRequestResponse {
 }
 
 async function createBoostSession(
-    apiUrlBase: string
+    apiUrlBase: string,
+    actionFilters?: string[]
 ): Promise<BoostStartRequestResponse> {
     const response = await axios.post(apiUrlBase, {
         command: 'START',
-        language: clientLanguage
+        language: clientLanguage,
+        filter_values: actionFilters
     });
 
     return response.data;
@@ -324,11 +326,13 @@ const SessionContext = createContext<Session>({});
 
 interface SessionProperties {
     boostApiUrlBase?: string;
+    actionFilters?: string[];
 }
 
 const SessionProvider = (properties: SessionProperties) => {
     const boostApiUrlBase =
         properties.boostApiUrlBase ?? defaultBoostApiUrlBase;
+    const actionFilters = properties.actionFilters;
 
     const [status, setStatus] = useState<Session['status']>('disconnected');
     const [error, setError] = useState<SessionError>();
@@ -672,11 +676,11 @@ const SessionProvider = (properties: SessionProperties) => {
                         language
                     }
                 ).catch(async (error) => {
-                    if (
-                        error?.response &&
-                        error.response.data.error === 'session ended'
-                    ) {
-                        return createBoostSession(boostApiUrlBase);
+                    if (error?.response?.data?.error === 'session ended') {
+                        return createBoostSession(
+                            boostApiUrlBase,
+                            actionFilters
+                        );
                     }
 
                     throw error;
@@ -684,7 +688,11 @@ const SessionProvider = (properties: SessionProperties) => {
 
                 update(session);
             } else {
-                const session = await createBoostSession(boostApiUrlBase);
+                const session = await createBoostSession(
+                    boostApiUrlBase,
+                    actionFilters
+                );
+
                 update(session);
             }
 
@@ -696,6 +704,7 @@ const SessionProvider = (properties: SessionProperties) => {
         finishLoading();
     }, [
         boostApiUrlBase,
+        actionFilters,
         savedConversationId,
         language,
         setIsLoading,
@@ -933,6 +942,7 @@ export {
     BoostResponse,
     BoostResponseElement,
     BoostResponseElementLinksItem,
+    SessionProperties,
     Session,
     SessionContext,
     SessionProvider
