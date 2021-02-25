@@ -543,7 +543,9 @@ const EvaluationModal = ({
 
                         {onFeedback && (
                             <RadioGruppe
-                                legend={localizations.what_did_you_want_information_about}
+                                legend={
+                                    localizations.what_did_you_want_information_about
+                                }
                             >
                                 <AreaRadio localizationId='work' />
                                 <AreaRadio localizationId='family' />
