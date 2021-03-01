@@ -18,7 +18,7 @@ import Chatbot from '@navikt/nav-chatbot';
 <Chatbot/>
 // eller med options (defaults er definert nedenfor)
 <Chatbot
-    boostApiUrlBase='https://navtest.boost.ai/api/chat/v2'
+    boostApiUrlBase='https://staging-nav.boost.ai/api/chat/v2'
     actionFilters={undefined}
     analyticsCallback={console.log}
 />
