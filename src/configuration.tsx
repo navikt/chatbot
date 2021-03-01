@@ -8,7 +8,7 @@ if (window.location.href.includes('/en/')) {
 }
 
 const clientLanguage = internalClientLanguage;
-const boostApiUrlBase = 'https://navtest.boost.ai/api/chat/v2';
+const boostApiUrlBase = 'https://staging-nav.boost.ai/api/chat/v2';
 const conversationIdCookieName = 'nav-chatbot:conversation';
 const languageCookieName = 'nav-chatbot:language';
 const openCookieName = 'nav-chatbot:open';
