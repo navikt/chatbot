@@ -1,6 +1,7 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useMemo, useEffect, useCallback} from 'react';
 import styled from 'styled-components';
 import {RadioPanel} from 'nav-frontend-skjema';
+import useLanguage from '../contexts/language';
 import useLoader from '../hooks/use-loader';
 
 import {
@@ -17,6 +18,7 @@ import Message, {
     ContainerElement,
     AvatarElement
 } from './message';
+import AriaLabelElement from './aria-label';
 
 const LinkButtonElement = styled.div`
     max-width: ${conversationSideWidth};
@@ -45,6 +47,13 @@ const LinkButtonElement = styled.div`
     }
 `;
 
+const translations = {
+    _opens_in_new_window: {
+        en: '(opens in new window)',
+        no: '(åpnes i nytt vindu)'
+    }
+};
+
 interface ResponseLinkProperties {
     response: BoostResponse;
     elementIndex?: number;
@@ -62,6 +71,8 @@ const ResponseLink = ({
     onAction,
     onLink
 }: ResponseLinkProperties) => {
+    const {translate} = useLanguage();
+    const localizations = useMemo(() => translate(translations), [translate]);
     const [isSelected, setIsSelected] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
     const [isLoading, setIsLoading] = useLoader();
@@ -132,6 +143,14 @@ const ResponseLink = ({
                     onClick={handleLinkClick}
                 >
                     {link.text}
+                    {link.link_target === '_blank' && (
+                        <>
+                            {' '}
+                            <AriaLabelElement>
+                                {localizations._opens_in_new_window}
+                            </AriaLabelElement>
+                        </>
+                    )}
                 </a>
             </Message>
         );
