@@ -121,9 +121,11 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
                 <Textarea
                     name='message'
                     value={message}
-                    placeholder={responsesLength <= 1
-                        ? localizations.ask_your_question
-                        : undefined}
+                    placeholder={
+                        responsesLength <= 1
+                            ? localizations.ask_your_question
+                            : undefined
+                    }
                     maxLength={messageMaxCharacters}
                     tabIndex={isObscured ? -1 : undefined}
                     tellerTekst={(count, maxCount) => (
