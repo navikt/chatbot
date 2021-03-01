@@ -53,6 +53,10 @@ const translations = {
         en: 'message',
         no: 'melding'
     },
+    ask_your_question: {
+        en: 'Ask your question',
+        no: 'Still ditt spørsmål'
+    },
     restart: {
         en: 'Restart',
         no: 'Start på nytt'
@@ -67,7 +71,7 @@ interface FormProperties {
 
 const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
     const {translate} = useLanguage();
-    const {id, conversation, sendPing} = useSession();
+    const {id, conversation, responses, queue, sendPing} = useSession();
     const localizations = useMemo(() => translate(translations), [translate]);
     const [message, setMessage] = useState<string>('');
     const conversationStatus = conversation?.state.chat_status;
@@ -109,12 +113,17 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
         [message]
     );
 
+    const responsesLength = (responses?.length ?? 0) + (queue ? 1 : 0);
+
     return (
         <FormElement aria-hidden={isObscured} onSubmit={handleSubmit}>
             <PaddingElement>
                 <Textarea
                     name='message'
                     value={message}
+                    placeholder={responsesLength <= 1
+                        ? localizations.ask_your_question
+                        : undefined}
                     maxLength={messageMaxCharacters}
                     tabIndex={isObscured ? -1 : undefined}
                     tellerTekst={(count, maxCount) => (
