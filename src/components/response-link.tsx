@@ -11,6 +11,7 @@ import {
 
 import {linkDisableTimeout, englishButtonText} from '../configuration';
 import Spinner, {SpinnerElement} from './spinner';
+import AriaLabelElement from './aria-label';
 
 import Message, {
     avatarSize,
@@ -18,7 +19,6 @@ import Message, {
     ContainerElement,
     AvatarElement
 } from './message';
-import AriaLabelElement from './aria-label';
 
 const LinkButtonElement = styled.div`
     max-width: ${conversationSideWidth};
