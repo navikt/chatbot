@@ -289,7 +289,17 @@ const EvaluationModal = ({
         event.preventDefault();
 
         if (rating) {
-            void sendFeedback!(Math.round(Number.parseInt(rating, 10)));
+            let ratingValue = 0;
+
+            if (rating === translations.yes.no) {
+                ratingValue = 1;
+            } else if (rating === translations.partly.no) {
+                ratingValue = 1;
+            } else if (rating === translations.no.no) {
+                ratingValue = 0;
+            }
+
+            void sendFeedback!(ratingValue);
         }
 
         if (onFeedback) {
