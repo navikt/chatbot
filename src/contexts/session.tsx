@@ -48,6 +48,15 @@ interface BoostResponseElementHtml {
     };
 }
 
+interface BoostResponseElementVideo {
+    type: 'video';
+    payload: {
+        fullscreen: true | false;
+        source: 'vimeo';
+        url: string;
+    };
+}
+
 interface BoostResponseElementLinksItem {
     id: string;
     text: string;
@@ -66,6 +75,7 @@ interface BoostResponseElementLinks {
 type BoostResponseElement =
     | BoostResponseElementText
     | BoostResponseElementHtml
+    | BoostResponseElementVideo
     | BoostResponseElementLinks;
 
 interface BoostResponse {

@@ -157,7 +157,8 @@ export {
     conversationSideWidth,
     GroupElement,
     ContainerElement,
-    AvatarElement
+    AvatarElement,
+    MessageBubble
 };
 
 export default Message;

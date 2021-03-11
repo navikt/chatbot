@@ -7,7 +7,7 @@ import useLanguage from '../contexts/language';
 import {BoostResponse, BoostResponseElement} from '../contexts/session';
 import {authenticationPrefix} from '../configuration';
 import Spinner from './spinner';
-import Message, {GroupElement} from './message';
+import Message, {GroupElement, MessageBubble} from './message';
 import ResponseLink, {ResponseLinkProperties} from './response-link';
 import AriaLabelElement from './aria-label';
 
@@ -92,6 +92,32 @@ const LinkPanelTextTitle = styled(Ingress)`
 
 const LinkPanelTextBody = styled(Normaltekst)`
     color: #3e3832;
+`;
+
+const VideoMessageElement = styled(Message)`
+    ${MessageBubble} {
+        width: 100%;
+        max-width: 390px;
+    }
+`;
+
+const VideoElement = styled.div`
+    width: 100%;
+    max-width: 400px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border-radius: 6px;
+    position: relative;
+    padding-bottom: 56.25%;
+    overflow: hidden;
+`;
+
+const IframeElement = styled.iframe`
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
 `;
 
 const translations = {
@@ -335,6 +361,28 @@ const ResponseItem = ({
                     <Contents {...{html}} lang={responseLanguage} />
                 </Message>
             </>
+        );
+    }
+
+    if (element.type === 'video') {
+        const videoUrl = element.payload.url.replace(
+            'https://vimeo.com/',
+            'https://player.vimeo.com/video/'
+        );
+
+        return (
+            <VideoMessageElement>
+                <VideoElement>
+                    <IframeElement
+                        allowFullScreen
+                        src={videoUrl}
+                        width='100%'
+                        height='100%'
+                        frameBorder='0'
+                        allow='autoplay; fullscreen; picture-in-picture'
+                    />
+                </VideoElement>
+            </VideoMessageElement>
         );
     }
 
