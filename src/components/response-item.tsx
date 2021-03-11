@@ -95,9 +95,11 @@ const LinkPanelTextBody = styled(Normaltekst)`
 `;
 
 const VideoMessageElement = styled(Message)`
+    max-width: 500px;
+
     ${MessageBubble} {
         width: 100%;
-        max-width: 390px;
+        box-sizing: border-box;
     }
 `;
 
