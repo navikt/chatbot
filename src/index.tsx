@@ -521,7 +521,9 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
                     <ConversationElement aria-hidden={isModalOpen}>
                         <PaddingElement>
-                            {(!responses || (responses?.length === 0)) && <FillerElement />}
+                            {(!responses || responses?.length === 0) && (
+                                <FillerElement />
+                            )}
 
                             <div role='log'>
                                 {responses?.map((response, index) => (

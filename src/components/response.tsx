@@ -58,7 +58,7 @@ const Response = ({
         }
     }, [onReveal]);
 
-    if (!response?.elements || (response.elements?.length === 0)) {
+    if (!response?.elements || response.elements?.length === 0) {
         return null;
     }
 
