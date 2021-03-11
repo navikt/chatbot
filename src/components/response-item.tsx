@@ -100,8 +100,8 @@ const translations = {
         no: 'Du sier'
     },
     chatbot_frida_says: {
-        en: 'Chatbot Frida says',
-        no: 'Chatbot Frida sier'
+        en: 'Chat robot Frida says',
+        no: 'Chat-robot Frida sier'
     },
     nav_says: {
         en: 'NAV says',

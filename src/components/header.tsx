@@ -132,7 +132,7 @@ const Header = ({
             {isHumanChat ? (
                 <TitleElement>{localizations.chat_with_nav}</TitleElement>
             ) : (
-                <TitleElement>Chatbot Frida</TitleElement>
+                <TitleElement>Chat-robot Frida</TitleElement>
             )}
 
             <HeaderActionsElement>

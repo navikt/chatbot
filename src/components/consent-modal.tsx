@@ -32,9 +32,9 @@ const translations = {
     },
     consent_text_2: {
         en:
-            'The conversation is saved to improve our chatbot. This is an anonymous chat where you can ask general questions about NAV’s services.',
+            'The conversation is saved to improve our chat robot. This is an anonymous chat where you can ask general questions about NAV’s services.',
         no:
-            'Dialogen lagres for å lære chatboten å bli bedre. Dette er en anonym chat hvor du kan få svar på generelle spørsmål om NAV sine ytelser og tjenester.'
+            'Dialogen lagres for å lære chat-roboten å bli bedre. Dette er en anonym chat hvor du kan få svar på generelle spørsmål om NAV sine ytelser og tjenester.'
     },
     consent_text_3: {
         en:
