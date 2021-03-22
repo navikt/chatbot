@@ -14,6 +14,7 @@ import {
     boostApiUrlBase as defaultBoostApiUrlBase,
     cookieDomain,
     cacheSessionName,
+    actionFilterCacheSessionName,
     clientLanguage,
     conversationIdCookieName,
     minimumPollTimeout,
@@ -142,12 +143,14 @@ interface BoostPollRequestOptions {
 async function pollBoostSession(
     apiUrlBase: string,
     conversationId: string,
+    actionFilters: string[],
     options?: BoostPollRequestOptions
 ): Promise<BoostPollRequestResponse> {
     const response = await axios.post(apiUrlBase, {
         command: 'POLL',
         conversation_id: conversationId,
-        value: options?.mostRecentResponseId
+        value: options?.mostRecentResponseId,
+        filter_values: actionFilters
     });
 
     return response.data;
@@ -178,6 +181,7 @@ interface BoostPostRequestOptions {
 async function postBoostSession(
     apiUrlBase: string,
     conversationId: string,
+    actionFilters: string[],
     options: BoostPostRequestOptionsText | BoostPostRequestOptionsLink
 ): Promise<BoostPostRequestResponse> {
     const requestOptions: BoostPostRequestOptions = {type: options.type};
@@ -193,6 +197,7 @@ async function postBoostSession(
     const response = await axios.post(apiUrlBase, {
         command: 'POST',
         conversation_id: conversationId,
+        filter_values: actionFilters,
         ...requestOptions
     });
 
@@ -302,6 +307,39 @@ function removeCache(): void {
     }
 }
 
+function setActionFilterCache(actionFilters: string[]) {
+    if (window.sessionStorage) {
+        window.sessionStorage.setItem(
+            actionFilterCacheSessionName,
+            JSON.stringify(actionFilters)
+        );
+    }
+}
+
+function getActionFilterCache(): string[] | undefined {
+    if (window.sessionStorage) {
+        const data = window.sessionStorage.getItem(
+            actionFilterCacheSessionName
+        );
+
+        if (data) {
+            try {
+                return JSON.parse(data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+
+    return undefined;
+}
+
+function removeActionFilterCache(): void {
+    if (window.sessionStorage) {
+        window.sessionStorage.removeItem(actionFilterCacheSessionName);
+    }
+}
+
 interface SessionError extends Error {
     code?: string;
 }
@@ -319,6 +357,7 @@ interface Session {
     conversation?: BoostConversation;
     responses?: BoostResponse[];
     queue?: BoostResponse;
+    actionFilters?: string[];
     isLoading?: boolean;
     hasSpokenToAgent?: boolean;
     start?: () => Promise<void>;
@@ -330,6 +369,9 @@ interface Session {
     sendLink?: (linkId: string) => Promise<void>;
     sendPing?: () => Promise<void>;
     sendFeedback?: (rating: number, message?: string) => Promise<void>;
+    updateActionFilters?: (
+        callback: (previousState: string[]) => string[]
+    ) => void;
 }
 
 const SessionContext = createContext<Session>({});
@@ -342,7 +384,9 @@ interface SessionProperties {
 const SessionProvider = (properties: SessionProperties) => {
     const boostApiUrlBase =
         properties.boostApiUrlBase ?? defaultBoostApiUrlBase;
-    const actionFilters = properties.actionFilters;
+    const [actionFilters, updateActionFilters] = useState<string[]>(
+        properties.actionFilters ?? []
+    );
 
     const [status, setStatus] = useState<Session['status']>('disconnected');
     const [error, setError] = useState<SessionError>();
@@ -524,6 +568,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 const response = await postBoostSession(
                     boostApiUrlBase,
                     conversationId,
+                    actionFilters,
                     {
                         type: 'text',
                         message
@@ -564,6 +609,7 @@ const SessionProvider = (properties: SessionProperties) => {
         [
             boostApiUrlBase,
             conversationId,
+            actionFilters,
             update,
             language,
             setIsLoading,
@@ -578,6 +624,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 const response = await postBoostSession(
                     boostApiUrlBase,
                     conversationId,
+                    actionFilters,
                     {
                         type: 'action_link',
                         id
@@ -603,7 +650,14 @@ const SessionProvider = (properties: SessionProperties) => {
                 finishLoading();
             }
         },
-        [boostApiUrlBase, conversationId, update, setIsLoading, handleError]
+        [
+            boostApiUrlBase,
+            conversationId,
+            actionFilters,
+            update,
+            setIsLoading,
+            handleError
+        ]
     );
 
     const sendLink = useCallback(
@@ -613,6 +667,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 const response = await postBoostSession(
                     boostApiUrlBase,
                     conversationId,
+                    actionFilters,
                     {
                         type: 'external_link',
                         id
@@ -637,7 +692,14 @@ const SessionProvider = (properties: SessionProperties) => {
                 finishLoading();
             }
         },
-        [boostApiUrlBase, conversationId, update, setIsLoading, handleError]
+        [
+            boostApiUrlBase,
+            conversationId,
+            actionFilters,
+            update,
+            setIsLoading,
+            handleError
+        ]
     );
 
     const sendPing = useCallback(async () => {
@@ -677,6 +739,14 @@ const SessionProvider = (properties: SessionProperties) => {
 
                 if (cache) {
                     update(cache as BoostResumeRequestResponse);
+                }
+
+                const actionFilterCache = getActionFilterCache();
+
+                if (actionFilterCache) {
+                    updateActionFilters((previousState) => [
+                        ...new Set(previousState.concat(actionFilterCache))
+                    ]);
                 }
 
                 const session = await getBoostSession(
@@ -723,12 +793,14 @@ const SessionProvider = (properties: SessionProperties) => {
     ]);
 
     const remove = useCallback(async () => {
+        updateActionFilters(properties.actionFilters ?? []);
         setSavedConversationId(undefined);
         setConversation(undefined);
         setResponses(undefined);
         setQueue(undefined);
 
         removeCache();
+        removeActionFilterCache();
         cookies.remove(conversationIdCookieName, {domain: cookieDomain});
 
         if (conversationId) {
@@ -738,7 +810,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 }
             );
         }
-    }, [boostApiUrlBase, conversationId]);
+    }, [properties.actionFilters, boostApiUrlBase, conversationId]);
 
     const restart = useCallback(async () => {
         const finishLoading = setIsLoading();
@@ -826,9 +898,14 @@ const SessionProvider = (properties: SessionProperties) => {
                     return;
                 }
 
-                await pollBoostSession(boostApiUrlBase, conversationId, {
-                    mostRecentResponseId
-                })
+                await pollBoostSession(
+                    boostApiUrlBase,
+                    conversationId,
+                    actionFilters,
+                    {
+                        mostRecentResponseId
+                    }
+                )
                     .then((updatedSession) => {
                         if (
                             status !== 'disconnected' &&
@@ -889,6 +966,7 @@ const SessionProvider = (properties: SessionProperties) => {
         return undefined;
     }, [
         boostApiUrlBase,
+        actionFilters,
         status,
         hasSpokenToAgent,
         conversationId,
@@ -904,6 +982,12 @@ const SessionProvider = (properties: SessionProperties) => {
             setCache({conversation, responses});
         }
     }, [conversation, responses]);
+
+    useEffect(() => {
+        if (actionFilters) {
+            setActionFilterCache(actionFilters);
+        }
+    }, [actionFilters]);
 
     useEffect(() => {
         if (conversationId) {
@@ -929,6 +1013,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 conversation,
                 responses,
                 queue,
+                actionFilters,
                 isLoading,
                 hasSpokenToAgent,
                 sendMessage,
@@ -936,6 +1021,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 sendLink,
                 sendPing,
                 sendFeedback,
+                updateActionFilters,
                 start,
                 restart,
                 finish,

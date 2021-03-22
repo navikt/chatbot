@@ -15,6 +15,7 @@ const openCookieName = 'nav-chatbot:open';
 const consentCookieName = 'nav-chatbot:consent';
 const unreadCookieName = 'nav-chatbot:unread';
 const cacheSessionName = 'nav-chatbot:cache';
+const actionFilterCacheSessionName = 'nav-chatbot:cache-action_filters';
 const containerWidthNumber = 400;
 const containerWidth = `${containerWidthNumber}px`;
 const containerHeightNumber = 568;
@@ -25,7 +26,8 @@ const botResponseRevealDelayBuffer = botResponseRevealDelay / 2;
 const minimumPollTimeout = 1000;
 const agentMaximumPollTimeout = 4000;
 const botMaximumPollTimeout = 30000;
-const authenticationPrefix = 'Init:Auth:';
+const welcomeMessage = '<p>Hei! Jeg heter Frida og er NAV sin chat-robot.</p>';
+const authenticationMessagePrefix = 'Init:Auth:';
 const englishButtonText = 'For English, click here';
 const englishButtonResponse = 'English, please';
 
@@ -44,6 +46,7 @@ export {
     consentCookieName,
     unreadCookieName,
     cacheSessionName,
+    actionFilterCacheSessionName,
     containerWidthNumber,
     containerWidth,
     containerHeightNumber,
@@ -54,7 +57,8 @@ export {
     minimumPollTimeout,
     agentMaximumPollTimeout,
     botMaximumPollTimeout,
-    authenticationPrefix,
+    welcomeMessage,
+    authenticationMessagePrefix,
     englishButtonText,
     englishButtonResponse,
     fullscreenMediaQuery,
