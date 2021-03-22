@@ -354,7 +354,6 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
             setIsEvaluating(false);
         } else if (isFinishing) {
             setIsEvaluating(true);
-            void finish!();
         } else {
             setIsFinishing(true);
         }
