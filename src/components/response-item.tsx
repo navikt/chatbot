@@ -114,6 +114,7 @@ const LinkPanelTextBody = styled(Normaltekst)`
 
 const VideoMessageElement = styled(Message)`
     max-width: 500px;
+    flex: 1;
 
     ${MessageBubble} {
         width: 100%;
