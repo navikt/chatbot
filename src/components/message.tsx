@@ -46,13 +46,15 @@ const AvatarElement = styled.div`
 `;
 
 interface MessageBubbleProperties {
+    isHuman?: boolean;
     isThinking?: boolean;
 }
 
 const MessageBubble = styled.div`
     max-width: ${conversationSideWidth};
     max-width: calc(${conversationSideWidth} - ${avatarSize} - 8px);
-    background: #e7e9e9;
+    background: ${(properties: MessageBubbleProperties) => properties.isHuman ? '#eae7e5' : '#e7e9e9'};
+
     margin: auto;
     padding: 8px 12px;
     position: relative;
@@ -60,6 +62,7 @@ const MessageBubble = styled.div`
     box-sizing: border-box;
     display: inline-block;
     vertical-align: top;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
 
     ${(properties: MessageBubbleProperties) =>
         properties.isThinking &&
@@ -73,6 +76,7 @@ const MessageBubble = styled.div`
                 position: absolute;
                 bottom: -2px;
                 left: -7px;
+                box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
             }
 
             &:after {
@@ -82,8 +86,10 @@ const MessageBubble = styled.div`
                 height: 12px;
                 border-radius: 12px;
                 position: absolute;
-                bottom: 1px;
+                bottom: 0;
                 left: -2px;
+                border: 1px solid rgba(0,0,0,0.15);
+                border-width: 0 0 1px 1px;
             }
         `};
 `;
@@ -118,11 +124,10 @@ const TextElement = styled(Normaltekst)`
     white-space: pre-wrap;
 `;
 
-interface MessageProperties {
+interface MessageProperties extends MessageBubbleProperties {
     avatarUrl?: string;
     alignment?: 'left' | 'right';
     lang?: string;
-    isThinking?: boolean;
     children?: React.ReactNode;
 }
 
@@ -130,7 +135,6 @@ const Message = ({
     avatarUrl,
     alignment,
     lang,
-    isThinking,
     children,
     ...properties
 }: MessageProperties) => {
@@ -143,7 +147,7 @@ const Message = ({
                 {avatarUrl && <img src={avatarUrl} alt='' />}
             </AvatarElement>
 
-            <BubbleElement {...{isThinking}}>
+            <BubbleElement {...properties}>
                 <TextElement tag='div' {...{lang}}>
                     {children}
                 </TextElement>

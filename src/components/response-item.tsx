@@ -320,6 +320,7 @@ const ResponseItem = ({
     );
 
     const [responseLanguage] = (response.language ?? 'no').split('-');
+    const isHumanAgent = Boolean(response.is_human_agent);
 
     if (element.type === 'text') {
         const {text} = element.payload;
@@ -375,13 +376,14 @@ const ResponseItem = ({
             <>
                 <AriaLabelElement lang={language}>
                     {`${
-                        response.is_human_agent
+                        isHumanAgent
                             ? localizations.nav_says
                             : localizations.chatbot_frida_says
                     }:`}
                 </AriaLabelElement>
 
                 <Message
+                    isHuman={isHumanAgent}
                     avatarUrl={
                         elementIndex === 0 ? response.avatar_url : undefined
                     }
@@ -436,13 +438,14 @@ const ResponseItem = ({
             <>
                 <AriaLabelElement lang={language}>
                     {`${
-                        response.is_human_agent
+                        isHumanAgent
                             ? localizations.nav_says
                             : localizations.chatbot_frida_says
                     }:`}
                 </AriaLabelElement>
 
                 <Message
+                    isHuman={isHumanAgent}
                     avatarUrl={
                         elementIndex === 0 ? response.avatar_url : undefined
                     }
@@ -472,7 +475,7 @@ const ResponseItem = ({
         );
 
         return (
-            <VideoMessageElement>
+            <VideoMessageElement isHuman={isHumanAgent}>
                 <VideoElement>
                     <IframeElement
                         allowFullScreen
