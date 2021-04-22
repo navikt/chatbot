@@ -1,16 +1,147 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useEffect, useCallback} from 'react';
 import styled, {css} from 'styled-components';
 import {Innholdstittel} from 'nav-frontend-typografi';
 import finishIcon from '../assets/finish.svg';
 import minimizeIcon from '../assets/minimize.svg';
 import fullscreenIcon from '../assets/maximize.svg';
 import contractIcon from '../assets/contract.svg';
+import caretDownIcon from '../assets/caret-down.svg';
 import useSession from '../contexts/session';
 import useLanguage from '../contexts/language';
 import AriaLabelElement from './aria-label';
 import {fullscreenMediaQuery} from '../configuration';
 
-const TitleElement = styled(Innholdstittel)``;
+const translations = {
+    chat_with_nav: {
+        en: 'Chat with NAV',
+        no: 'Chat med NAV'
+    },
+    choose_context: {
+        en: 'Choose context',
+        no: 'Velg din rolle'
+    },
+    private_person: {
+        en: 'Private person',
+        no: 'Privatperson'
+    },
+    employer: {
+        en: 'Employer',
+        no: 'Arbeidsgiver'
+    },
+    minimize_chat_window: {
+        en: 'Minimize chat window',
+        no: 'Minimer chatvindu'
+    },
+    smaller_chat_window: {
+        en: 'Use smaller chat window',
+        no: 'Bruk mindre chatvindu'
+    },
+    open_in_fullscreen: {
+        en: 'Open chat in fullscreen',
+        no: 'Åpne chat i fullskjerm'
+    },
+    end_chat: {
+        en: 'End chat',
+        no: 'Avslutt chat'
+    }
+};
+
+const SelectWrapper = styled(Innholdstittel)`
+    position: relative;
+`;
+
+const SelectElementIcon = styled.div`
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    pointer-events: none;
+
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+`;
+
+const SelectElement = styled.select`
+    appearance: none;
+    background: none;
+    font-size: 22px;
+    font-family: 'Source Sans Pro', Arial, sans-serif;
+    font-weight: 600;
+    margin-top: 7px;
+    margin-left: 12px;
+    cursor: pointer;
+    padding: 2px;
+    padding-right: 28px;
+    border: 0;
+
+    &:focus {
+        outline: none;
+        box-shadow: inset 0 0 0 3px #005b82;
+        border-radius: 7px;
+    }
+`;
+
+const validContexts = ['privatperson', 'arbeidsgiver'];
+
+const ContextSelector = () => {
+    const {translate} = useLanguage();
+    const {actionFilters, updateActionFilters} = useSession();
+    const localizations = useMemo(() => translate(translations), [translate]);
+    const internalUpdateActionFilters = useCallback(
+        (value: string) => {
+            updateActionFilters!((actionFilters: string[]) => {
+                const values = actionFilters.filter(
+                    (value) => !validContexts.includes(value)
+                );
+
+                return values.concat(value);
+            });
+        },
+        [updateActionFilters]
+    );
+
+    const handleContextChange = useCallback(
+        (event: React.ChangeEvent<HTMLSelectElement>) => {
+            const value = event.target.value;
+            internalUpdateActionFilters(value);
+        },
+        [internalUpdateActionFilters]
+    );
+
+    const currentContext = useMemo(
+        () => actionFilters?.find((value) => validContexts.includes(value)),
+        [actionFilters]
+    );
+
+    useEffect(() => {
+        if (!currentContext) {
+            internalUpdateActionFilters(validContexts[0]);
+        }
+    }, [currentContext, internalUpdateActionFilters]);
+
+    return (
+        <SelectWrapper>
+            <AriaLabelElement>{localizations.choose_context}:</AriaLabelElement>
+            <SelectElement
+                value={currentContext}
+                onChange={handleContextChange}
+            >
+                <option value='privatperson'>
+                    {localizations.private_person}
+                </option>
+
+                <option value='arbeidsgiver'>{localizations.employer}</option>
+            </SelectElement>
+
+            <SelectElementIcon
+                dangerouslySetInnerHTML={{__html: caretDownIcon}}
+            />
+        </SelectWrapper>
+    );
+};
 
 interface HeaderElementProperties {
     isHumanChat?: boolean;
@@ -36,12 +167,8 @@ const HeaderElement = styled.div`
                 0 1px 4px rgba(0, 0, 0, 0.15), 0 2px 5px rgba(0, 0, 0, 0.1);
         `}
 
-    ${TitleElement} {
-        font-size: 22px;
-        line-height: 1em;
-        margin: auto;
-        margin-left: 0;
-        padding-left: 12px;
+    ${SelectElement} {
+        background: none;
     }
 `;
 
@@ -79,29 +206,6 @@ const FullscreenIconButtonElement = styled(IconButtonElement)`
 
 const IconElement = styled.span``;
 
-const translations = {
-    chat_with_nav: {
-        en: 'Chat with NAV',
-        no: 'Chat med NAV'
-    },
-    minimize_chat_window: {
-        en: 'Minimize chat window',
-        no: 'Minimer chatvindu'
-    },
-    smaller_chat_window: {
-        en: 'Use smaller chat window',
-        no: 'Bruk mindre chatvindu'
-    },
-    open_in_fullscreen: {
-        en: 'Open chat in fullscreen',
-        no: 'Åpne chat i fullskjerm'
-    },
-    end_chat: {
-        en: 'End chat',
-        no: 'Avslutt chat'
-    }
-};
-
 interface HeaderProperties {
     isFullscreen?: boolean;
     isObscured?: boolean;
@@ -129,11 +233,8 @@ const Header = ({
             aria-hidden={isObscured}
             {...properties}
         >
-            {isHumanChat ? (
-                <TitleElement>{localizations.chat_with_nav}</TitleElement>
-            ) : (
-                <TitleElement>Chat-robot Frida</TitleElement>
-            )}
+            <AriaLabelElement>{localizations.chat_with_nav}</AriaLabelElement>
+            <ContextSelector />
 
             <HeaderActionsElement>
                 <IconButtonElement
@@ -145,6 +246,7 @@ const Header = ({
                     <IconElement
                         dangerouslySetInnerHTML={{__html: minimizeIcon}}
                     />
+
                     <AriaLabelElement>
                         {localizations.minimize_chat_window}
                     </AriaLabelElement>
@@ -160,6 +262,7 @@ const Header = ({
                         <IconElement
                             dangerouslySetInnerHTML={{__html: contractIcon}}
                         />
+
                         <AriaLabelElement>
                             {localizations.smaller_chat_window}
                         </AriaLabelElement>
@@ -174,6 +277,7 @@ const Header = ({
                         <IconElement
                             dangerouslySetInnerHTML={{__html: fullscreenIcon}}
                         />
+
                         <AriaLabelElement>
                             {localizations.open_in_fullscreen}
                         </AriaLabelElement>
@@ -189,6 +293,7 @@ const Header = ({
                     <IconElement
                         dangerouslySetInnerHTML={{__html: finishIcon}}
                     />
+
                     <AriaLabelElement>
                         {localizations.end_chat}
                     </AriaLabelElement>

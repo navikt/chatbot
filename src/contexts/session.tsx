@@ -1,6 +1,7 @@
 import React, {
     createContext,
     useContext,
+    useMemo,
     useCallback,
     useState,
     useEffect
@@ -1003,32 +1004,51 @@ const SessionProvider = (properties: SessionProperties) => {
         }
     }, [start, status, savedConversationId]);
 
-    return (
-        <SessionContext.Provider
-            {...properties}
-            value={{
-                id: conversationId,
-                status,
-                error,
-                conversation,
-                responses,
-                queue,
-                actionFilters,
-                isLoading,
-                hasSpokenToAgent,
-                sendMessage,
-                sendAction,
-                sendLink,
-                sendPing,
-                sendFeedback,
-                updateActionFilters,
-                start,
-                restart,
-                finish,
-                download
-            }}
-        />
+    const value = useMemo(
+        () => ({
+            id: conversationId,
+            status,
+            error,
+            conversation,
+            responses,
+            queue,
+            actionFilters,
+            isLoading,
+            hasSpokenToAgent,
+            sendMessage,
+            sendAction,
+            sendLink,
+            sendPing,
+            sendFeedback,
+            updateActionFilters,
+            start,
+            restart,
+            finish,
+            download
+        }),
+        [
+            actionFilters,
+            conversation,
+            conversationId,
+            download,
+            error,
+            finish,
+            hasSpokenToAgent,
+            isLoading,
+            queue,
+            responses,
+            restart,
+            sendAction,
+            sendFeedback,
+            sendLink,
+            sendMessage,
+            sendPing,
+            start,
+            status
+        ]
     );
+
+    return <SessionContext.Provider {...properties} value={value} />;
 };
 
 const useSession = () => useContext(SessionContext);

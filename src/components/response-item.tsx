@@ -1,17 +1,12 @@
-import React, {useMemo, useEffect, useCallback} from 'react';
+import React, {useMemo} from 'react';
 import styled from 'styled-components';
 import {LenkepanelBase} from 'nav-frontend-lenkepanel';
 import {Ingress, Normaltekst, Undertekst} from 'nav-frontend-typografi';
 import {Select} from 'nav-frontend-skjema';
 import idPortenIcon from '../assets/id-porten.svg';
 import useLanguage from '../contexts/language';
-
-import useSession, {
-    BoostResponse,
-    BoostResponseElement
-} from '../contexts/session';
-
-import {welcomeMessage, authenticationMessagePrefix} from '../configuration';
+import {BoostResponse, BoostResponseElement} from '../contexts/session';
+import {authenticationMessagePrefix} from '../configuration';
 import Spinner from './spinner';
 import Message, {GroupElement, MessageBubble} from './message';
 import ResponseLink, {ResponseLinkProperties} from './response-link';
@@ -58,18 +53,6 @@ const SpinnerElement = styled.span`
     position: relative;
     margin-left: 4px;
     top: 4px;
-`;
-
-const SelectMessageElement = styled(Message)`
-    ${MessageBubble} {
-        width: 100%;
-    }
-`;
-
-const SelectElement = styled(Select)`
-    margin-top: 4px;
-    margin-bottom: 4px;
-    box-sizing: border-box;
 `;
 
 const LinkPanelElement = styled(LenkepanelBase)`
@@ -142,18 +125,6 @@ const IframeElement = styled.iframe`
 `;
 
 const translations = {
-    who_are_you: {
-        en: 'Who are you?',
-        no: 'Hvem er du?'
-    },
-    private_person: {
-        en: 'Private person',
-        no: 'Privatperson'
-    },
-    employer: {
-        en: 'Employer',
-        no: 'Arbeidsgiver'
-    },
     you_say: {
         en: 'You say',
         no: 'Du sier'
@@ -230,61 +201,6 @@ const Contents = ({html, lang}: ContentsProperties) => {
             {...{lang}}
             dangerouslySetInnerHTML={{__html: output}}
         />
-    );
-};
-
-const validContexts = ['privatperson', 'arbeidsgiver'];
-
-const ContextSelector = () => {
-    const {translate, language} = useLanguage();
-    const {actionFilters, updateActionFilters} = useSession();
-    const localizations = useMemo(() => translate(translations), [translate]);
-    const internalUpdateActionFilters = useCallback(
-        (value: string) => {
-            updateActionFilters!((actionFilters: string[]) => {
-                const values = actionFilters.filter(
-                    (value) => !validContexts.includes(value)
-                );
-
-                return values.concat(value);
-            });
-        },
-        [updateActionFilters]
-    );
-
-    const handleContextChange = useCallback(
-        (event: React.ChangeEvent<HTMLSelectElement>) => {
-            const value = event.target.value;
-            internalUpdateActionFilters(value);
-        },
-        [internalUpdateActionFilters]
-    );
-
-    const currentContext = useMemo(
-        () => actionFilters?.find((value) => validContexts.includes(value)),
-        [actionFilters]
-    );
-
-    useEffect(() => {
-        if (!currentContext) {
-            internalUpdateActionFilters(validContexts[0]);
-        }
-    }, [currentContext, internalUpdateActionFilters]);
-
-    return (
-        <SelectMessageElement>
-            <SelectElement
-                value={currentContext}
-                description={localizations.who_are_you}
-                onChange={handleContextChange}
-            >
-                <option value='privatperson'>
-                    {localizations.private_person}
-                </option>
-
-                <option value='arbeidsgiver'>{localizations.employer}</option>
-            </SelectElement>
-        </SelectMessageElement>
     );
 };
 
@@ -455,15 +371,6 @@ const ResponseItem = ({
                 </Message>
             </>
         );
-
-        if (html === welcomeMessage) {
-            return (
-                <>
-                    {responseItem}
-                    <ContextSelector />
-                </>
-            );
-        }
 
         return responseItem;
     }

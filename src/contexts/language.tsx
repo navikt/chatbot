@@ -2,6 +2,7 @@ import React, {
     createContext,
     useContext,
     useState,
+    useMemo,
     useEffect,
     useCallback
 } from 'react';
@@ -70,12 +71,12 @@ const LanguageProvider = (properties: Record<string, unknown>) => {
         }
     }, [language]);
 
-    return (
-        <LanguageContext.Provider
-            {...properties}
-            value={{language, translate, setLanguage}}
-        />
-    );
+    const value = useMemo(() => ({language, translate, setLanguage}), [
+        language,
+        translate
+    ]);
+
+    return <LanguageContext.Provider {...properties} value={value} />;
 };
 
 const useLanguage = () => useContext(LanguageContext);

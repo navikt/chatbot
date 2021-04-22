@@ -53,7 +53,8 @@ interface MessageBubbleProperties {
 const MessageBubble = styled.div`
     max-width: ${conversationSideWidth};
     max-width: calc(${conversationSideWidth} - ${avatarSize} - 8px);
-    background: ${(properties: MessageBubbleProperties) => properties.isHuman ? '#eae7e5' : '#e7e9e9'};
+    background: ${(properties: MessageBubbleProperties) =>
+        properties.isHuman ? '#eae7e5' : '#e7e9e9'};
 
     margin: auto;
     padding: 8px 12px;
@@ -62,7 +63,7 @@ const MessageBubble = styled.div`
     box-sizing: border-box;
     display: inline-block;
     vertical-align: top;
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
 
     ${(properties: MessageBubbleProperties) =>
         properties.isThinking &&
@@ -76,7 +77,7 @@ const MessageBubble = styled.div`
                 position: absolute;
                 bottom: -2px;
                 left: -7px;
-                box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+                box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
             }
 
             &:after {
@@ -88,7 +89,7 @@ const MessageBubble = styled.div`
                 position: absolute;
                 bottom: 0;
                 left: -2px;
-                border: 1px solid rgba(0,0,0,0.15);
+                border: 1px solid rgba(0, 0, 0, 0.08);
                 border-width: 0 0 1px 1px;
             }
         `};

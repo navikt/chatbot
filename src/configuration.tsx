@@ -26,7 +26,6 @@ const botResponseRevealDelayBuffer = botResponseRevealDelay / 2;
 const minimumPollTimeout = 1000;
 const agentMaximumPollTimeout = 4000;
 const botMaximumPollTimeout = 30000;
-const welcomeMessage = '<p>Hei! Jeg heter Frida og er NAV sin chat-robot. -- test --</p>';
 const authenticationMessagePrefix = 'Init:Auth:';
 const englishButtonText = 'For English, click here';
 const englishButtonResponse = 'English, please';
@@ -57,7 +56,6 @@ export {
     minimumPollTimeout,
     agentMaximumPollTimeout,
     botMaximumPollTimeout,
-    welcomeMessage,
     authenticationMessagePrefix,
     englishButtonText,
     englishButtonResponse,
