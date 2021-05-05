@@ -376,10 +376,34 @@ const ResponseItem = ({
     }
 
     if (element.type === 'video') {
-        const videoUrl = element.payload.url.replace(
-            'https://vimeo.com/',
-            'https://player.vimeo.com/video/'
-        );
+        let videoUrl = element.payload.url;
+
+        if (videoUrl.startsWith('https://vimeo.com/')) {
+            videoUrl.replace(
+                'https://vimeo.com/',
+                'https://player.vimeo.com/video/'
+            );
+        } else if (videoUrl.startsWith('https://youtu.be/')) {
+            videoUrl.replace(
+                'https://youtu.be/',
+                'https://www.youtube.com/embed/'
+            );
+        } else if (videoUrl.startsWith('https://www.youtube.com/watch?')) {
+            const [, videoUrlQueries] = videoUrl.split('?');
+            let videoId = '';
+
+            videoUrlQueries.split('&').forEach((query) => {
+                const [key, value] = query.split('=');
+
+                if (key === 'v' && value) {
+                    videoId = value;
+                }
+            });
+
+            if (videoId) {
+                videoUrl = `https://www.youtube.com/embed/${videoId}`;
+            }
+        }
 
         return (
             <VideoMessageElement isHuman={isHumanAgent}>
