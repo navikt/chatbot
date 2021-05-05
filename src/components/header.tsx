@@ -86,7 +86,7 @@ const SelectElement = styled.select`
 
 const validContexts = ['privatperson', 'arbeidsgiver'];
 
-const ContextSelector = () => {
+const ContextSelector = ({...properties}) => {
     const {translate} = useLanguage();
     const {actionFilters, updateActionFilters} = useSession();
     const localizations = useMemo(() => translate(translations), [translate]);
@@ -126,6 +126,7 @@ const ContextSelector = () => {
         <SelectWrapper>
             <AriaLabelElement>{localizations.choose_context}:</AriaLabelElement>
             <SelectElement
+                {...properties}
                 value={currentContext}
                 onChange={handleContextChange}
             >
@@ -234,7 +235,11 @@ const Header = ({
             {...properties}
         >
             <AriaLabelElement>{localizations.chat_with_nav}</AriaLabelElement>
-            <ContextSelector />
+
+            <ContextSelector
+                tabIndex={isObscured ? -1 : 0}
+                disabled={isObscured}
+            />
 
             <HeaderActionsElement>
                 <IconButtonElement
