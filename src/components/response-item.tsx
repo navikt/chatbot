@@ -173,7 +173,7 @@ const Contents = ({html, lang}: ContentsProperties) => {
             }
         }
 
-        const linkRegexp = /(^|\s)(https?:\/\/\S+)($|\s)/gm;
+        const linkRegexp = /(^|\s)(www\.|https?:\/\/\S+)($|\s)/gm;
         const linkMatches = result.match(linkRegexp);
 
         if (linkMatches) {
