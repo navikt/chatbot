@@ -85,6 +85,7 @@ interface BoostResponse {
     language?: string;
     is_human_agent?: boolean;
     source: string;
+    feedback?: 'positive' | 'remove-positive' | 'negative' | 'remove-negative';
     avatar_url?: string;
     date_created: string;
     elements: BoostResponseElement[];
@@ -241,6 +242,27 @@ interface BoostRateRequestResponse {
     conversation: BoostConversation;
 }
 
+type RateBoostResponseAction = BoostResponse['feedback'];
+
+async function rateBoostResponse(
+    apiUrlBase: string,
+    conversationId: string,
+    data: {
+        id: string;
+        action: RateBoostResponseAction;
+    }
+) {
+    const response = await axios.post(apiUrlBase, {
+        command: 'POST',
+        type: 'feedback',
+        conversation_id: conversationId,
+        id: data.id,
+        value: data.action
+    });
+
+    return response.data;
+}
+
 async function rateBoostSession(
     apiUrlBase: string,
     conversationId: string,
@@ -370,6 +392,10 @@ interface Session {
     sendLink?: (linkId: string) => Promise<void>;
     sendPing?: () => Promise<void>;
     sendFeedback?: (rating: number, message?: string) => Promise<void>;
+    sendMessageFeedback?: (
+        id: string,
+        action: RateBoostResponseAction
+    ) => Promise<void>;
     updateActionFilters?: (
         callback: (previousState: string[]) => string[]
     ) => void;
@@ -512,6 +538,24 @@ const SessionProvider = (properties: SessionProperties) => {
                     const currentResponseIds = new Set(
                         previousResponses.map((index) => String(index.id))
                     );
+
+                    responses.forEach((response) => {
+                        const stringedResponseId = String(response.id);
+
+                        if (currentResponseIds.has(stringedResponseId)) {
+                            const currentResponseIndex = previousResponses.findIndex(
+                                (index) =>
+                                    String(index.id) === stringedResponseId
+                            );
+
+                            if (currentResponseIndex >= 0) {
+                                Object.assign(
+                                    previousResponses[currentResponseIndex],
+                                    response
+                                );
+                            }
+                        }
+                    });
 
                     responses.forEach((response) => {
                         if (!currentResponseIds.has(String(response.id))) {
@@ -722,6 +766,20 @@ const SessionProvider = (properties: SessionProperties) => {
                 await rateBoostSession(boostApiUrlBase, conversationId, {
                     rating,
                     message
+                }).catch((error) => {
+                    console.error(error);
+                });
+            }
+        },
+        [boostApiUrlBase, conversationId]
+    );
+
+    const sendMessageFeedback = useCallback(
+        async (id: string, action: RateBoostResponseAction) => {
+            if (conversationId) {
+                await rateBoostResponse(boostApiUrlBase, conversationId, {
+                    id,
+                    action
                 }).catch((error) => {
                     console.error(error);
                 });
@@ -1020,6 +1078,7 @@ const SessionProvider = (properties: SessionProperties) => {
             sendLink,
             sendPing,
             sendFeedback,
+            sendMessageFeedback,
             updateActionFilters,
             start,
             restart,
@@ -1027,24 +1086,25 @@ const SessionProvider = (properties: SessionProperties) => {
             download
         }),
         [
-            actionFilters,
-            conversation,
             conversationId,
-            download,
+            status,
             error,
-            finish,
-            hasSpokenToAgent,
-            isLoading,
+            conversation,
             queue,
+            actionFilters,
+            isLoading,
+            hasSpokenToAgent,
             responses,
-            restart,
-            sendAction,
-            sendFeedback,
-            sendLink,
             sendMessage,
+            sendAction,
+            sendLink,
             sendPing,
+            sendFeedback,
+            sendMessageFeedback,
             start,
-            status
+            restart,
+            finish,
+            download
         ]
     );
 

@@ -173,7 +173,7 @@ const Contents = ({html, lang}: ContentsProperties) => {
             }
         }
 
-        const linkRegexp = /(^|\s)(www\.|https?:\/\/\S+)($|\s)/gm;
+        const linkRegexp = /(^|\s)((?:www\.|https?:\/\/)\S+)($|\s)/gm;
         const linkMatches = result.match(linkRegexp);
 
         if (linkMatches) {
@@ -181,7 +181,12 @@ const Contents = ({html, lang}: ContentsProperties) => {
                 linkRegexp,
                 (string, prefix, match, suffix) => {
                     if (match) {
-                        const url = String(match);
+                        let url = String(match);
+
+                        if (url.startsWith('www.')) {
+                            url = `http://${url}`;
+                        }
+
                         const href = `<a href="${url}">${url}</a>`;
 
                         return `${String(prefix)}${href}${String(suffix)}`;
