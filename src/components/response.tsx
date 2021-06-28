@@ -91,6 +91,7 @@ const IconElement = styled.span`
 `;
 
 const LikeButtonElement = styled(FeedbackButtonElement)`
+    line-height: 1em;
     ${(properties: FeedbackButtonElementProperties) =>
         properties.isFilled &&
         css`
