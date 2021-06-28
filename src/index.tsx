@@ -129,8 +129,6 @@ const StatusContainerElement = styled.div`
 
 const ConversationElement = styled.div`
     overflow: auto;
-    scroll-snap-type: y proximity;
-    scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     flex: 1;
     position: relative;
@@ -143,7 +141,6 @@ const FillerElement = styled.div`
 
 const AnchorElement = styled.div`
     overflow-anchor: auto;
-    scroll-snap-align: start;
 `;
 
 const translations = {
