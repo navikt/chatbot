@@ -384,12 +384,12 @@ const ResponseItem = ({
         let videoUrl = element.payload.url;
 
         if (videoUrl.startsWith('https://vimeo.com/')) {
-            videoUrl.replace(
+            videoUrl = videoUrl.replace(
                 'https://vimeo.com/',
                 'https://player.vimeo.com/video/'
             );
         } else if (videoUrl.startsWith('https://youtu.be/')) {
-            videoUrl.replace(
+            videoUrl = videoUrl.replace(
                 'https://youtu.be/',
                 'https://www.youtube.com/embed/'
             );
