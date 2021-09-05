@@ -70,6 +70,8 @@ const ButtonElement = styled.button`
 
 const TextElement = styled(Normaltekst)`
     padding-right: ${openButtonAvatarSizeNumber / 2 - 4}px;
+    color: #000;
+    line-height: 1.4em;
     display: inline-block;
     vertical-align: top;
 

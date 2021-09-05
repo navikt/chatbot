@@ -9,7 +9,7 @@ import caretDownIcon from '../assets/caret-down.svg';
 import useSession from '../contexts/session';
 import useLanguage from '../contexts/language';
 import AriaLabelElement from './aria-label';
-import {fullscreenMediaQuery} from '../configuration';
+import {fullscreenMediaQuery, contextFilters} from '../configuration';
 
 const translations = {
     chat_with_nav: {
@@ -72,6 +72,7 @@ const SelectElement = styled.select`
     font-weight: 600;
     margin-top: 7px;
     margin-left: 12px;
+    line-height: 1.4em;
     cursor: pointer;
     padding: 2px;
     padding-right: 28px;
@@ -84,17 +85,15 @@ const SelectElement = styled.select`
     }
 `;
 
-const validContexts = ['privatperson', 'arbeidsgiver'];
-
 const ContextSelector = ({...properties}) => {
     const {translate} = useLanguage();
     const {actionFilters, updateActionFilters} = useSession();
     const localizations = useMemo(() => translate(translations), [translate]);
     const internalUpdateActionFilters = useCallback(
         (value: string) => {
-            updateActionFilters!((actionFilters: string[]) => {
-                const values = actionFilters.filter(
-                    (value) => !validContexts.includes(value)
+            updateActionFilters!((previousState: string[]) => {
+                const values = previousState.filter(
+                    (value) => !contextFilters.includes(value)
                 );
 
                 return values.concat(value);
@@ -112,13 +111,13 @@ const ContextSelector = ({...properties}) => {
     );
 
     const currentContext = useMemo(
-        () => actionFilters?.find((value) => validContexts.includes(value)),
+        () => actionFilters?.find((value) => contextFilters.includes(value)),
         [actionFilters]
     );
 
     useEffect(() => {
         if (!currentContext) {
-            internalUpdateActionFilters(validContexts[0]);
+            internalUpdateActionFilters(contextFilters[0]);
         }
     }, [currentContext, internalUpdateActionFilters]);
 

@@ -31,7 +31,10 @@ import {
     cookieDomain,
     openCookieName,
     consentCookieName,
-    unreadCookieName
+    unreadCookieName,
+    contextFilters,
+    employerButtonText,
+    personButtonText
 } from './configuration';
 
 interface ContainerElement {
@@ -191,7 +194,8 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         finish,
         sendMessage,
         sendAction,
-        sendLink
+        sendLink,
+        changeContext
     } = useSession();
 
     const localizations = useMemo(() => translate(translations), [translate]);
@@ -236,13 +240,21 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
     const handleAction = useCallback(
         async (link: BoostResponseElementLinksItem) => {
-            await (link?.text === englishButtonText
-                ? sendMessage!(englishButtonResponse)
-                : sendAction!(link.id));
+            if (link?.text === englishButtonText) {
+                void sendMessage!(englishButtonResponse);
+            } else {
+                if (link?.text === employerButtonText) {
+                    changeContext!('arbeidsgiver');
+                } else if (link?.text === personButtonText) {
+                    changeContext!('privatperson');
+                }
+
+                void sendAction!(link.id);
+            }
 
             scrollToBottom();
         },
-        [sendMessage, sendAction, scrollToBottom]
+        [sendMessage, changeContext, sendAction, scrollToBottom]
     );
 
     const handleSubmit = useCallback(

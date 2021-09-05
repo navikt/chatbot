@@ -20,10 +20,14 @@ import {
     conversationIdCookieName,
     minimumPollTimeout,
     agentMaximumPollTimeout,
-    botMaximumPollTimeout
+    botMaximumPollTimeout,
+    contextFilters
 } from '../configuration';
 
 import useLanguage from './language';
+
+const contextFiltersConstant = [...contextFilters] as const;
+type ContextFilter = typeof contextFiltersConstant[number];
 
 interface BoostConversation {
     id: string;
@@ -399,6 +403,7 @@ interface Session {
     updateActionFilters?: (
         callback: (previousState: string[]) => string[]
     ) => void;
+    changeContext?: (newContext: ContextFilter) => void;
 }
 
 const SessionContext = createContext<Session>({});
@@ -788,6 +793,15 @@ const SessionProvider = (properties: SessionProperties) => {
         [boostApiUrlBase, conversationId]
     );
 
+    const changeContext = useCallback(async (newContext: ContextFilter) => {
+        updateActionFilters((previousActionFilters: string[]) => {
+            const updatedActionFilters = previousActionFilters.filter(
+                (filter) => !contextFilters.includes(filter)
+            );
+            return updatedActionFilters.concat(newContext);
+        });
+    }, []);
+
     const start = useCallback(async () => {
         const finishLoading = setIsLoading();
         setStatus('connecting');
@@ -803,9 +817,20 @@ const SessionProvider = (properties: SessionProperties) => {
                 const actionFilterCache = getActionFilterCache();
 
                 if (actionFilterCache) {
-                    updateActionFilters((previousState) => [
-                        ...new Set(previousState.concat(actionFilterCache))
-                    ]);
+                    updateActionFilters((previousState) => {
+                        let filters = [...previousState];
+                        const contextFilter = actionFilterCache.find((filter) =>
+                            contextFilters.includes(filter)
+                        );
+
+                        if (contextFilter) {
+                            filters = filters.filter(
+                                (filter) => !contextFilters.includes(filter)
+                            );
+                        }
+
+                        return [...new Set(filters.concat(actionFilterCache))];
+                    });
                 }
 
                 const session = await getBoostSession(
@@ -1080,6 +1105,7 @@ const SessionProvider = (properties: SessionProperties) => {
             sendFeedback,
             sendMessageFeedback,
             updateActionFilters,
+            changeContext,
             start,
             restart,
             finish,
@@ -1101,6 +1127,8 @@ const SessionProvider = (properties: SessionProperties) => {
             sendPing,
             sendFeedback,
             sendMessageFeedback,
+            updateActionFilters,
+            changeContext,
             start,
             restart,
             finish,

@@ -27,8 +27,11 @@ const minimumPollTimeout = 1000;
 const agentMaximumPollTimeout = 4000;
 const botMaximumPollTimeout = 30000;
 const authenticationMessagePrefix = 'Init:Auth:';
+const contextFilters = ['privatperson', 'arbeidsgiver'];
 const englishButtonText = 'For English, click here';
 const englishButtonResponse = 'English, please';
+const employerButtonText = 'Jeg er arbeidsgiver';
+const personButtonText = 'Jeg er ikke arbeidsgiver';
 
 const fullscreenMediaQuery = `(max-width: ${containerWidthNumber + 100}px)`;
 const navigationMinimizationMediaQuery = `(max-width: ${
@@ -57,8 +60,11 @@ export {
     agentMaximumPollTimeout,
     botMaximumPollTimeout,
     authenticationMessagePrefix,
+    contextFilters,
     englishButtonText,
     englishButtonResponse,
+    employerButtonText,
+    personButtonText,
     fullscreenMediaQuery,
     navigationMinimizationMediaQuery
 };

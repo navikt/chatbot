@@ -38,11 +38,10 @@ const FeedbackButtonElement = styled.button`
     background: #fff;
     width: 34px;
     height: 34px;
+    line-height: 1em;
     border: 0;
-    box-shadow:
-        inset 0 0 0 1px rgba(0, 0, 0, 0.4),
-        inset 0 -2px rgba(255, 255, 255, 0.4),
-        inset 0 -1px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+        inset 0 -2px rgba(255, 255, 255, 0.4), inset 0 -1px rgba(0, 0, 0, 0.2);
     margin: 0;
     margin-right: 8px;
     padding: 9px;
@@ -53,9 +52,7 @@ const FeedbackButtonElement = styled.button`
 
     &:focus {
         outline: none;
-        box-shadow:
-            0 0 0 2px #000,
-            inset 0 0 0 1px #000,
+        box-shadow: 0 0 0 2px #000, inset 0 0 0 1px #000,
             inset 0 -2px rgba(255, 255, 255, 0.4),
             inset 0 -1px rgba(0, 0, 0, 0.2);
     }
@@ -91,7 +88,6 @@ const IconElement = styled.span`
 `;
 
 const LikeButtonElement = styled(FeedbackButtonElement)`
-    line-height: 1em;
     ${(properties: FeedbackButtonElementProperties) =>
         properties.isFilled &&
         css`
@@ -115,8 +111,7 @@ const LikeButtonElement = styled(FeedbackButtonElement)`
             properties.isFilled &&
             css`
                 transform: translateY(-1px);
-            `
-        };
+            `};
     }
 
     svg {
@@ -124,9 +119,8 @@ const LikeButtonElement = styled(FeedbackButtonElement)`
             properties.isFilled &&
             css`
                 fill: #fff;
-                filter:
-                    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.4))
-                    drop-shadow(0 0 1px rgba(0,0,0,0.4));
+                filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.4))
+                    drop-shadow(0 0 1px rgba(0, 0, 0, 0.4));
             `};
     }
 `;
@@ -172,8 +166,7 @@ const DislikeButtonElement = styled(FeedbackButtonElement)`
             properties.isFilled &&
             css`
                 transform: translateY(0);
-            `
-        };
+            `};
     }
 
     svg {
@@ -184,11 +177,9 @@ const DislikeButtonElement = styled(FeedbackButtonElement)`
             properties.isFilled &&
             css`
                 fill: #fff;
-                filter:
-                    drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.4))
-                    drop-shadow(0 0 1px rgba(0,0,0,0.4));
-            `
-        };
+                filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.4))
+                    drop-shadow(0 0 1px rgba(0, 0, 0, 0.4));
+            `};
     }
 `;
 
