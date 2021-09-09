@@ -371,6 +371,10 @@ interface SessionError extends Error {
     code?: string;
 }
 
+type SendActionOptions = {
+    actionFilters?: string[];
+};
+
 interface Session {
     id?: string;
     status?:
@@ -392,7 +396,10 @@ interface Session {
     finish?: () => Promise<void>;
     download?: () => Promise<void>;
     sendMessage?: (message: string) => Promise<void>;
-    sendAction?: (actionId: string) => Promise<void>;
+    sendAction?: (
+        actionId: string,
+        options: SendActionOptions
+    ) => Promise<void>;
     sendLink?: (linkId: string) => Promise<void>;
     sendPing?: () => Promise<void>;
     sendFeedback?: (rating: number, message?: string) => Promise<void>;
@@ -668,13 +675,13 @@ const SessionProvider = (properties: SessionProperties) => {
     );
 
     const sendAction = useCallback(
-        async (id: string) => {
+        async (id: string, options: SendActionOptions) => {
             if (conversationId) {
                 const finishLoading = setIsLoading();
                 const response = await postBoostSession(
                     boostApiUrlBase,
                     conversationId,
-                    actionFilters,
+                    options?.actionFilters || actionFilters,
                     {
                         type: 'action_link',
                         id
@@ -793,11 +800,12 @@ const SessionProvider = (properties: SessionProperties) => {
         [boostApiUrlBase, conversationId]
     );
 
-    const changeContext = useCallback(async (newContext: ContextFilter) => {
+    const changeContext = useCallback((newContext: ContextFilter) => {
         updateActionFilters((previousActionFilters: string[]) => {
             const updatedActionFilters = previousActionFilters.filter(
                 (filter) => !contextFilters.includes(filter)
             );
+
             return updatedActionFilters.concat(newContext);
         });
     }, []);

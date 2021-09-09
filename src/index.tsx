@@ -189,6 +189,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         conversation,
         responses,
         queue,
+        actionFilters,
         start,
         restart,
         finish,
@@ -243,18 +244,25 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
             if (link?.text === englishButtonText) {
                 void sendMessage!(englishButtonResponse);
             } else {
+                const sentActionFilters =
+                    actionFilters?.filter(
+                        (filter) => !contextFilters.includes(filter)
+                    ) || [];
+
                 if (link?.text === employerButtonText) {
                     changeContext!('arbeidsgiver');
+                    sentActionFilters.push('arbeidsgiver');
                 } else if (link?.text === personButtonText) {
                     changeContext!('privatperson');
+                    sentActionFilters.push('privatperson');
                 }
 
-                void sendAction!(link.id);
+                void sendAction!(link.id, {actionFilters: sentActionFilters});
             }
 
             scrollToBottom();
         },
-        [sendMessage, changeContext, sendAction, scrollToBottom]
+        [actionFilters, sendMessage, changeContext, sendAction, scrollToBottom]
     );
 
     const handleSubmit = useCallback(
