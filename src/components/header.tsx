@@ -87,27 +87,15 @@ const SelectElement = styled.select`
 
 const ContextSelector = ({...properties}) => {
     const {translate} = useLanguage();
-    const {actionFilters, updateActionFilters} = useSession();
+    const {actionFilters, changeContext} = useSession();
     const localizations = useMemo(() => translate(translations), [translate]);
-    const internalUpdateActionFilters = useCallback(
-        (value: string) => {
-            updateActionFilters!((previousState: string[]) => {
-                const values = previousState.filter(
-                    (value) => !contextFilters.includes(value)
-                );
-
-                return values.concat(value);
-            });
-        },
-        [updateActionFilters]
-    );
 
     const handleContextChange = useCallback(
         (event: React.ChangeEvent<HTMLSelectElement>) => {
             const value = event.target.value;
-            internalUpdateActionFilters(value);
+            changeContext?.(value);
         },
-        [internalUpdateActionFilters]
+        [changeContext]
     );
 
     const currentContext = useMemo(
@@ -117,9 +105,9 @@ const ContextSelector = ({...properties}) => {
 
     useEffect(() => {
         if (!currentContext) {
-            internalUpdateActionFilters(contextFilters[0]);
+            changeContext?.(contextFilters[0]);
         }
-    }, [currentContext, internalUpdateActionFilters]);
+    }, [currentContext, changeContext]);
 
     return (
         <SelectWrapper>

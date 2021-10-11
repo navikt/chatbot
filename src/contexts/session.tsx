@@ -810,6 +810,23 @@ const SessionProvider = (properties: SessionProperties) => {
         });
     }, []);
 
+    const mergeActionFilters = useCallback((newActionFilters: string[]) => {
+        updateActionFilters((previousState) => {
+            let filters = [...previousState];
+            const contextFilter = newActionFilters.find((filter) =>
+                contextFilters.includes(filter)
+            );
+
+            if (contextFilter) {
+                filters = filters.filter(
+                    (filter) => !contextFilters.includes(filter)
+                );
+            }
+
+            return [...new Set(filters.concat(newActionFilters))];
+        });
+    }, []);
+
     const start = useCallback(async () => {
         const finishLoading = setIsLoading();
         setStatus('connecting');
@@ -825,20 +842,7 @@ const SessionProvider = (properties: SessionProperties) => {
                 const actionFilterCache = getActionFilterCache();
 
                 if (actionFilterCache) {
-                    updateActionFilters((previousState) => {
-                        let filters = [...previousState];
-                        const contextFilter = actionFilterCache.find((filter) =>
-                            contextFilters.includes(filter)
-                        );
-
-                        if (contextFilter) {
-                            filters = filters.filter(
-                                (filter) => !contextFilters.includes(filter)
-                            );
-                        }
-
-                        return [...new Set(filters.concat(actionFilterCache))];
-                    });
+                    mergeActionFilters(actionFilterCache);
                 }
 
                 const session = await getBoostSession(
@@ -881,6 +885,7 @@ const SessionProvider = (properties: SessionProperties) => {
         language,
         setIsLoading,
         update,
+        mergeActionFilters,
         handleError
     ]);
 
@@ -1080,6 +1085,12 @@ const SessionProvider = (properties: SessionProperties) => {
             setActionFilterCache(actionFilters);
         }
     }, [actionFilters]);
+
+    useEffect(() => {
+        if (properties.actionFilters) {
+            mergeActionFilters(properties.actionFilters);
+        }
+    }, [mergeActionFilters, properties.actionFilters]);
 
     useEffect(() => {
         if (conversationId) {
