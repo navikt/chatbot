@@ -18,16 +18,11 @@
   },
   "exclude": [
     "node_modules",
-    "build",
-    "scripts",
-    "acceptance-tests",
-    "webpack",
-    "jest",
-    "src/setupTests.ts",
-    "src/**/styles.ts",
     "tests",
     "umd",
-    "./**/*.js",
-    "demo"
+    "demo",
+    "umd.js",
+    "nwb.config.js",
+    "nwb.demo.config.js"
   ]
 }
