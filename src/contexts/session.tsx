@@ -208,7 +208,7 @@ async function postBoostSession(
             break;
         }
 
-        // no default
+        // No default
     }
 
     const response = await axios.post(apiUrlBase, {

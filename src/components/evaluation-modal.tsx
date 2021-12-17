@@ -307,7 +307,7 @@ const EvaluationModal = ({
                     break;
                 }
 
-                // no default
+                // No default
             }
 
             void sendFeedback!(ratingValue);
