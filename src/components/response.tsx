@@ -12,12 +12,12 @@ import {
     botResponseRevealDelayBuffer
 } from '../configuration';
 
+import useLanguage from '../contexts/language';
 import Obscured from './obscurer';
 import TypingIndicator from './typing-indicator';
 import ResponseItem, {ResponseItemProperties} from './response-item';
 import Message, {AvatarElement, GroupElement} from './message';
 import AriaLabelElement from './aria-label';
-import useLanguage from '../contexts/language';
 
 const FeedbackElement = styled.span`
     margin-top: 10px;

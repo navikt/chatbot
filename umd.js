@@ -1,2 +1,3 @@
-import * as components from './src'; // eslint-disable-line import/extensions
+import * as components from './src';
+
 export default components;

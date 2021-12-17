@@ -8,8 +8,8 @@ import contractIcon from '../assets/contract.svg';
 import caretDownIcon from '../assets/caret-down.svg';
 import useSession from '../contexts/session';
 import useLanguage from '../contexts/language';
-import AriaLabelElement from './aria-label';
 import {fullscreenMediaQuery, contextFilters} from '../configuration';
+import AriaLabelElement from './aria-label';
 
 const translations = {
     chat_with_nav: {

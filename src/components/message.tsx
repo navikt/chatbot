@@ -163,7 +163,9 @@ export {
     GroupElement,
     ContainerElement,
     AvatarElement,
-    MessageBubble
+    MessageBubble,
+    BubbleLeftElement as MessageBubbleLeft,
+    BubbleRightElement as MessageBubbleRight
 };
 
 export default Message;

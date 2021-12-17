@@ -42,10 +42,8 @@ const translations = {
         no: 'Samtalen er avsluttet.'
     },
     network_error: {
-        en:
-            'We are having connection issues. Please check your network settings, and try again.',
-        no:
-            'Vi får ikke kontakt. Vennligst sjekk internettilkoblingen din og prøv igjen.'
+        en: 'We are having connection issues. Please check your network settings, and try again.',
+        no: 'Vi får ikke kontakt. Vennligst sjekk internettilkoblingen din og prøv igjen.'
     },
     error: {
         en: 'Something went wrong.',

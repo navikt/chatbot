@@ -85,9 +85,11 @@ const LinkPanelTextElement = styled.div`
 const LinkPanelTextTitle = styled(Ingress)`
     color: #3e3832;
 
-    ${LinkPanelElement}:hover & {
-        color: #0067c5;
-        text-decoration: underline;
+    @media (hover: hover) {
+        ${LinkPanelElement}:hover & {
+            color: #0067c5;
+            text-decoration: underline;
+        }
     }
 `;
 
@@ -397,13 +399,13 @@ const ResponseItem = ({
             const [, videoUrlQueries] = videoUrl.split('?');
             let videoId = '';
 
-            videoUrlQueries.split('&').forEach((query) => {
+            for (const query of videoUrlQueries.split('&')) {
                 const [key, value] = query.split('=');
 
                 if (key === 'v' && value) {
                     videoId = value;
                 }
-            });
+            }
 
             if (videoId) {
                 videoUrl = `https://www.youtube.com/embed/${videoId}`;

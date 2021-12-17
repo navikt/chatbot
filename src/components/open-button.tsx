@@ -1,12 +1,14 @@
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import styled, {css} from 'styled-components';
 import {Normaltekst, Undertekst} from 'nav-frontend-typografi';
 import fridaIcon from '../assets/frida.svg';
 import useSession from '../contexts/session';
 import useLanguage from '../contexts/language';
+import {messagePromptCacheName} from '../configuration';
 import AriaLabelElement from './aria-label';
+import {MessageBubbleLeft} from './message';
 
-const openButtonAvatarSizeNumber = 60;
+const openButtonAvatarSizeNumber = 70;
 const openButtonAvatarSize = `${openButtonAvatarSizeNumber}px`;
 
 interface ButtonElementProperties {
@@ -15,8 +17,9 @@ interface ButtonElementProperties {
 
 const ButtonElement = styled.button`
     appearance: none;
-    background: #fff;
-    padding: 6px 13px;
+    background: #e0dae7;
+    padding: 8px 15px;
+    padding-right: ${openButtonAvatarSizeNumber / 3.5}px;
     margin-right: ${openButtonAvatarSizeNumber / 3}px;
     margin-bottom: ${openButtonAvatarSizeNumber / 6}px;
     position: fixed;
@@ -38,20 +41,22 @@ const ButtonElement = styled.button`
         properties.isVisible
             ? css`transform 0.5s, opacity 0.2s 0.3s`
             : css`transform 0.2s, opacity 0.1s`};
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4),
-        0 0 0 2px rgba(255, 255, 255, 1), 0 1px 4px rgba(0, 0, 0, 0.5),
-        0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), 0 0 0 1px #fff,
+        0 0 0 4px #fff, 0 1px 4px rgba(0, 0, 0, 0.5),
+        0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 5px rgba(0, 0, 0, 0.1);
 
-    &:hover {
-        background-color: #005b82;
+    @media (hover: hover) {
+        &:hover {
+            background-color: #5c4378;
+        }
     }
 
     &:focus {
-        background: #005b82;
+        background: #5c4378;
         outline: none;
-        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4),
-            0 0 0 2px rgba(255, 255, 255, 1), 0 1px 4px rgba(0, 0, 0, 0.6),
-            0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 4px #005b82;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 0 2px #fff,
+            0 1px 4px rgba(0, 0, 0, 0.6), 0 4px 10px rgba(0, 0, 0, 0.3),
+            0 0 0 4px #5c4378;
     }
 
     @media (min-width: 480px) {
@@ -69,7 +74,8 @@ const ButtonElement = styled.button`
 `;
 
 const TextElement = styled(Normaltekst)`
-    padding-right: ${openButtonAvatarSizeNumber / 2 - 4}px;
+    font-size: 18px;
+    padding-right: ${openButtonAvatarSizeNumber / 2}px;
     color: #000;
     line-height: 1.4em;
     display: inline-block;
@@ -108,16 +114,24 @@ const AvatarElement = styled.div`
         position: absolute;
         top: 0;
         left: 0;
-        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3),
-            0 0 0 2px rgba(255, 255, 255, 1), 0 1px 4px rgba(0, 0, 0, 0.6),
-            0 4px 10px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), 0 0 0 2px #fff,
+            0 0 0 4px #826ba1, 0 0 0 5px #fff, 0 0 1px 5px rgba(0, 0, 0, 0.2),
+            0 4px 10px rgba(0, 0, 0, 0.4);
         border-radius: ${openButtonAvatarSize};
     }
 
+    @media (hover: hover) {
+        ${ButtonElement}:hover &:before {
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), 0 0 0 2px #fff,
+                0 0 0 4px #826ba1, 0 0 0 6px #fff,
+                0 0 1px 5px rgba(0, 0, 0, 0.2), 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+    }
+
     ${ButtonElement}:focus &:before {
-        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3),
-            0 0 0 2px rgba(255, 255, 255, 1), 0 1px 4px rgba(0, 0, 0, 0.6),
-            0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 4px #005b82;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), 0 0 0 2px #fff,
+            0 1px 4px rgba(0, 0, 0, 0.6), 0 4px 10px rgba(0, 0, 0, 0.3),
+            0 0 0 4px #5c4378;
     }
 
     @media (min-width: 480px) {
@@ -128,7 +142,7 @@ const AvatarElement = styled.div`
 `;
 
 const UnreadCountElement = styled(Undertekst)`
-    background: #c30000;
+    background: #544066;
     width: 21px;
     height: 21px;
     text-align: center;
@@ -164,8 +178,130 @@ const translations = {
     _unread_messages: {
         en: 'unread messages',
         no: 'uleste meldinger'
+    },
+    hi_what_can_i_help_you_with: {
+        en: 'Hi! What can I help you with?',
+        no: 'Hei! Hva kan jeg hjelpe deg med?'
     }
 };
+
+interface MessageBubbleContainerProperties {
+    isVisible?: boolean;
+}
+
+const MessageBubbleContainer = styled.div`
+    width: 90%;
+    max-width: 340px;
+    position: fixed;
+    bottom: ${8 + openButtonAvatarSizeNumber}px;
+    right: ${8 + openButtonAvatarSizeNumber}px;
+    text-align: right;
+
+    pointer-events: ${(properties: MessageBubbleContainerProperties) =>
+        properties.isVisible ? 'all' : 'none'};
+    transform: ${(properties: MessageBubbleContainerProperties) =>
+        properties.isVisible
+            ? css`scale(1)`
+            : css`scale(0.8) translate3d(0,${
+                  openButtonAvatarSizeNumber * 2
+              }px,0)`};
+    opacity: ${(properties: MessageBubbleContainerProperties) =>
+        properties.isVisible ? '1' : '0'};
+    transition: ${(properties: MessageBubbleContainerProperties) =>
+        properties.isVisible
+            ? css`transform 0.5s, opacity 0.2s 0.3s`
+            : css`transform 0.2s, opacity 0.1s`};
+
+    @media (min-width: 480px) {
+        bottom: ${20 + openButtonAvatarSizeNumber}px;
+        right: ${20 + openButtonAvatarSizeNumber}px;
+    }
+
+    @media (min-width: 580px) {
+        bottom: ${30 + openButtonAvatarSizeNumber}px;
+        right: ${30 + openButtonAvatarSizeNumber}px;
+    }
+`;
+
+const MessageBubble = styled(MessageBubbleLeft)`
+    --border-color: rgba(0, 0, 0, 0.3);
+
+    border-radius: 18px;
+    text-align: left;
+    padding: 12px 14px;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px var(--border-color),
+        0 1px 4px rgba(0, 0, 0, 0.03), 0 4px 10px rgba(0, 0, 0, 0.07);
+
+    &:before {
+        right: -7px;
+        left: auto;
+        box-shadow: inset 0 0 0 1px var(--border-color);
+    }
+
+    &:after {
+        right: -2px;
+        left: auto;
+        border-width: 0 1px 1px 0;
+        border-color: var(--border-color);
+    }
+
+    @media (hover: hover) {
+        &:hover {
+            background-color: #e8ebeb;
+            --border-color: rgba(0, 0, 0, 0.5);
+        }
+    }
+`;
+
+const MessageBubbleText = styled(TextElement)`
+    font-size: 16px;
+    color: #000;
+    line-height: 1.2em;
+    padding-right: 14px;
+`;
+
+const MessagePrompt = ({isVisible}: {isVisible?: boolean}) => {
+    const {language, translate} = useLanguage();
+    const localizations = useMemo(() => translate(translations), [translate]);
+
+    return (
+        <MessageBubbleContainer aria-hidden tabIndex={-1} isVisible={isVisible}>
+            <label htmlFor='chatbot-frida-knapp'>
+                <MessageBubble isThinking>
+                    <MessageBubbleText tag='div' lang={language}>
+                        {localizations.hi_what_can_i_help_you_with}
+                    </MessageBubbleText>
+                </MessageBubble>
+            </label>
+        </MessageBubbleContainer>
+    );
+};
+
+function setMessagePromptCache(wasDisplayed: boolean) {
+    if (window.localStorage) {
+        window.localStorage.setItem(
+            messagePromptCacheName,
+            JSON.stringify(wasDisplayed)
+        );
+    }
+}
+
+function getMessagePromptCache(): boolean | undefined {
+    if (window.localStorage) {
+        const data = window.localStorage.getItem(messagePromptCacheName);
+
+        if (data) {
+            try {
+                return JSON.parse(data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+
+    return undefined;
+}
 
 interface OpenButtonProperties {
     isOpen: boolean;
@@ -187,40 +323,83 @@ const OpenButton = ({
         status === 'connected'
             ? localizations.open_chat
             : localizations.chat_with_us;
+    const isVisible = Boolean(!isOpen && !isOpening);
+    const [isMessagePromptVisible, setIsMessagePromptVisible] = useState(false);
+    const [internalUnreadCount, setInternalUnreadCount] = useState(unreadCount);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const wasDisplayed = getMessagePromptCache();
+
+            if (isVisible) {
+                if (!wasDisplayed) {
+                    let timeout = setTimeout(() => {
+                        setMessagePromptCache(true);
+                        setIsMessagePromptVisible(isVisible);
+
+                        timeout = setTimeout(() => {
+                            setInternalUnreadCount((previousState) =>
+                                previousState === 0 ? 1 : previousState
+                            );
+                        }, 200);
+                    }, 5000);
+
+                    return () => {
+                        clearTimeout(timeout);
+                    };
+                }
+            } else {
+                setIsMessagePromptVisible(isVisible);
+            }
+        }
+
+        return undefined;
+    }, [isVisible]);
+
+    useEffect(() => {
+        setInternalUnreadCount(unreadCount);
+    }, [unreadCount]);
 
     return (
-        <ButtonElement
-            id='chatbot-frida-knapp' // Required for external onclick
-            type='button'
-            lang={language}
-            isVisible={!isOpen && !isOpening}
-            aria-hidden={isOpen}
-            tabIndex={isOpen ? -1 : 0}
-            {...{onClick}}
-        >
-            <TextElement>
-                {label}
-                <AriaLabelElement>.</AriaLabelElement>
-            </TextElement>
+        <>
+            <ButtonElement
+                id='chatbot-frida-knapp' // Required for external onclick
+                type='button'
+                lang={language}
+                isVisible={isVisible}
+                aria-hidden={isOpen}
+                tabIndex={isOpen ? -1 : 0}
+                {...{onClick}}
+            >
+                <TextElement>
+                    {label}
+                    <AriaLabelElement>.</AriaLabelElement>
+                </TextElement>
 
-            <AvatarElement
-                dangerouslySetInnerHTML={{
-                    __html: fridaIcon
-                }}
-            />
+                <AvatarElement
+                    dangerouslySetInnerHTML={{
+                        __html: fridaIcon
+                    }}
+                />
 
-            <UnreadCountElement>
-                {unreadCount > 0 && `${unreadCount > 9 ? '9' : unreadCount}`}
-            </UnreadCountElement>
+                <UnreadCountElement>
+                    {internalUnreadCount > 0 &&
+                        `${
+                            internalUnreadCount > 9 ? '9' : internalUnreadCount
+                        }`}
+                </UnreadCountElement>
 
-            {unreadCount > 0 && (
-                <AriaLabelElement>
-                    {unreadCount === 1
-                        ? localizations._unread_message
-                        : localizations._unread_messages}
-                </AriaLabelElement>
-            )}
-        </ButtonElement>
+                {internalUnreadCount > 0 && (
+                    <AriaLabelElement>
+                        {internalUnreadCount === 1
+                            ? localizations._unread_message
+                            : localizations._unread_messages}
+                    </AriaLabelElement>
+                )}
+            </ButtonElement>
+
+            <MessagePrompt isVisible={isMessagePromptVisible} />
+        </>
     );
 };
 

@@ -21,7 +21,7 @@ type Localizations = Record<string, string>;
 function getLocalizations(languageKey: string, translations: Translations) {
     const localizations: Localizations = {};
 
-    Object.entries(translations).forEach(([key, translation]) => {
+    for (const [key, translation] of Object.entries(translations)) {
         if (translation[languageKey]) {
             localizations[key] = translation[languageKey];
         } else {
@@ -31,7 +31,7 @@ function getLocalizations(languageKey: string, translations: Translations) {
                 new Error(`Missing "${languageKey}" translation: ${key}`)
             );
         }
-    });
+    }
 
     return localizations;
 }
@@ -71,10 +71,10 @@ const LanguageProvider = (properties: Record<string, unknown>) => {
         }
     }, [language]);
 
-    const value = useMemo(() => ({language, translate, setLanguage}), [
-        language,
-        translate
-    ]);
+    const value = useMemo(
+        () => ({language, translate, setLanguage}),
+        [language, translate]
+    );
 
     return <LanguageContext.Provider {...properties} value={value} />;
 };

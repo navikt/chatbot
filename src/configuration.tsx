@@ -16,6 +16,7 @@ const consentCookieName = 'nav-chatbot:consent';
 const unreadCookieName = 'nav-chatbot:unread';
 const cacheSessionName = 'nav-chatbot:cache';
 const actionFilterCacheSessionName = 'nav-chatbot:cache-action_filters';
+const messagePromptCacheName = 'nav-chatbot:displayed-message-prompt';
 const containerWidthNumber = 480;
 const containerWidth = `${containerWidthNumber}px`;
 const containerHeightNumber = 740;
@@ -25,7 +26,7 @@ const botResponseRevealDelay = 1250;
 const botResponseRevealDelayBuffer = botResponseRevealDelay / 2;
 const minimumPollTimeout = 1000;
 const agentMaximumPollTimeout = 4000;
-const botMaximumPollTimeout = 30000;
+const botMaximumPollTimeout = 30_000;
 const authenticationMessagePrefix = 'Init:Auth:';
 const contextFilters = ['privatperson', 'arbeidsgiver'];
 const englishButtonText = 'For English, click here';
@@ -49,6 +50,7 @@ export {
     unreadCookieName,
     cacheSessionName,
     actionFilterCacheSessionName,
+    messagePromptCacheName,
     containerWidthNumber,
     containerWidth,
     containerHeightNumber,

@@ -192,12 +192,23 @@ async function postBoostSession(
 ): Promise<BoostPostRequestResponse> {
     const requestOptions: BoostPostRequestOptions = {type: options.type};
 
-    if (options.type === 'text') {
-        requestOptions.value = options.message;
-    } else if (options.type === 'action_link') {
-        requestOptions.id = options.id;
-    } else if (options.type === 'external_link') {
-        requestOptions.id = options.id;
+    switch (options.type) {
+        case 'text': {
+            requestOptions.value = options.message;
+            break;
+        }
+
+        case 'action_link': {
+            requestOptions.id = options.id;
+            break;
+        }
+
+        case 'external_link': {
+            requestOptions.id = options.id;
+            break;
+        }
+
+        // no default
     }
 
     const response = await axios.post(apiUrlBase, {
@@ -503,9 +514,8 @@ const SessionProvider = (properties: SessionProperties) => {
             const [mostRecentResponse] = responses.slice(-1);
 
             if (mostRecentResponse?.language) {
-                const [updatedLanguage] = mostRecentResponse.language.split(
-                    '-'
-                );
+                const [updatedLanguage] =
+                    mostRecentResponse.language.split('-');
 
                 setLanguage!(updatedLanguage);
             }
@@ -514,13 +524,13 @@ const SessionProvider = (properties: SessionProperties) => {
                 if (previousQueue) {
                     const messages: string[] = [];
 
-                    responses.forEach((response) => {
-                        response.elements.forEach((element) => {
+                    for (const response of responses) {
+                        for (const element of response.elements) {
                             if (element.type === 'text') {
                                 messages.push(element.payload.text);
                             }
-                        });
-                    });
+                        }
+                    }
 
                     const updatedElements = previousQueue.elements.filter(
                         (element) =>
@@ -551,14 +561,15 @@ const SessionProvider = (properties: SessionProperties) => {
                         previousResponses.map((index) => String(index.id))
                     );
 
-                    responses.forEach((response) => {
+                    for (const response of responses) {
                         const stringedResponseId = String(response.id);
 
                         if (currentResponseIds.has(stringedResponseId)) {
-                            const currentResponseIndex = previousResponses.findIndex(
-                                (index) =>
-                                    String(index.id) === stringedResponseId
-                            );
+                            const currentResponseIndex =
+                                previousResponses.findIndex(
+                                    (index) =>
+                                        String(index.id) === stringedResponseId
+                                );
 
                             if (currentResponseIndex >= 0) {
                                 Object.assign(
@@ -567,13 +578,13 @@ const SessionProvider = (properties: SessionProperties) => {
                                 );
                             }
                         }
-                    });
+                    }
 
-                    responses.forEach((response) => {
+                    for (const response of responses) {
                         if (!currentResponseIds.has(String(response.id))) {
                             previousResponses.push(response);
                         }
-                    });
+                    }
 
                     previousResponses.sort(
                         (a, b) =>

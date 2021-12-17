@@ -25,28 +25,20 @@ const translations = {
         no: 'Behandling av personopplysninger'
     },
     consent_text_1: {
-        en:
-            'Before we can start chatting, please read about our processing of personal data.',
-        no:
-            'Før vi kan chatte ber vi deg lese om vår behandling av personopplysninger.'
+        en: 'Before we can start chatting, please read about our processing of personal data.',
+        no: 'Før vi kan chatte ber vi deg lese om vår behandling av personopplysninger.'
     },
     consent_text_2: {
-        en:
-            'The conversation is saved to improve our chat robot. This is an anonymous chat where you can ask general questions about NAV’s services.',
-        no:
-            'Dialogen lagres for å lære chat-roboten å bli bedre. Dette er en anonym chat hvor du kan få svar på generelle spørsmål om NAV sine ytelser og tjenester.'
+        en: 'The conversation is saved to improve our chat robot. This is an anonymous chat where you can ask general questions about NAV’s services.',
+        no: 'Dialogen lagres for å lære chat-roboten å bli bedre. Dette er en anonym chat hvor du kan få svar på generelle spørsmål om NAV sine ytelser og tjenester.'
     },
     consent_text_3: {
-        en:
-            'For your safety, please do not write sensitive information such as name, social security number, or case numbers.',
-        no:
-            'Av hensyn til din sikkerhet ber vi deg om å ikke skrive sensitive opplysninger, som for eksempel navn, fødselsnummer eller saksnummer.'
+        en: 'For your safety, please do not write sensitive information such as name, social security number, or case numbers.',
+        no: 'Av hensyn til din sikkerhet ber vi deg om å ikke skrive sensitive opplysninger, som for eksempel navn, fødselsnummer eller saksnummer.'
     },
     consent_text_4: {
-        en:
-            'Read more about <a href="https://www.nav.no/en/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">how we process personal data</a>.',
-        no:
-            'Les mer om <a href="https://www.nav.no/no/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">hvordan NAV behandler personopplysninger</a>.'
+        en: 'Read more about <a href="https://www.nav.no/en/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">how we process personal data</a>.',
+        no: 'Les mer om <a href="https://www.nav.no/no/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">hvordan NAV behandler personopplysninger</a>.'
     },
     consent_text_5: {
         en: 'Have you read and understood this?',
@@ -65,10 +57,8 @@ const translations = {
         no: 'Chat avbrutt'
     },
     find_other_ways_to_contact_us: {
-        en:
-            'Find <a href="https://www.nav.no/person/kontakt-oss/en" data-minimize="true">other ways to contact us</a>.',
-        no:
-            'Se <a href="https://www.nav.no/person/kontakt-oss" data-minimize="true">andre måter å kontakte oss på</a>.'
+        en: 'Find <a href="https://www.nav.no/person/kontakt-oss/en" data-minimize="true">other ways to contact us</a>.',
+        no: 'Se <a href="https://www.nav.no/person/kontakt-oss" data-minimize="true">andre måter å kontakte oss på</a>.'
     },
     close: {
         en: 'Close',
@@ -178,8 +168,7 @@ const ConsentModal = ({
                             <span
                                 // eslint-disable-next-line react/no-danger
                                 dangerouslySetInnerHTML={{
-                                    __html:
-                                        localizations.find_other_ways_to_contact_us
+                                    __html: localizations.find_other_ways_to_contact_us
                                 }}
                             />
                         </TextElement>

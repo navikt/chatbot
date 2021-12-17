@@ -291,12 +291,23 @@ const EvaluationModal = ({
         if (rating) {
             let ratingValue = 0;
 
-            if (rating === translations.yes.no) {
-                ratingValue = 1;
-            } else if (rating === translations.partly.no) {
-                ratingValue = 1;
-            } else if (rating === translations.no.no) {
-                ratingValue = 0;
+            switch (rating) {
+                case translations.yes.no: {
+                    ratingValue = 1;
+                    break;
+                }
+
+                case translations.partly.no: {
+                    ratingValue = 1;
+                    break;
+                }
+
+                case translations.no.no: {
+                    ratingValue = 0;
+                    break;
+                }
+
+                // no default
             }
 
             void sendFeedback!(ratingValue);
