@@ -228,6 +228,7 @@ const MessageBubble = styled(MessageBubbleLeft)`
 
     border-radius: 20px;
     text-align: left;
+    line-height: 1em;
     padding: 12px 14px;
     cursor: pointer;
     box-shadow: inset 0 0 0 1px var(--border-color),
