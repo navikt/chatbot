@@ -226,12 +226,13 @@ const MessageBubbleContainer = styled.div`
 const MessageBubble = styled(MessageBubbleLeft)`
     --border-color: rgba(0, 0, 0, 0.3);
 
-    border-radius: 18px;
+    border-radius: 20px;
     text-align: left;
     padding: 12px 14px;
     cursor: pointer;
     box-shadow: inset 0 0 0 1px var(--border-color),
-        0 1px 4px rgba(0, 0, 0, 0.03), 0 4px 10px rgba(0, 0, 0, 0.07);
+        0 1px 4px rgba(0, 0, 0, 0.03), 0 4px 10px rgba(0, 0, 0, 0.07),
+        0 0 0 3px #fff;
 
     &:before {
         right: -7px;
