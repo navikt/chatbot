@@ -2,6 +2,7 @@ import React, {useRef, useState, useMemo, useEffect, useCallback} from 'react';
 import styled, {css} from 'styled-components';
 import cookies from 'js-cookie';
 import useLanguage, {LanguageProvider} from './contexts/language';
+import "@navikt/ds-css";
 
 import useSession, {
     SessionProperties,
