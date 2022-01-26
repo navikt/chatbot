@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import styled from 'styled-components';
 import {Textarea} from 'nav-frontend-skjema';
 import {Knapp as Button} from 'nav-frontend-knapper';
@@ -73,7 +73,9 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
     const {translate} = useLanguage();
     const {id, conversation, responses, queue, sendPing} = useSession();
     const localizations = useMemo(() => translate(translations), [translate]);
-    const [message, setMessage] = useState<string>('');
+    const [message, setMessage] = useState<string>(
+        localStorage.getItem('chatbotMessage') || ''
+    );
     const conversationStatus = conversation?.state.chat_status;
     const messageMaxCharacters = conversation?.state.max_input_chars ?? 110;
 
@@ -102,6 +104,10 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
         },
         [handleSubmit]
     );
+
+    useEffect(() => {
+        localStorage.setItem('chatbotMessage', message);
+    }, [message]);
 
     useDebouncedEffect(
         2000,
