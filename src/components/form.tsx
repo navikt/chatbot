@@ -74,7 +74,7 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
     const {id, conversation, responses, queue, sendPing} = useSession();
     const localizations = useMemo(() => translate(translations), [translate]);
     const [message, setMessage] = useState<string>(
-        localStorage.getItem('chatbotMessage') || ''
+        sessionStorage.getItem('chatbotMessage') || ''
     );
     const conversationStatus = conversation?.state.chat_status;
     const messageMaxCharacters = conversation?.state.max_input_chars ?? 110;
@@ -106,7 +106,7 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
     );
 
     useEffect(() => {
-        localStorage.setItem('chatbotMessage', message);
+        sessionStorage.setItem('chatbotMessage', message);
     }, [message]);
 
     useDebouncedEffect(
