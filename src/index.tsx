@@ -238,7 +238,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         }
     }, []);
 
-    const handleMount = useCallback((node) => {
+    const handleMount = useCallback((node: HTMLDivElement) => {
         if (node) {
             setReference(node);
         }

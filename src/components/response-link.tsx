@@ -89,7 +89,7 @@ const ResponseLink = ({
     }, [link, isLoading, setIsLoading, onAction]);
 
     const handleKeyPress = useCallback(
-        (event) => {
+        (event: React.KeyboardEvent<HTMLDivElement>) => {
             if (event.key.toLowerCase() === 'enter') {
                 void handleAction();
             }
@@ -98,7 +98,7 @@ const ResponseLink = ({
     );
 
     const handleLinkClick = useCallback(
-        async (event) => {
+        async (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
             if (onLink) {
                 event.preventDefault();
                 event.stopPropagation();
