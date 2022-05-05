@@ -2,7 +2,7 @@ import React, {useRef, useState, useMemo, useEffect, useCallback} from 'react';
 import styled, {css} from 'styled-components';
 import cookies from 'js-cookie';
 import useLanguage, {LanguageProvider} from './contexts/language';
-import "@navikt/ds-css";
+import '@navikt/ds-css';
 
 import useSession, {
     SessionProperties,
@@ -183,6 +183,8 @@ interface ChatProperties {
     analyticsCallback?: () => void;
 }
 
+type AnalyticsType = undefined | ((name: string, data: any) => void);
+
 const Chat = ({analyticsCallback}: ChatProperties) => {
     const {translate, language} = useLanguage();
     const {
@@ -223,6 +225,8 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
     const [unreadCount, setUnreadCount] = useState<number>(
         () => Number.parseInt(String(cookies.get(unreadCookieName)), 10) || 0
     );
+
+    const basicAnalytics: AnalyticsType = analyticsCallback;
 
     const scrollToBottom = useCallback((options?: ScrollIntoViewOptions) => {
         if (anchor.current) {
@@ -279,6 +283,10 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         setUnreadCount(0);
         scrollToBottom({behavior: 'auto'});
 
+        if (basicAnalytics) {
+            basicAnalytics('chat-åpen', {komponent: 'chatbot'});
+        }
+
         if (reference) {
             reference.focus();
         }
@@ -303,6 +311,9 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
         setIsOpen(false);
         setIsFullscreen(false);
         setUnreadCount(0);
+        // if (basicAnalytics) {
+        //     basicAnalytics('chat-lukket', {komponent: 'chatbot'});
+        // }
     }, [setIsClosing]);
 
     const handleConditionalFullscreenClose = useCallback(async () => {
@@ -370,6 +381,10 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
             void finish!();
             setIsFinishing(false);
             setIsEvaluating(false);
+
+            if (basicAnalytics) {
+                basicAnalytics('chat-avsluttet', {komponent: 'chatbot'});
+            }
         } else if (isFinishing) {
             setIsEvaluating(true);
         } else {
