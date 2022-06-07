@@ -54,8 +54,8 @@ const translations = {
         no: 'melding'
     },
     ask_your_question: {
-        en: 'Ask your question',
-        no: 'Still ditt spørsmål'
+        en: 'Please ask your question here. Do not write any personal information.',
+        no: 'Still spørsmålet ditt her. Ikke skriv navn eller fødselsnummer.'
     },
     restart: {
         en: 'Restart',

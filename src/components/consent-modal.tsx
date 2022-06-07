@@ -25,23 +25,23 @@ const translations = {
         no: 'Behandling av personopplysninger'
     },
     consent_text_1: {
-        en: 'Before we can start chatting, please read about our processing of personal data.',
-        no: 'Før vi kan chatte ber vi deg lese om vår behandling av personopplysninger.'
+        en: 'Before you start the chat, please read <a href="https://www.nav.no/no/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">how we process your personal information.</a>',
+        no: 'Før du starter chatten ber vi deg lese <a href="https://www.nav.no/no/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">hvordan vi behandler personopplysningene dine.</a>'
     },
     consent_text_2: {
-        en: 'The conversation is saved to improve our chat robot. This is an anonymous chat where you can ask general questions about NAV’s services.',
-        no: 'Dialogen lagres for å lære chat-roboten å bli bedre. Dette er en anonym chat hvor du kan få svar på generelle spørsmål om NAV sine ytelser og tjenester.'
+        en: 'The chat will be stored and used in our work to make our chatbot better.',
+        no: 'Vi lagrer chatten, og bruker den i arbeidet med å gjøre chatbot Frida bedre.'
     },
     consent_text_3: {
-        en: 'For your safety, please do not write sensitive information such as name, social security number, or case numbers.',
-        no: 'Av hensyn til din sikkerhet ber vi deg om å ikke skrive sensitive opplysninger, som for eksempel navn, fødselsnummer eller saksnummer.'
+        en: 'To ensure your privacy it is important that you do not write personal information that may identify you or others. Personal information can for example be name, address, date of birth and case number. This also applies to you as an employer, doctor or therapist.',
+        no: 'For å sikre personvernet ditt er det viktig at du ikke skriver personopplysninger som gjør at vi kan identifisere deg, eller andre, i chatten. Personopplysninger kan være for eksempel navn, fødselsdato, adresse og saksnummer. Dette gjelder også deg som arbeidsgiver, lege eller behandler.'
     },
     consent_text_4: {
-        en: 'Read more about <a href="https://www.nav.no/en/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">how we process personal data</a>.',
-        no: 'Les mer om <a href="https://www.nav.no/no/nav-og-samfunn/om-nav/personvern-i-arbeids-og-velferdsetaten">hvordan NAV behandler personopplysninger</a>.'
+        en: 'You will first chat with our chatbot Frida, but you can choose to be transfered to a human advisor without logging in (weekdays 09:00-15:00).',
+        no: 'Du møter først chatbot Frida, men kan gå videre for å chatte med en veileder uten å logge inn (hverdager 09:00-15:00).'
     },
     consent_text_5: {
-        en: 'Have you read and understood this?',
+        en: 'Have you read and understood the information above?',
         no: 'Har du lest og forstått dette?'
     },
     cancel: {
@@ -106,7 +106,12 @@ const ConsentModal = ({
                         </TitleElement>
 
                         <TextElement>
-                            {localizations.consent_text_1}
+                            <span
+                                // eslint-disable-next-line react/no-danger
+                                dangerouslySetInnerHTML={{
+                                    __html: localizations.consent_text_1
+                                }}
+                            />
                         </TextElement>
                         <TextElement>
                             {localizations.consent_text_2}
@@ -115,12 +120,7 @@ const ConsentModal = ({
                             {localizations.consent_text_3}
                         </TextElement>
                         <TextElement>
-                            <span
-                                // eslint-disable-next-line react/no-danger
-                                dangerouslySetInnerHTML={{
-                                    __html: localizations.consent_text_4
-                                }}
-                            />
+                            {localizations.consent_text_4}
                         </TextElement>
                         <TextElement>
                             {localizations.consent_text_5}

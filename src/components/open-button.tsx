@@ -42,15 +42,15 @@ const ButtonElement = styled.button`
             ? css`transform 0.5s, opacity 0.2s 0.3s`
             : css`transform 0.2s, opacity 0.1s`};
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4),
-        0 0 0 5px var(--navds-global-color-purple-500), 0 1px 4px rgba(0, 0, 0, 0.5),
-        0 4px 10px #000, 0 0 0 6px rgba(0, 0, 0, 0.10);
+        0 0 0 5px var(--navds-global-color-purple-500),
+        0 1px 4px rgba(0, 0, 0, 0.5), 0 4px 10px #000,
+        0 0 0 6px rgba(0, 0, 0, 0.1);
 
     @media (hover: hover) {
         &:hover {
             background-color: var(--navds-global-color-purple-500);
             box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 0 5px #fff,
-                0 4px 10px #000,
-                0 0 0 6px rgba(0, 0, 0, 0.10);
+                0 4px 10px #000, 0 0 0 6px rgba(0, 0, 0, 0.1);
         }
     }
 
@@ -58,8 +58,7 @@ const ButtonElement = styled.button`
         background: var(--navds-global-color-purple-500);
         outline: none;
         box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 0 5px #fff,
-                0 4px 10px #000,
-                0 0 0 6px rgba(0, 0, 0, 0.10);
+            0 4px 10px #000, 0 0 0 6px rgba(0, 0, 0, 0.1);
     }
 
     @media (min-width: 480px) {
@@ -117,26 +116,26 @@ const AvatarElement = styled.div`
         position: absolute;
         top: 0;
         left: 0;
-        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), 0 0 0 6px var(--navds-global-color-purple-500),
-            0 0 0 5px #fff, 0 0 1px 5px rgba(0, 0, 0, 0.2),
-            0 4px 10px #000, 
-            10px 10px 10px rgba(0,0,0, 0.3);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+            0 0 0 6px var(--navds-global-color-purple-500), 0 0 0 5px #fff,
+            0 0 1px 5px rgba(0, 0, 0, 0.2), 0 4px 10px #000,
+            10px 10px 10px rgba(0, 0, 0, 0.3);
         border-radius: ${openButtonAvatarSize};
     }
 
     @media (hover: hover) {
         ${ButtonElement}:hover &:before {
-            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), 0 0 0 6px var(--navds-global-color-purple-500),
-                0 0 0 6px #fff,
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+                0 0 0 6px var(--navds-global-color-purple-500), 0 0 0 6px #fff,
                 0 0 1px 5px rgba(0, 0, 0, 0.2), 0 4px 10px #000,
-                10px 10px 10px rgba(0,0,0, 0.3);
+                10px 10px 10px rgba(0, 0, 0, 0.3);
         }
     }
 
     ${ButtonElement}:focus &:before {
-        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), 0 0 0 6px var(--navds-global-color-purple-500),
-            0 4px 10px #000,
-            0 0 0 4px #5c4378, 010px 10px 10px rgba(0,0,0, 0.3);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3),
+            0 0 0 6px var(--navds-global-color-purple-500), 0 4px 10px #000,
+            0 0 0 4px #5c4378, 010px 10px 10px rgba(0, 0, 0, 0.3);
     }
 
     @media (min-width: 480px) {
@@ -339,7 +338,7 @@ const OpenButton = ({
             const wasDisplayed = getMessagePromptCache();
 
             if (isVisible) {
-                if (!wasDisplayed) {
+                if (!wasDisplayed && !(window.innerWidth < 1280)) {
                     let timeout = setTimeout(() => {
                         setMessagePromptCache(true);
                         setIsMessagePromptVisible(isVisible);
@@ -351,7 +350,7 @@ const OpenButton = ({
                         }, 200);
                         timeout = setTimeout(() => {
                             setIsMessagePromptVisible(false);
-                        }, 5000);
+                        }, 2000);
                     }, 5000);
 
                     return () => {
