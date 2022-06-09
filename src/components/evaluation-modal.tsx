@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+import React, {useCallback, useState, useMemo} from 'react';
 import styled from 'styled-components';
 import {Knapp} from 'nav-frontend-knapper';
 
@@ -6,7 +6,8 @@ import {
     RadioGruppe,
     Radio,
     CheckboxGruppe,
-    Checkbox
+    Checkbox,
+    Textarea
 } from 'nav-frontend-skjema';
 
 import useLanguage from '../contexts/language';
@@ -18,6 +19,7 @@ import Modal, {
     TitleElement,
     TextElement
 } from './modal';
+import TextareaCounter from './textarea-counter';
 
 const FormElement = styled.form``;
 const ActionsElement = styled.div`
@@ -241,6 +243,7 @@ const EvaluationModal = ({
     const [satisfaction, setSatisfaction] = useState<string>();
     const [area, setArea] = useState<string>();
     const [reasons, setReasons] = useState<string[]>([]);
+    const [message, setMessage] = useState<string>('');
     const localizations = useMemo(() => translate(translations), [translate]);
 
     function handleRatingClick(event: React.MouseEvent) {
@@ -528,6 +531,23 @@ const EvaluationModal = ({
         />
     );
 
+    function handleMessageChange(
+        event: React.ChangeEvent<HTMLTextAreaElement>
+    ) {
+        setMessage(event.target.value);
+    }
+
+    const FeedbackTextarea = () => (
+        <Textarea
+            value={message}
+            label='Heisann'
+            tellerTekst={(count, maxCount) => (
+                <TextareaCounter {...{count, maxCount}} />
+            )}
+            onChange={handleMessageChange}
+        />
+    );
+
     return (
         <Modal
             {...properties}
@@ -580,6 +600,8 @@ const EvaluationModal = ({
                         )}
 
                         {onFeedback && <ReasonCheckboxGroup />}
+
+                        {<FeedbackTextarea />}
 
                         <ActionsElement>
                             <ActionsSpacerElement />

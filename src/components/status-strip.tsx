@@ -1,13 +1,17 @@
 import React, {useMemo} from 'react';
 import styled from 'styled-components';
-import AlertStripe from 'nav-frontend-alertstriper';
+import {Alert} from '@navikt/ds-react';
 import useLanguage from '../contexts/language';
 import useSession from '../contexts/session';
 import Spinner, {SpinnerElement} from './spinner';
 
-const Element = styled(AlertStripe)`
+const Element = styled(Alert)`
     backdrop-filter: blur(2px);
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+
+    .navds-alert__wrapper {
+        flex: 1;
+    }
 
     ${SpinnerElement} {
         svg circle {
@@ -64,18 +68,32 @@ const StatusStrip = () => {
     switch (status) {
         case 'connecting': {
             return (
-                <Element type='info'>
-                    <ContentsElement>
-                        <TextElement>{localizations.connecting}</TextElement>
-                        <Spinner />
-                    </ContentsElement>
-                </Element>
+                <div>
+                    <Element
+                        fullWidth={true}
+                        inline={false}
+                        size='medium'
+                        variant='info'
+                    >
+                        <ContentsElement>
+                            <TextElement>
+                                {localizations.connecting}
+                            </TextElement>
+                            <Spinner />
+                        </ContentsElement>
+                    </Element>
+                </div>
             );
         }
 
         case 'restarting': {
             return (
-                <Element type='advarsel'>
+                <Element
+                    fullWidth={true}
+                    inline={false}
+                    size='medium'
+                    variant='warning'
+                >
                     <ContentsElement>
                         <TextElement>{localizations.restarting}</TextElement>
                         <Spinner />
@@ -86,8 +104,15 @@ const StatusStrip = () => {
 
         case 'ended': {
             return (
-                <Element type='suksess'>
-                    {localizations.conversation_ended}
+                <Element
+                    fullWidth={true}
+                    inline={false}
+                    size='medium'
+                    variant='success'
+                >
+                    <ContentsElement>
+                        {localizations.conversation_ended}
+                    </ContentsElement>
                 </Element>
             );
         }
@@ -95,17 +120,40 @@ const StatusStrip = () => {
         case 'error': {
             if (error?.code === 'network_error') {
                 return (
-                    <Element type='feil'>{localizations.network_error}</Element>
+                    <Element
+                        fullWidth={true}
+                        inline={false}
+                        size='medium'
+                        variant='error'
+                    >
+                        <ContentsElement>
+                            {localizations.network_error}
+                        </ContentsElement>
+                    </Element>
                 );
             }
 
-            return <Element type='feil'>{localizations.error}</Element>;
+            return (
+                <Element
+                    fullWidth={true}
+                    inline={false}
+                    size='medium'
+                    variant='error'
+                >
+                    <ContentsElement>{localizations.error}</ContentsElement>
+                </Element>
+            );
         }
 
         default: {
             if (conversationStatus === 'in_human_chat_queue') {
                 return (
-                    <Element type='info'>
+                    <Element
+                        fullWidth={true}
+                        inline={false}
+                        size='medium'
+                        variant='info'
+                    >
                         <ContentsElement>
                             <TextElement>
                                 {localizations.waiting_for_human}

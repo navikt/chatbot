@@ -92,6 +92,7 @@ const ContextSelector = ({...properties}) => {
 
     const handleContextChange = useCallback(
         (event: React.ChangeEvent<HTMLSelectElement>) => {
+            console.log('per');
             const value = event.target.value;
             changeContext?.(value);
         },
@@ -105,7 +106,8 @@ const ContextSelector = ({...properties}) => {
 
     useEffect(() => {
         if (!currentContext) {
-            changeContext?.(contextFilters[0]);
+            console.log('pål');
+            // changeContext?.(contextFilters[0]);
         }
     }, [currentContext, changeContext]);
 

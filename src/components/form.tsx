@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import styled from 'styled-components';
 import {Textarea} from 'nav-frontend-skjema';
+import {Textarea as Texty} from '@navikt/ds-react';
 import {Knapp as Button} from 'nav-frontend-knapper';
 import useDebouncedEffect from '../hooks/use-debounced-effect';
 import useSession from '../contexts/session';
@@ -124,6 +125,17 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
     return (
         <FormElement aria-hidden={isObscured} onSubmit={handleSubmit}>
             <PaddingElement>
+                <Texty
+                    label='Test'
+                    placeholder={
+                        responsesLength <= 1
+                            ? localizations.ask_your_question
+                            : undefined
+                    }
+                    size='small'
+                    maxLength={110}
+                    hideLabel
+                ></Texty>
                 <Textarea
                     name='message'
                     value={message}

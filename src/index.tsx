@@ -258,6 +258,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
                     changeContext!('arbeidsgiver');
                     sentActionFilters.push('arbeidsgiver');
                 } else if (link?.text === personButtonText) {
+                    console.log('Feil');
                     changeContext!('privatperson');
                     sentActionFilters.push('privatperson');
                 }
