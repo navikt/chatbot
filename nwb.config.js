@@ -7,9 +7,6 @@ module.exports = {
             externals: {
                 react: 'React',
                 '@navikt/fnrvalidator': '@navikt/fnrvalidator',
-                'nav-frontend-alertstriper': 'nav-frontend-alertstriper',
-                'nav-frontend-alertstriper-style':
-                    'nav-frontend-alertstriper-style',
                 'nav-frontend-chevron-style': 'nav-frontend-chevron-style',
                 'nav-frontend-core': 'nav-frontend-core',
                 'nav-frontend-ikoner-assets': 'nav-frontend-ikoner-assets',
