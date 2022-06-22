@@ -258,7 +258,6 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
                     changeContext!('arbeidsgiver');
                     sentActionFilters.push('arbeidsgiver');
                 } else if (link?.text === personButtonText) {
-                    console.log('Feil');
                     changeContext!('privatperson');
                     sentActionFilters.push('privatperson');
                 }
@@ -273,6 +272,15 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
     const handleSubmit = useCallback(
         (message: string) => {
+            if (basicAnalytics) {
+                basicAnalytics('sender-melding', {
+                    komponent: 'chatbot',
+                    type:
+                        conversation?.state.chat_status === 'assigned_to_human'
+                            ? 'veileder'
+                            : 'frida'
+                });
+            }
             void sendMessage!(message);
         },
         [sendMessage]
@@ -541,6 +549,7 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
             {isConsideredOpen && (
                 <ContainerElement
+                    role='dialog'
                     lang={language}
                     {...{isFullscreen, isClosing, isOpening}}
                 >

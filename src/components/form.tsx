@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import styled from 'styled-components';
-import {Textarea} from 'nav-frontend-skjema';
-import {Textarea as Texty} from '@navikt/ds-react';
+import {Textarea} from '@navikt/ds-react';
 import {Knapp as Button} from 'nav-frontend-knapper';
 import useDebouncedEffect from '../hooks/use-debounced-effect';
 import useSession from '../contexts/session';
@@ -71,7 +70,7 @@ interface FormProperties {
 }
 
 const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
-    const {translate} = useLanguage();
+    const {translate, language} = useLanguage();
     const {id, conversation, responses, queue, sendPing} = useSession();
     const localizations = useMemo(() => translate(translations), [translate]);
     const [message, setMessage] = useState<string>(
@@ -125,33 +124,26 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
     return (
         <FormElement aria-hidden={isObscured} onSubmit={handleSubmit}>
             <PaddingElement>
-                <Texty
-                    label='Test'
+                <Textarea
+                    label={localizations.ask_your_question}
                     placeholder={
                         responsesLength <= 1
                             ? localizations.ask_your_question
                             : undefined
                     }
                     size='small'
-                    maxLength={110}
-                    hideLabel
-                ></Texty>
-                <Textarea
-                    name='message'
                     value={message}
-                    placeholder={
-                        responsesLength <= 1
-                            ? localizations.ask_your_question
-                            : undefined
-                    }
                     maxLength={messageMaxCharacters}
                     tabIndex={isObscured ? -1 : undefined}
-                    tellerTekst={(count, maxCount) => (
-                        <TextareaCounter {...{count, maxCount}} />
-                    )}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
-                />
+                    hideLabel
+                    error={
+                        message.length <= messageMaxCharacters
+                            ? ''
+                            : 'Du har brukt for mange tegn'
+                    }
+                ></Textarea>
 
                 <ActionsElement>
                     <Button

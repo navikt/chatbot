@@ -204,7 +204,6 @@ const Contents = ({html, lang}: ContentsProperties) => {
 
     return (
         <ContentsElement
-            role='text'
             {...{lang}}
             dangerouslySetInnerHTML={{__html: output}}
         />

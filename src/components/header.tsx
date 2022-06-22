@@ -92,7 +92,6 @@ const ContextSelector = ({...properties}) => {
 
     const handleContextChange = useCallback(
         (event: React.ChangeEvent<HTMLSelectElement>) => {
-            console.log('per');
             const value = event.target.value;
             changeContext?.(value);
         },

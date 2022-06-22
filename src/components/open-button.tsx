@@ -267,7 +267,13 @@ const MessageBubbleText = styled(TextElement)`
     padding-right: 14px;
 `;
 
-const MessagePrompt = ({isVisible}: {isVisible?: boolean}) => {
+const MessagePrompt = ({
+    isVisible,
+    label
+}: {
+    isVisible?: boolean;
+    label?: string;
+}) => {
     const {language, translate} = useLanguage();
     const localizations = useMemo(() => translate(translations), [translate]);
 
@@ -276,7 +282,7 @@ const MessagePrompt = ({isVisible}: {isVisible?: boolean}) => {
             <label htmlFor='chatbot-frida-knapp'>
                 <MessageBubble isThinking>
                     <MessageBubbleText tag='div' lang={language}>
-                        {localizations.hi_what_can_i_help_you_with}
+                        {label}
                     </MessageBubbleText>
                 </MessageBubble>
             </label>
@@ -407,7 +413,7 @@ const OpenButton = ({
                 )}
             </ButtonElement>
 
-            <MessagePrompt isVisible={isMessagePromptVisible} />
+            <MessagePrompt isVisible={isMessagePromptVisible} label={label} />
         </>
     );
 };
