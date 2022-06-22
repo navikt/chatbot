@@ -272,6 +272,15 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
     const handleSubmit = useCallback(
         (message: string) => {
+            if (basicAnalytics) {
+                basicAnalytics('sender-melding', {
+                    komponent: 'chatbot',
+                    type:
+                        conversation?.state.chat_status === 'assigned_to_human'
+                            ? 'veileder'
+                            : 'frida'
+                });
+            }
             void sendMessage!(message);
         },
         [sendMessage]
