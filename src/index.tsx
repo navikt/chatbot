@@ -46,6 +46,7 @@ interface ContainerElement {
 
 const ContainerElement = styled.div`
     background-color: #fff;
+    color: #000;
     width: ${containerWidth};
     height: ${containerHeight};
     height: min(${containerHeight}, calc(100% - 20px - 20px));
