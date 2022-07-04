@@ -247,6 +247,15 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
 
     const handleAction = useCallback(
         async (link: BoostResponseElementLinksItem) => {
+            if (basicAnalytics) {
+                basicAnalytics('sender-melding', {
+                    komponent: 'chatbot',
+                    type:
+                        conversation?.state.chat_status === 'assigned_to_human'
+                            ? 'veileder'
+                            : 'frida'
+                });
+            }
             if (link?.text === englishButtonText) {
                 void sendMessage!(englishButtonResponse);
             } else {
@@ -262,7 +271,6 @@ const Chat = ({analyticsCallback}: ChatProperties) => {
                     changeContext!('privatperson');
                     sentActionFilters.push('privatperson');
                 }
-
                 void sendAction!(link.id, {actionFilters: sentActionFilters});
             }
 
