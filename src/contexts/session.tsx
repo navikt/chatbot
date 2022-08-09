@@ -812,13 +812,10 @@ const SessionProvider = (properties: SessionProperties) => {
     );
 
     const changeContext = useCallback((newContext: ContextFilter) => {
-        console.log('Heisann');
         updateActionFilters((previousActionFilters: string[]) => {
             const updatedActionFilters = previousActionFilters.filter(
                 (filter) => !contextFilters.includes(filter)
             );
-            console.log(updatedActionFilters);
-            console.log(newContext);
 
             return updatedActionFilters.concat(newContext);
         });

@@ -215,6 +215,10 @@ const translations = {
     submit: {
         en: 'Submit',
         no: 'Send inn'
+    },
+    other_feedback: {
+        en: 'Other',
+        no: 'Annet'
     }
 };
 
@@ -325,7 +329,8 @@ const EvaluationModal = ({
                     svar: rating,
                     hyggelig: satisfaction,
                     omrade: area,
-                    omrade_spesifisering: reasons
+                    omrade_spesifisering: reasons,
+                    annet: message
                 }
             });
         }
@@ -537,17 +542,6 @@ const EvaluationModal = ({
         setMessage(event.target.value);
     }
 
-    const FeedbackTextarea = () => (
-        <Textarea
-            value={message}
-            label='Heisann'
-            tellerTekst={(count, maxCount) => (
-                <TextareaCounter {...{count, maxCount}} />
-            )}
-            onChange={handleMessageChange}
-        />
-    );
-
     return (
         <Modal
             {...properties}
@@ -601,7 +595,16 @@ const EvaluationModal = ({
 
                         {onFeedback && <ReasonCheckboxGroup />}
 
-                        {<FeedbackTextarea />}
+                        {onFeedback && (
+                            <Textarea
+                                value={message}
+                                label={localizations.other_feedback}
+                                tellerTekst={(count, maxCount) => (
+                                    <TextareaCounter {...{count, maxCount}} />
+                                )}
+                                onChange={handleMessageChange}
+                            />
+                        )}
 
                         <ActionsElement>
                             <ActionsSpacerElement />

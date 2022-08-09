@@ -60,6 +60,10 @@ const translations = {
     restart: {
         en: 'Restart',
         no: 'Start på nytt'
+    },
+    too_many_characters: {
+        en: 'You have used to many characters',
+        no: 'Du har brukt for mange tegn'
     }
 };
 
@@ -141,7 +145,7 @@ const Form = ({isObscured, onSubmit, onRestart}: FormProperties) => {
                     error={
                         message.length <= messageMaxCharacters
                             ? ''
-                            : 'Du har brukt for mange tegn'
+                            : localizations.too_many_characters
                     }
                 ></Textarea>
 

@@ -105,8 +105,7 @@ const ContextSelector = ({...properties}) => {
 
     useEffect(() => {
         if (!currentContext) {
-            console.log('pål');
-            // changeContext?.(contextFilters[0]);
+            changeContext?.(contextFilters[0]);
         }
     }, [currentContext, changeContext]);
 
