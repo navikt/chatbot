@@ -1,8 +1,7 @@
 import React, {useMemo} from 'react';
 import styled from 'styled-components';
-import {LenkepanelBase} from 'nav-frontend-lenkepanel';
-import {Ingress, Normaltekst, Undertekst} from 'nav-frontend-typografi';
-import {Select} from 'nav-frontend-skjema';
+import {LinkPanel} from '@navikt/ds-react';
+import {Detail} from '@navikt/ds-react';
 import idPortenIcon from '../assets/id-porten.svg';
 import useLanguage from '../contexts/language';
 import {BoostResponse, BoostResponseElement} from '../contexts/session';
@@ -44,7 +43,7 @@ const ContentsElement = styled.span`
     }
 `;
 
-const SubtextElement = styled(Undertekst)`
+const SubtextElement = styled(Detail)`
     text-align: right;
     color: #444;
 `;
@@ -55,7 +54,7 @@ const SpinnerElement = styled.span`
     top: 4px;
 `;
 
-const LinkPanelElement = styled(LenkepanelBase)`
+const LinkPanelElement = styled(LinkPanel)`
     margin-top: 15px;
     margin-bottom: 15px;
 
@@ -82,7 +81,7 @@ const LinkPanelTextElement = styled.div`
     flex: 1;
 `;
 
-const LinkPanelTextTitle = styled(Ingress)`
+const LinkPanelTextTitle = styled(LinkPanel.Title)`
     color: #3e3832;
 
     @media (hover: hover) {
@@ -93,8 +92,13 @@ const LinkPanelTextTitle = styled(Ingress)`
     }
 `;
 
-const LinkPanelTextBody = styled(Normaltekst)`
+const LinkPanelTextBody = styled(LinkPanel.Description)`
     color: #3e3832;
+`;
+
+const LinkPanelContent = styled.div`
+    display: flex;
+    align-items: center;
 `;
 
 const VideoMessageElement = styled(Message)`
@@ -253,11 +257,9 @@ const ResponseItem = ({
                     <AriaLabelElement lang={language}>
                         {`${localizations.you_say}:`}
                     </AriaLabelElement>
-
                     <Message alignment='right' lang={responseLanguage}>
                         {text}
                     </Message>
-
                     <SubtextElement lang={language}>
                         {localizations.sending}
 
@@ -329,29 +331,26 @@ const ResponseItem = ({
                 <LinkPanelElement
                     border
                     href={authenticationUrl}
-                    linkCreator={(properties) => (
-                        <a
-                            {...properties}
-                            data-internal
-                            target='_blank'
-                            tabIndex={isObscured ? -1 : 0}
-                        />
-                    )}
+                    data-internal
+                    target='_blank'
+                    tabIndex={isObscured ? -1 : 0}
                 >
-                    <LinkPanelIconElement
-                        dangerouslySetInnerHTML={{
-                            __html: idPortenIcon
-                        }}
-                    />
+                    <LinkPanelContent>
+                        <LinkPanelIconElement
+                            dangerouslySetInnerHTML={{
+                                __html: idPortenIcon
+                            }}
+                        />
 
-                    <LinkPanelTextElement>
-                        <LinkPanelTextTitle lang={responseLanguage}>
-                            {localizations.electronic_authentication}
-                        </LinkPanelTextTitle>
-                        <LinkPanelTextBody lang={responseLanguage}>
-                            {localizations.please_log_in}
-                        </LinkPanelTextBody>
-                    </LinkPanelTextElement>
+                        <LinkPanelTextElement>
+                            <LinkPanelTextTitle lang={responseLanguage}>
+                                {localizations.electronic_authentication}
+                            </LinkPanelTextTitle>
+                            <LinkPanelTextBody lang={responseLanguage}>
+                                {localizations.please_log_in}
+                            </LinkPanelTextBody>
+                        </LinkPanelTextElement>
+                    </LinkPanelContent>
                 </LinkPanelElement>
             );
         }

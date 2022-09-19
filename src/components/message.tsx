@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, {css} from 'styled-components';
-import {Normaltekst} from 'nav-frontend-typografi';
+import {BodyLong} from '@navikt/ds-react';
 
 const avatarSize = '36px';
 const conversationSideWidth = '90%';
@@ -121,7 +121,7 @@ const BubbleRightElement = styled(MessageBubble)`
     border-radius: 18px 18px 18px 18px;
 `;
 
-const TextElement = styled(Normaltekst)`
+const TextElement = styled(BodyLong)`
     white-space: pre-wrap;
 `;
 
