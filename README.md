@@ -1,3 +1,5 @@
+Arkivert ettersom vi nå benytter chat-klienten fra Boost.
+
 # Chatbot Frida
 
 ## Bruk
